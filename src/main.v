@@ -1,5 +1,8 @@
-enum Instructions {
+module main
+
+enum Instruction {
 	add
+	decr
 }
 
 enum ArithmeticTarget {
