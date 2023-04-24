@@ -1,5 +1,3 @@
-module main
-
 struct Registers {
 mut:	
 	a u8
@@ -47,3 +45,22 @@ fn (mut reg Registers) set_hl(value u16) {
 	reg.h = u8((value & 0xFF00) >> 8)
 	reg.l = u8(value & 0xFF)
 } 
+
+fn (mut reg Registers) overflowing_add (r string, value u8) (u8, bool){
+	mut target := 0
+	match r {
+		'a' {target = reg.a}
+		'b' {target = reg.b}
+		'c' {target = reg.c}
+		'd' {target = reg.d}
+		'e' {target = reg.e}
+		'f' {target = reg.f}
+		'h' {target = reg.h}
+		'l' {target = reg.l}
+		else {target = reg.a}
+	}
+	mut new_value := u16(target) + u16(value)
+	new_value = new_value >> 8
+	println(new_value)
+	return u8(target + value), false
+}

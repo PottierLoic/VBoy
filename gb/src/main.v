@@ -1,5 +1,3 @@
-module main
-
 enum Instruction {
 	add
 	decr

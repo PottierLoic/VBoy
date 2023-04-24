@@ -1,5 +1,3 @@
-module main
-
 const (
 	zero_flag_byte_position = 7
 	substract_flag_byte_position = 6
