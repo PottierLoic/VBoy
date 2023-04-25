@@ -14,11 +14,24 @@ struct Instruction_Target {
 }
 
 
-fn byte_to_instruction(value u8) Instruction_Target {
+fn instruction_from_byte(value u8, prefixed bool) Instruction_Target {
+	if prefixed {
+		return instruction_from_byte_prefixed(value)
+	} else {
+		return instruction_from_byte_not_prefixed(value)
+	}
+}
+
+fn instruction_from_byte_prefixed(value u8) Instruction_Target {
 	match value {
-		// all of thoses instructions are wrong and are only here for tests
-		0x02 { return Instruction_Target{Instruction.inc, ArithmeticTarget.b}}
-		0x13 { return Instruction_Target{Instruction.inc, ArithmeticTarget.d}}
-		else { return Instruction_Target{Instruction.add, ArithmeticTarget.b}}
+		0x00 { return Instruction_Target{Instruction.inc, ArithmeticTarget.b} }
+		else { return Instruction_Target{Instruction.inc, ArithmeticTarget.b} } // add all remaining instruct
+	}
+}
+
+fn instruction_from_byte_not_prefixed(value u8) Instruction_Target {
+	match value {
+		0x02 { return Instruction_Target{Instruction.inc, ArithmeticTarget.b} }
+		else { return Instruction_Target{Instruction.inc, ArithmeticTarget.b} } // add all remaining instruct
 	}
 }
