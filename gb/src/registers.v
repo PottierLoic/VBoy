@@ -61,6 +61,27 @@ fn (mut reg Registers) overflowing_add (r string, value u8) (u8, bool){
 	}
 	mut new_value := u16(target) + u16(value)
 	new_value = new_value >> 8
-	println(new_value)
-	return u8(target + value), false
+	return u8(target + value), new_value > 0
+}
+
+fn (reg Registers) print_binary () {
+	println("a : ${reg.a:b}")
+	println("b : ${reg.b:b}")
+	println("c : ${reg.c:b}")
+	println("d : ${reg.d:b}")
+	println("e : ${reg.e:b}")
+	println("f : ${reg.f:b}")
+	println("h : ${reg.h:b}")
+	println("l : ${reg.l:b}")
+}
+
+fn (reg Registers) print_decimal () {
+	println("a : ${reg.a}")
+	println("b : ${reg.b}")
+	println("c : ${reg.c}")
+	println("d : ${reg.d}")
+	println("e : ${reg.e}")
+	println("f : ${reg.f}")
+	println("h : ${reg.h}")
+	println("l : ${reg.l}")
 }

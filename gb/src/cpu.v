@@ -1,9 +1,13 @@
 struct Cpu {
 mut:
 	registers Registers
+	pc u16
+	bus MemoryBus
 }
 
-fn (mut cpu Cpu) execute(instruction Instruction, target ArithmeticTarget) {
+fn (mut cpu Cpu) execute(instr Instruction_Target) {
+	instruction := instr.instruction
+	target := instr.target
 	match instruction {
 		.add {
 			match target {
@@ -21,6 +25,10 @@ fn (mut cpu Cpu) execute(instruction Instruction, target ArithmeticTarget) {
 			println("not supported instruction")
 		}
 	}
+}
+
+fn (mut cpu Cpu) step() {
+	mut instruction_byte := cpu.bus.read_byte(cpu.pc)
 }
 
 fn (mut cpu Cpu) add(value u8) u8 {

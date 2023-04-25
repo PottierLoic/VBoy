@@ -1,15 +1,16 @@
-enum Instruction {
-	add
-	decr
-}
 
-enum ArithmeticTarget {
-	a b c d e h l
-}
 
 fn main() {
-	mut reg := Registers{b: 1}
-	println(reg.get_bc())
-	reg.set_bc(127)
-	println(reg.get_bc())
+
+	println("test cpu")
+	mut cpu := Cpu{}
+	cpu.registers.a = 250
+	cpu.registers.c = 12
+
+	cpu.registers.print_decimal()
+	println("calcul . . . ")
+
+	cpu.execute(Instruction_Target{.add, .c})
+	cpu.registers.print_decimal()
+	println(u8_to_flag(cpu.registers.f))
 }
