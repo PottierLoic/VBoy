@@ -1,6 +1,6 @@
 fn main() {
 
-  println("test cpu")
+  println("Starting VBoy")
   mut cpu := Cpu{}
   cpu.registers.a = 120
   cpu.registers.c = 136
