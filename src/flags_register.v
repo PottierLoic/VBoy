@@ -13,10 +13,10 @@ struct FlagsRegister {
 }
 
 fn flag_to_u8 (reg FlagsRegister) u8 {
-  return u8((if reg.zero == true { 1 } else { 0 }) << zero_flag_byte_position |
-        (if reg.subtract == true { 1 } else { 0 }) << substract_flag_byte_position |
-        (if reg.half_carry == true { 1 } else { 0 }) << half_carry_flag_byte_position |
-        (if reg.carry == true { 1 } else { 0 }) << carry_flag_byte_position)
+  return u8((if reg.zero == true { 1 } else { 0 }) * 2^zero_flag_byte_position |
+        (if reg.subtract == true { 1 } else { 0 }) * 2^substract_flag_byte_position |
+        (if reg.half_carry == true { 1 } else { 0 }) * 2^half_carry_flag_byte_position |
+        (if reg.carry == true { 1 } else { 0 }) * 2^carry_flag_byte_position)
 } 
 
 fn u8_to_flag (val u8) FlagsRegister {

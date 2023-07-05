@@ -3,8 +3,8 @@ enum ArithmeticTarget {
 }
 
 enum Instruction {
-	add(ArithmeticTarget)
-	decr(ArithmeticTarget)
+	add {ArithmeticTarget}
+	decr {ArithmeticTarget}
 }
 
 fn exec(instruction Instruction) {
