@@ -1,8 +1,8 @@
-# Roadmap  
+# Roadmap
 
-Implement the following cpu instructions that act on register data:  
+Implement the following cpu instructions that act on register data:
 
-- [ ] ADD (add to a) - add the value of the target to
+- [ ] ADD (add to a) - add the value of the target to the a register
 - [ ] ADDHL (add to HL) - just like ADD except that the target is added to the HL register
 - [ ] ADC (add with carry) - just like ADD except that the value of the carry flag is also added to the number
 - [ ] SUB (subtract) - subtract the value stored in a specific register with the value in the A register

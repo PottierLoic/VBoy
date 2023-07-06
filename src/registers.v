@@ -46,19 +46,8 @@ fn (mut reg Registers) set_hl(value u16) {
   reg.l = u8(value & 0xFF)
 }
 
-fn (mut reg Registers) overflowing_add (r string, value u8) (u8, bool){
-  mut target := 0
-  match r {
-    'a' {target = reg.a}
-    'b' {target = reg.b}
-    'c' {target = reg.c}
-    'd' {target = reg.d}
-    'e' {target = reg.e}
-    'f' {target = reg.f}
-    'h' {target = reg.h}
-    'l' {target = reg.l}
-    else {target = reg.a}
-  }
+/* Need a rework to use a pointer to the destination register (maybe) istead of a string that need a big match case bloc */
+fn (mut reg Registers) overflowing_add (target u8, value u8) (u8, bool){
   mut new_value := u16(target) + u16(value)
   new_value = new_value >> 8
   return u8(target + value), new_value > 0

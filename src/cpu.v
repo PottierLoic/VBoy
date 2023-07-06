@@ -1,5 +1,3 @@
-type Instruction = InstructionTarget | InstructionCondition
-
 struct Cpu {
 mut:
   registers Registers
@@ -9,14 +7,16 @@ mut:
 
 /* Execute the provided instruction and return next program counter. */
 fn (mut cpu Cpu) execute(instr Instruction) u16 {
-
   match instr {
     InstructionCondition {
       match instr.jump_instruction {
         .jp {
           should_jump := match instr.condition {
-            .not_zero { u8_to_flag(cpu.registers.f).zero }
-            else { panic("not supported jump condition: ${instr.condition}") }
+            .not_zero { !u8_to_flag(cpu.registers.f).zero }
+            .not_carry { !u8_to_flag(cpu.registers.f).carry }
+            .zero { u8_to_flag(cpu.registers.f).zero }
+            .carry { u8_to_flag (cpu.registers.f).carry }
+            .always { true }
           }
           cpu.jump(should_jump)
           return cpu.pc
@@ -41,6 +41,42 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
         else { println("not supported instruction") }
       }
       return cpu.pc
+    }
+    InstructionLoad {
+      match instr.mem_instruction {
+        .ld {
+          match instr.load_type {
+            .byte {
+              mut source_value := match instr.source {
+                .a { cpu.registers.a }
+                .b { cpu.registers.b }
+                .c { cpu.registers.c }
+                .d { cpu.registers.d }
+                .e { cpu.registers.e }
+                .h { cpu.registers.h }
+                .l { cpu.registers.l }
+                .d8 { cpu.bus.read_byte(cpu.pc + 1) }
+                .hli { cpu.bus.read_byte(cpu.registers.get_hl()) }
+              }
+              match instr.target {
+                .a { cpu.registers.a = source_value }
+                .b { cpu.registers.b = source_value }
+                .c { cpu.registers.c = source_value }
+                .d { cpu.registers.d = source_value }
+                .e { cpu.registers.e = source_value }
+                .h { cpu.registers.h = source_value }
+                .l { cpu.registers.l = source_value }
+                .hli { cpu.bus.write_byte(cpu.registers.get_hl(), source_value) }
+              }
+              match instr.source {
+                .d8 { cpu.pc += 2 }
+                else { cpu.pc++ }
+              }
+            }
+            else { panic("Unknown instruction") }
+          }
+        }
+      }
     }
   }
 }
@@ -76,7 +112,7 @@ fn (mut cpu Cpu) step() {
 
 /* Add the target value to register A and change flags. */
 fn (mut cpu Cpu) add(value u8) u8 {
-  new_value, did_overflow := cpu.registers.overflowing_add('a', value)
+  new_value, did_overflow := cpu.registers.overflowing_add(cpu.registers.a, value)
   flags := FlagsRegister{
     zero: new_value == 0
     subtract: false
