@@ -68,8 +68,14 @@ struct InstructionStack {
 	target StackTarget
 }
 
+/* Waiting instructions, they have no targets */
+enum WaitingInstruction {
+	nop
+	halt
+}
+
 /* An instruction can be a jump, an arithmetic instruction, or a memory reading/writing */
-type Instruction = InstructionTarget | InstructionCondition | InstructionLoad | InstructionStack
+type Instruction = InstructionTarget | InstructionCondition | InstructionLoad | InstructionStack | WaitingInstruction
 
 /* Choose the correct method to read the instruction */
 fn instruction_from_byte(value u8, prefixed bool) InstructionTarget {

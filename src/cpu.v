@@ -9,6 +9,16 @@ mut:
 /* Execute the provided instruction and return next program counter. */
 fn (mut cpu Cpu) execute(instr Instruction) u16 {
   match instr {
+    WaitingInstruction {
+      match instr {
+        .nop {
+          cpu.pc++
+        }
+        .halt {
+          // THIS IS A TEMPORARY MEASURE IT SHOULD AND WILL NOT STAY LIKE THIS
+        }
+      }
+    }
     InstructionCondition {
       should_jump := match instr.condition {
         .not_zero { !u8_to_flag(cpu.registers.f).zero }
