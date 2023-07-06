@@ -65,38 +65,37 @@ fn (mut reg Registers) overflowing_add (r string, value u8) (u8, bool){
 }
 
 fn (reg Registers) print () {
-  flag := u8_to_flag(cpu.registers.f)
+  flag := u8_to_flag(reg.f)
   println("----------------------")
-  print("| a | ") print_u8_b2(reg.a) print(" | ") print_full_b10(reg.a) println(" |")
-  print("| b | ") print_u8_b2(reg.b) print(" | ") print_full_b10(reg.b) println(" |")
-  print("| c | ") print_u8_b2(reg.c) print(" | ") print_full_b10(reg.c) println(" |")
-  print("| d | ") print_u8_b2(reg.d) print(" | ") print_full_b10(reg.d) println(" |")
-  print("| e | ") print_u8_b2(reg.e) print(" | ") print_full_b10(reg.e) println(" |")
-  print("| f | ") print_u8_b2(reg.f) print(" | ") print_full_b10(reg.f) println(" |")
-  print("| h | ") print_u8_b2(reg.h) print(" | ") print_full_b10(reg.h) println(" |")
-  print("| l | ") print_u8_b2(reg.l) print(" | ") print_full_b10(reg.l) println(" |")
+  print("| a | ") print_full_b2(reg.a) print(" | ") print_full_b10(reg.a) println(" |")
+  print("| b | ") print_full_b2(reg.b) print(" | ") print_full_b10(reg.b) println(" |")
+  print("| c | ") print_full_b2(reg.c) print(" | ") print_full_b10(reg.c) println(" |")
+  print("| d | ") print_full_b2(reg.d) print(" | ") print_full_b10(reg.d) println(" |")
+  print("| e | ") print_full_b2(reg.e) print(" | ") print_full_b10(reg.e) println(" |")
+  print("| f | ") print_full_b2(reg.f) print(" | ") print_full_b10(reg.f) println(" |")
+  print("| h | ") print_full_b2(reg.h) print(" | ") print_full_b10(reg.h) println(" |")
+  print("| l | ") print_full_b2(reg.l) print(" | ") print_full_b10(reg.l) println(" |")
   println("----------------------")
-  print("| zero |    ${flag.zero}   ") if flag.zero { print(" ")} println("|")
-  print("| subtract |    ${flag.subtract}   ") if flag.subtract { print(" ")} println("|")
-  print("| subtract |    ${flag.subtract}   ") if flag.subtract { print(" ")} println("|")
-  print("| subtract |    ${flag.subtract}   ") if flag.subtract { print(" ")} println("|")
+  print("| zero       | ${flag.zero} ") if flag.zero { print(" ")} println("|")
+  print("| subtract   | ${flag.subtract} ") if flag.subtract { print(" ")} println("|")
+  print("| half-carry | ${flag.half_carry} ") if flag.half_carry { print(" ")} println("|")
+  print("| carry      | ${flag.carry} ") if flag.carry { print(" ")} println("|")
+  println("----------------------")
 }
 
 fn print_full_b2 (nb u8) {
-	for i in 0..8 {
-		print(nb >> i & 1)
+	for i in 0 .. 8 {
+		print(nb >> (7 - i) & 1)
 	}
 }
 
 fn print_full_b10 (nb u8) {
   mut tmp := nb
-	for i in 0..3 {
-    digit := tmp % 10
+  mut digits := 0
+  for tmp != 0 {
     tmp /= 10
-    if tmp == 0 && digit == 0 && i != 0 {
-      print("0")
-    } else {
-      print(digit)
-    }
-	}
+    digits++
+  }
+  for _ in 0 .. 3 - digits - int(nb == 0) { print("0") }
+  print(nb)
 }

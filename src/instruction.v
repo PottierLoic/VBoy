@@ -25,13 +25,13 @@ fn instruction_from_byte(value u8, prefixed bool) Instruction_Target {
 fn instruction_from_byte_prefixed(value u8) Instruction_Target {
 	match value {
 		0x00 { return Instruction_Target{Instruction.inc, ArithmeticTarget.b} }
-		else { return Instruction_Target{Instruction.inc, ArithmeticTarget.b} } // add all remaining instruct
+		else { panic("Instruction not found: ${value}") } // add all remaining instruct
 	}
 }
 
 fn instruction_from_byte_not_prefixed(value u8) Instruction_Target {
 	match value {
 		0x02 { return Instruction_Target{Instruction.inc, ArithmeticTarget.b} }
-		else { return Instruction_Target{Instruction.inc, ArithmeticTarget.b} } // add all remaining instruct
+		else { panic("Instruction not found: ${value}") } // add all remaining instruct
 	}
 }

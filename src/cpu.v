@@ -16,7 +16,7 @@ fn (mut cpu Cpu) execute(instr Instruction_Target) u16 {
           mut value := cpu.registers.c
           mut new_value := cpu.add(value)
           cpu.registers.a = new_value
-          cpu.pc += 1
+          cpu.pc++
         }
         /* TODO: Support all remaining targets. */
         else { println("not supported target") }
@@ -28,6 +28,16 @@ fn (mut cpu Cpu) execute(instr Instruction_Target) u16 {
   return cpu.pc
 }
 
+fn (mut cpu Cpu) jump (should_jump bool) {
+  if should_jump {
+    mut least_significant_byte := u16(cpu.bus.read_byte(cpu.pc + 1))
+    mut most_significant_byte := u16(cpu.bus.read_byte(cpu.pc + 2))
+    cpu.pc = most_significant_byte << 8 | least_significant_byte
+  } else {
+    cpu.pc += 3
+  }
+}
+
 /* Extract the next instruction and execute it. */
 fn (mut cpu Cpu) step() {
   mut instruction_byte := cpu.bus.read_byte(cpu.pc)
@@ -36,7 +46,7 @@ fn (mut cpu Cpu) step() {
     instruction_byte = cpu.bus.read_byte(cpu.pc + 1)
   }
   instruction := instruction_from_byte(instruction_byte, prefixed)
-  next_pc := if instruction == instruction_from_byte(instruction_byte, prefixed) { 
+  next_pc := if instruction == instruction_from_byte(instruction_byte, prefixed) {
     cpu.execute(instruction)
   } else {
     x := if prefixed { "cb" } else { "" }
