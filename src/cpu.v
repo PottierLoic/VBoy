@@ -1,3 +1,5 @@
+type Instruction = InstructionTarget | InstructionCondition
+
 struct Cpu {
 mut:
   registers Registers
@@ -5,29 +7,45 @@ mut:
   bus MemoryBus
 }
 
-/* Execute the provided instruction and resturn next program counter. */
-fn (mut cpu Cpu) execute(instr Instruction_Target) u16 {
-  instruction := instr.instruction
-  target := instr.target
-  match instruction {
-    .add {
-      match target {
-        .c {
-          mut value := cpu.registers.c
-          mut new_value := cpu.add(value)
-          cpu.registers.a = new_value
-          cpu.pc++
+/* Execute the provided instruction and return next program counter. */
+fn (mut cpu Cpu) execute(instr Instruction) u16 {
+
+  match instr {
+    InstructionCondition {
+      match instr.jump_instruction {
+        .jp {
+          should_jump := match instr.condition {
+            .not_zero { u8_to_flag(cpu.registers.f).zero }
+            else { panic("not supported jump condition: ${instr.condition}") }
+          }
+          cpu.jump(should_jump)
+          return cpu.pc
         }
-        /* TODO: Support all remaining targets. */
-        else { println("not supported target") }
       }
     }
-    /* TODO: Support all remaining instructions. */
-    else { println("not supported instruction") }
+    InstructionTarget {
+      match instr.reg_instruction {
+        .add {
+          match instr.target {
+            .c {
+              mut value := cpu.registers.c
+              mut new_value := cpu.add(value)
+              cpu.registers.a = new_value
+              cpu.pc++
+            }
+            /* TODO: Support all remaining targets. */
+            else { println("not supported target") }
+          }
+        }
+        /* TODO: Support all remaining instructions. */
+        else { println("not supported instruction") }
+      }
+      return cpu.pc
+    }
   }
-  return cpu.pc
 }
 
+/* Jump to next address if the condition is met */
 fn (mut cpu Cpu) jump (should_jump bool) {
   if should_jump {
     mut least_significant_byte := u16(cpu.bus.read_byte(cpu.pc + 1))

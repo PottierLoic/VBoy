@@ -9,7 +9,7 @@ fn main() {
 
   cpu.registers.print()
   println("calcul . . . ")
-  cpu.execute(Instruction_Target{.add, .c})
+  cpu.execute(InstructionTarget{.add, .c})
 
   cpu.registers.print()
 }

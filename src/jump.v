@@ -5,3 +5,12 @@ enum JumpTest {
 	carry
 	always
 }
+
+enum JumpInstruction {
+	jp
+}
+
+struct InstructionCondition {
+	jump_instruction JumpInstruction
+	condition JumpTest
+}
