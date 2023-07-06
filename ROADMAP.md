@@ -1,5 +1,7 @@
 # Roadmap
 
+Rename / rework the register file, specifically the Instruction part that resolve the enums problems  
+
 Implement the following cpu instructions that act on register data:
 
 - [ ] ADD (add to a) - add the value of the target to the a register
@@ -31,3 +33,5 @@ Implement the following cpu instructions that act on register data:
 - [ ] SRA (shift right arithmetic) - arithmetic shift a specific register right by 1
 - [ ] SLA (shift left arithmetic) - arithmetic shift a specific register left by 1
 - [ ] SWAP (swap nibbles) - switch upper and lower nibble of a specific register
+
+Implement remaining memory loading / reading instructions

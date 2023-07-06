@@ -22,6 +22,8 @@ enum JumpTest {
 }
 enum JumpInstruction {
   jp
+  call
+  ret
 }
 struct InstructionCondition {
   jump_instruction JumpInstruction
@@ -53,8 +55,21 @@ struct InstructionLoad {
 	target LoadByteTarget
 }
 
+/* Stack targets and Instruction/Target struct */
+enum StackTarget {
+	bc de hl af
+}
+enum StackInstruction {
+	push
+	pop
+}
+struct InstructionStack {
+	instruction StackInstruction
+	target StackTarget
+}
+
 /* An instruction can be a jump, an arithmetic instruction, or a memory reading/writing */
-type Instruction = InstructionTarget | InstructionCondition | InstructionLoad
+type Instruction = InstructionTarget | InstructionCondition | InstructionLoad | InstructionStack
 
 /* Choose the correct method to read the instruction */
 fn instruction_from_byte(value u8, prefixed bool) InstructionTarget {
