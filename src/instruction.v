@@ -1,6 +1,6 @@
 /* Register instructions part, each register instruction is composed of an instruction and a target */
 enum ArithmeticTarget {
-  a b c d e f h l
+  a b c d e h l d8 hli
 }
 enum RegistersInstruction {
   add
@@ -38,12 +38,15 @@ enum LoadByteSource {
 	a b c d e h l d8 hli
 }
 enum LoadType {
-	byte
-	word
-	a_from_indirect
-	indirect_from_a
-	a_from_byte_address
-	byte_address_from_a
+	byte                  // done
+	word                  // not done
+	a_from_indirect       // not done
+	indirect_from_a       // not done
+	a_from_byte_address   // not done
+	byte_address_from_a   // not done
+  sp_from_hl            // not done
+  hl_from_spn           // not done
+  indirect_from_sp      // not done
 }
 enum LoadInstruction {
 	ld
@@ -83,7 +86,6 @@ fn instruction_from_byte(value u8, prefixed bool) InstructionTarget {
   else { return instruction_from_byte_not_prefixed(value) }
 }
 
-/*  */
 fn instruction_from_byte_prefixed(value u8) InstructionTarget {
   match value {
     0x00 { return InstructionTarget{RegistersInstruction.inc, ArithmeticTarget.b} }

@@ -1,6 +1,7 @@
 # Roadmap
 
 Rename / rework the register file, specifically the Instruction part that resolve the enums problems
+Naming is really bad and lead to missunderstandings.
 
 Implement the following cpu instructions that act on register data:
 
