@@ -39,12 +39,20 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
         .add {
           match instr.target {
             .c {
-              mut value := cpu.registers.c
-              mut new_value := cpu.add(value)
-              cpu.registers.a = new_value
+              cpu.registers.a = cpu.add(cpu.registers.c)
               cpu.pc++
             }
             /* TODO: Support all remaining targets. */
+            else { println("not supported target") }
+          }
+        }
+        .adc {
+          match instr.target {
+            .c {
+              cpu.registers.a = cpu.adc(cpu.registers.c)
+              cpu.pc++
+            }
+            /* TODO: Support all remaining targets */
             else { println("not supported target") }
           }
         }
@@ -157,6 +165,21 @@ fn (mut cpu Cpu) add (value u8) u8 {
   cpu.registers.f = flag_to_u8(flags)
   return new_value
 }
+
+/* Add the target value to register A, change flags and add carry value to register A. */
+fn (mut cpu Cpu) adc (value u8) u8 {
+  mut new_value, did_overflow := cpu.registers.overflowing_add(cpu.registers.a, value)
+  flags := FlagsRegister{
+    zero: new_value == 0
+    subtract: false
+    half_carry: (cpu.registers.a & 0xf) + (value & 0xf) > 0xf
+    carry: did_overflow
+  }
+  cpu.registers.f = flag_to_u8(flags)
+  if did_overflow { new_value++ }
+  return new_value
+}
+
 
 fn (mut cpu Cpu) push (value u16) {
   cpu.sp--
