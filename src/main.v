@@ -4,11 +4,11 @@ fn main() {
   mut cpu := Cpu{}
   println("CPU Initialized succesfully.")
 
-  cpu.registers.a = 127
-  cpu.registers.c = 136
+  cpu.registers.a = 0
+  cpu.registers.c = 248
 
   cpu.registers.print()
-  println("Test a + c . . . ")
-  cpu.execute(InstructionTarget{.adc, .c})
+  println("Test a - c . . . ")
+  cpu.execute(InstructionTarget{.decr, .a})
   cpu.registers.print()
 }

@@ -6,6 +6,7 @@ const (
 )
 
 struct FlagsRegister {
+mut:
   zero bool
   subtract bool
   half_carry bool

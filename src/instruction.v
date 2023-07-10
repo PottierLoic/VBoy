@@ -1,8 +1,13 @@
 /* Register instructions part, each register instruction is composed of an instruction and a target */
-enum ArithmeticTarget {
+enum RegisterU8 {
   a b c d e h l d8 hli
 }
-enum RegistersInstruction {
+
+enum RegisterU16 {
+  af bc de hl sp
+}
+
+enum RegisterInstruction {
   // Arithmetic instr
   add
   decr
@@ -62,8 +67,8 @@ enum RegistersInstruction {
   ei
 }
 struct InstructionTarget {
-  reg_instruction RegistersInstruction
-  target ArithmeticTarget
+  instruction RegisterInstruction
+  target RegisterU8
 }
 
 /* Jump instructions part, each jump instruction is composed of an instruction and a condition */
@@ -74,13 +79,8 @@ enum JumpTest {
   carry
   always
 }
-enum JumpInstruction {
-  jp
-  call
-  ret
-}
 struct InstructionCondition {
-  jump_instruction JumpInstruction
+  instruction RegisterInstruction
   condition JumpTest
 }
 
@@ -113,11 +113,8 @@ enum LoadType {
   hl_from_spn           // not done
   indirect_from_sp      // not done
 }
-enum LoadInstruction {
-	ld
-}
 struct InstructionLoad {
-	mem_instruction LoadInstruction
+	instruction RegisterInstruction
 	load_type LoadType
 	source LoadByteSource
 	target LoadByteTarget
@@ -127,12 +124,8 @@ struct InstructionLoad {
 enum StackTarget {
 	bc de hl af
 }
-enum StackInstruction {
-	push
-	pop
-}
 struct InstructionStack {
-	instruction StackInstruction
+	instruction RegisterInstruction
 	target StackTarget
 }
 
@@ -153,14 +146,14 @@ fn instruction_from_byte(value u8, prefixed bool) InstructionTarget {
 
 fn instruction_from_byte_prefixed(value u8) InstructionTarget {
   match value {
-    0x00 { return InstructionTarget{RegistersInstruction.inc, ArithmeticTarget.b} }
+    0x00 { return InstructionTarget{RegisterInstruction.inc, RegisterU8.b} }
     else { panic("Instruction not found: ${value}") } // add all remaining instruct
   }
 }
 
 fn instruction_from_byte_not_prefixed(value u8) InstructionTarget {
   match value {
-    0x02 { return InstructionTarget{RegistersInstruction.inc, ArithmeticTarget.b} }
+    0x02 { return InstructionTarget{RegisterInstruction.inc, RegisterU8.b} }
     else { panic("Instruction not found: ${value}") } // add all remaining instruct
   }
 }

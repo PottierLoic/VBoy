@@ -28,40 +28,79 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
         .carry { u8_to_flag (cpu.registers.f).carry }
         .always { true }
       }
-      match instr.jump_instruction {
+      match instr.instruction {
         .jp { cpu.jump(should_jump) }
         .call { cpu.call(should_jump) }
         .ret { cpu.ret(should_jump) }
+        else { panic("Instruction not supported ${instr.instruction}.") }
       }
     }
     InstructionTarget {
-      match instr.reg_instruction {
+      match instr.instruction {
         .add {
-          match instr.target {
-            .c {
-              cpu.registers.a = cpu.add(cpu.registers.c)
-              cpu.pc++
-            }
-            /* TODO: Support all remaining targets. */
-            else { println("not supported target") }
-          }
+          cpu.registers.a = cpu.add(cpu.registers.target_to_reg8(instr.target))
+          cpu.pc++
         }
         .adc {
+          cpu.registers.a = cpu.adc(cpu.registers.target_to_reg8(instr.target))
+          cpu.pc++
+        }
+        .sub {
+          cpu.registers.a = cpu.sub(cpu.registers.target_to_reg8(instr.target))
+          cpu.pc++
+        }
+        .sbc {
+          cpu.registers.a = cpu.sbc(cpu.registers.target_to_reg8(instr.target))
+          cpu.pc++
+        }
+        .and {
+          cpu.registers.a = cpu.and(cpu.registers.target_to_reg8(instr.target))
+          cpu.pc++
+        }
+        .or_ {
+          cpu.registers.a = cpu.or_(cpu.registers.target_to_reg8(instr.target))
+          cpu.pc++
+        }
+        .xor {
+          cpu.registers.a = cpu.xor(cpu.registers.target_to_reg8(instr.target))
+          cpu.pc++
+        }
+        .cp {
+          cpu.cp(cpu.registers.target_to_reg8(instr.target))
+          cpu.pc++
+        }
+        .inc {
           match instr.target {
-            .c {
-              cpu.registers.a = cpu.adc(cpu.registers.c)
-              cpu.pc++
-            }
-            /* TODO: Support all remaining targets */
-            else { println("not supported target") }
+            .a { cpu.registers.a = cpu.inc(instr.target) }
+            .b { cpu.registers.b = cpu.inc(instr.target) }
+            .c { cpu.registers.c = cpu.inc(instr.target) }
+            .d { cpu.registers.d = cpu.inc(instr.target) }
+            .e { cpu.registers.e = cpu.inc(instr.target) }
+            .h { cpu.registers.h = cpu.inc(instr.target) }
+            .l { cpu.registers.l = cpu.inc(instr.target) }
+            else { panic("Not supported target: ${instr.target}") }
           }
+          cpu.pc++
+        }
+        .decr {
+          match instr.target {
+            .a { cpu.registers.a = cpu.decr(instr.target) }
+            .b { cpu.registers.b = cpu.decr(instr.target) }
+            .c { cpu.registers.c = cpu.decr(instr.target) }
+            .d { cpu.registers.d = cpu.decr(instr.target) }
+            .e { cpu.registers.e = cpu.decr(instr.target) }
+            .h { cpu.registers.h = cpu.decr(instr.target) }
+            .l { cpu.registers.l = cpu.decr(instr.target) }
+            else { panic("Not supported target: ${instr.target}") }
+          }
+          cpu.pc++
         }
         /* TODO: Support all remaining instructions. */
         else { println("not supported instruction") }
       }
     }
     InstructionLoad {
-      match instr.mem_instruction {
+      match instr.instruction {
         .ld {
           match instr.load_type {
             .byte {
@@ -94,6 +133,7 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
             else { panic("Unknown instruction") }
           }
         }
+        else { panic("Instruction not supported ${instr.instruction}.") }
       }
     }
     InstructionStack {
@@ -118,6 +158,7 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
           }
           cpu.pc++
         }
+        else { panic("Instruction not supported ${instr.instruction}.") }
       }
     }
   }
@@ -155,7 +196,7 @@ fn (mut cpu Cpu) step() {
 
 /* Add the target value to register A and change flags. */
 fn (mut cpu Cpu) add (value u8) u8 {
-  new_value, did_overflow := cpu.registers.overflowing_add(cpu.registers.a, value)
+  new_value, did_overflow := overflowing_add(cpu.registers.a, value)
   flags := FlagsRegister{
     zero: new_value == 0
     subtract: false
@@ -168,7 +209,8 @@ fn (mut cpu Cpu) add (value u8) u8 {
 
 /* Add the target value to register A, change flags and add carry value to register A. */
 fn (mut cpu Cpu) adc (value u8) u8 {
-  mut new_value, did_overflow := cpu.registers.overflowing_add(cpu.registers.a, value)
+  mut new_value, did_overflow := overflowing_add(cpu.registers.a, value)
+  if did_overflow { new_value++ }
   flags := FlagsRegister{
     zero: new_value == 0
     subtract: false
@@ -176,10 +218,110 @@ fn (mut cpu Cpu) adc (value u8) u8 {
     carry: did_overflow
   }
   cpu.registers.f = flag_to_u8(flags)
-  if did_overflow { new_value++ }
   return new_value
 }
 
+/* Subtract the value from register A and change flags. */
+fn (mut cpu Cpu) sub (value u8) u8 {
+  new_value, did_underflow := underflowing_subtract(cpu.registers.a, value)
+  flags := FlagsRegister{
+    zero: new_value == 0
+    subtract: true
+    half_carry: (cpu.registers.a & 0xF) < (value & 0xF)
+    carry: did_underflow
+  }
+  cpu.registers.f = flag_to_u8(flags)
+  return new_value
+}
+
+/* Subtract the value from register A, change flags and subtract carry value from register A. */
+fn (mut cpu Cpu) sbc (value u8) u8 {
+  mut new_value, did_underflow := underflowing_subtract(cpu.registers.a, value)
+  if did_underflow { new_value-- }
+  flags := FlagsRegister{
+    zero: new_value == 0
+    subtract: true
+    half_carry: (cpu.registers.a & 0xF) < (value & 0xF)
+    carry: did_underflow
+  }
+  cpu.registers.f = flag_to_u8(flags)
+  return new_value
+}
+
+/* Perform the and operation between register A and the target */
+fn (mut cpu Cpu) and (value u8) u8 {
+  new_value := cpu.registers.a & value
+  flags := FlagsRegister{
+    zero: new_value == 0
+    subtract: false
+    half_carry: true
+    carry: false
+  }
+  cpu.registers.f = flag_to_u8(flags)
+  return new_value
+}
+
+/* Perform the or operation between register A and the target */
+fn (mut cpu Cpu) or_ (value u8) u8 {
+  new_value := cpu.registers.a | value
+  flags := FlagsRegister{
+    zero: new_value == 0
+    subtract: false
+    half_carry: false
+    carry: false
+  }
+  cpu.registers.f = flag_to_u8(flags)
+  return new_value
+}
+
+/* Perform the xor operation between register A and the target */
+fn (mut cpu Cpu) xor (value u8) u8 {
+  new_value := cpu.registers.a ^ value
+  flags := FlagsRegister{
+    zero: new_value == 0
+    subtract: false
+    half_carry: false
+    carry: false
+  }
+  cpu.registers.f = flag_to_u8(flags)
+  return new_value
+}
+
+/* Subtract target value from register A and change flags but don't change A value */
+fn (mut cpu Cpu) cp (value u8) {
+  new_value, did_underflow := underflowing_subtract(cpu.registers.a, value)
+  flags := FlagsRegister{
+    zero: new_value == 0
+    subtract: true
+    half_carry: (cpu.registers.a & 0xF) < (value & 0xF)
+    carry: did_underflow
+  }
+  cpu.registers.f = flag_to_u8(flags)
+}
+
+/* Increment the value of the target register and change flags */
+fn (mut cpu Cpu) inc (reg RegisterU8) u8 {
+  mut new_value := cpu.registers.target_to_reg8(reg)
+  new_value++
+  mut flags := u8_to_flag(cpu.registers.f)
+  flags.zero = new_value == 0
+  flags.subtract = false
+  flags.half_carry = (cpu.registers.a & 0xf) + 1 > 0xf
+  cpu.registers.f = flag_to_u8(flags)
+  return new_value
+}
+
+/* Decrement the value of the target register and change flags */
+fn (mut cpu Cpu) decr (reg RegisterU8) u8 {
+  mut new_value := cpu.registers.target_to_reg8(reg)
+  new_value--
+  mut flags := u8_to_flag(cpu.registers.f)
+  flags.zero = new_value == 0
+  flags.subtract = true
+  flags.half_carry = (cpu.registers.a & 0xF) < 1
+  cpu.registers.f = flag_to_u8(flags)
+  return new_value
+}
 
 fn (mut cpu Cpu) push (value u16) {
   cpu.sp--

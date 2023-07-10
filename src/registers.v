@@ -46,13 +46,6 @@ fn (mut reg Registers) set_hl(value u16) {
   reg.l = u8(value & 0xFF)
 }
 
-/* Add value to the target and handle overflow */
-fn (mut reg Registers) overflowing_add (target u8, value u8) (u8, bool){
-  mut new_value := u16(target) + u16(value)
-  new_value = new_value >> 8
-  return u8(target + value), new_value > 0
-}
-
 fn (reg Registers) print () {
   flag := u8_to_flag(reg.f)
   println("----------------------")
@@ -87,4 +80,27 @@ fn print_full_b10 (nb u8) {
   }
   for _ in 0 .. 3 - digits - int(nb == 0) { print("0") }
   print(nb)
+}
+
+fn (reg Registers) target_to_reg8 (target RegisterU8) u8 {
+  return match target {
+    .a { reg.a }
+    .b { reg.b }
+    .c { reg.c }
+    .d { reg.d }
+    .e { reg.e }
+    .h { reg.h }
+    .l { reg.l }
+    else { panic("missing a case in target_to_reg8: ${target}") }
+  }
+}
+
+fn (reg Registers) target_to_reg16 (target RegisterU16) u16 {
+  return match target {
+    .af { reg.get_af() }
+    .bc { reg.get_bc() }
+    .de { reg.get_de() }
+    .hl { reg.get_hl() }
+    else { panic("missing a case in target_to_reg16: ${target}") }
+  }
 }

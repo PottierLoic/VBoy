@@ -8,14 +8,14 @@ Implement the following cpu instructions that act on register data:
 - [x] ADD (add to a) - add the value of the target to the a register
 - [ ] ADDHL (add to HL) - just like ADD except that the target is added to the HL register
 - [x] ADC (add with carry) - just like ADD except that the value of the carry flag is also added to the number
-- [ ] SUB (subtract) - subtract the value stored in a specific register with the value in the A register
-- [ ] SBC (subtract with carry) - just like ADD except that the value of the carry flag is also subtracted from the number
-- [ ] AND (logical and) - do a bitwise and on the value in a specific register and the value in the A register
-- [ ] OR (logical or) - do a bitwise or on the value in a specific register and the value in the A register
-- [ ] XOR (logical xor) - do a bitwise xor on the value in a specific register and the value in the A register
-- [ ] CP (compare) - just like SUB except the result of the subtraction is not stored back into A
-- [ ] INC (increment) - increment the value in a specific register by 1
-- [ ] DEC (decrement) - decrement the value in a specific register by 1
+- [x] SUB (subtract) - subtract the value stored in a specific register with the value in the A register
+- [x] SBC (subtract with carry) - just like ADD except that the value of the carry flag is also subtracted from the number
+- [x] AND (logical and) - do a bitwise and on the value in a specific register and the value in the A register
+- [x] OR (logical or) - do a bitwise or on the value in a specific register and the value in the A register
+- [x] XOR (logical xor) - do a bitwise xor on the value in a specific register and the value in the A register
+- [x] CP (compare) - just like SUB except the result of the subtraction is not stored back into A
+- [x] INC (increment) - increment the value in a specific register by 1
+- [x] DEC (decrement) - decrement the value in a specific register by 1
 - [ ] CCF (complement carry flag) - toggle the value of the carry flag
 - [ ] SCF (set carry flag) - set the carry flag to true
 - [ ] RRA (rotate right A register) - bit rotate A register right through the carry flag
