@@ -48,7 +48,7 @@ const lcdstat_vector = 0x48
 const timer_vector = 0x50
 
 struct MemoryBus {
-  mut:
+mut:
   memory [65536]u8
 }
 

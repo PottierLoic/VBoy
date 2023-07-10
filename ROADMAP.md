@@ -20,14 +20,14 @@ Implement the following cpu instructions that act on register data:
 - [x] DEC (decrement) - decrement the value in a specific register by 1
 - [x] CCF (complement carry flag) - toggle the value of the carry flag
 - [x] SCF (set carry flag) - set the carry flag to true
-- [ ] RRA (rotate right A register) - bit rotate A register right through the carry flag
-- [ ] RLA (rotate left A register) - bit rotate A register left through the carry flag
-- [ ] RRCA (rotate right A register) - bit rotate A register right (not through the carry flag)
-- [ ] RRLA (rotate left A register) - bit rotate A register left (not through the carry flag)
-- [ ] CPL (complement) - toggle every bit of the A register
-- [ ] BIT (bit test) - test to see if a specific bit of a specific register is set
-- [ ] RESET (bit reset) - set a specific bit of a specific register to 0
-- [ ] SET (bit set) - set a specific bit of a specific register to 1
+- [x] RRA (rotate right A register) - bit rotate A register right through the carry flag
+- [x] RLA (rotate left A register) - bit rotate A register left through the carry flag
+- [x] RRCA (rotate right A register) - bit rotate A register right (not through the carry flag)
+- [x] RRLA (rotate left A register) - bit rotate A register left (not through the carry flag)
+- [x] CPL (complement) - toggle every bit of the A register
+- [Need to find a way to call it correctly but works] BIT (bit test) - test to see if a specific bit of a specific register is set
+- [Need to find a way to call it correctly but works] RESET (bit reset) - set a specific bit of a specific register to 0
+- [Need to find a way to call it correctly but works] SET (bit set) - set a specific bit of a specific register to 1
 - [ ] SRL (shift right logical) - bit shift a specific register right by 1
 - [ ] RR (rotate right) - bit rotate a specific register right by 1 through the carry flag
 - [ ] RL (rotate left) - bit rotate a specific register left by 1 through the carry flag

@@ -103,6 +103,35 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
           cpu.scf()
           cpu.pc++
         }
+        .rra {
+          cpu.registers.a = cpu.rra()
+          cpu.pc++
+        }
+        .rla {
+          cpu.registers.a = cpu.rla()
+          cpu.pc++
+        }
+        .rrca {
+          cpu.registers.a = cpu.rrca()
+          cpu.pc++
+        }
+        .rlca {
+          cpu.registers.a = cpu.rlca()
+          cpu.pc++
+        }
+        .cpl {
+          cpu.registers.a = cpu.cpl()
+          cpu.pc++
+        }
+        .bit {
+          // need to create a struct that can hold target register + target position
+        }
+        .res {
+          // need to create a struct that can hold target register + target position
+        }
+        .set {
+          // need to create a struct that can hold target register + target position
+        }
         /* TODO: Support all remaining instructions. */
         else { println("not supported instruction") }
       }
@@ -331,16 +360,112 @@ fn (mut cpu Cpu) decr (reg RegisterU8) u8 {
   return new_value
 }
 
+/* Rotate the bits or register A to the right and set the carry to the left most bit of the register */
+fn (mut cpu Cpu) rra () u8 {
+  mut new_value := cpu.registers.a
+  carry := new_value & 0x1
+  new_value >>= 1
+  new_value |= carry << 7
+  flags := FlagsRegister{
+    zero: new_value == 0
+    subtract: false
+    half_carry: false
+    carry: carry == 1
+  }
+  cpu.registers.f = flag_to_u8(flags)
+  return new_value
+}
+
+/* Rotate the bits or register A to the left and set the carry to the right most bit of the register */
+fn (mut cpu Cpu) rla () u8 {
+  mut new_value := cpu.registers.a
+  carry := new_value >> 7
+  new_value <<= 1
+  new_value |= carry
+  flags := FlagsRegister{
+    zero: new_value == 0
+    subtract: false
+    half_carry: false
+    carry: carry == 1
+  }
+  cpu.registers.f = flag_to_u8(flags)
+  return new_value
+}
+
+/* Rotate the bits or register A to the right and set the carry to the left most bit of the register */
+fn (mut cpu Cpu) rrca () u8 {
+  mut new_value := cpu.registers.a
+  carry := new_value & 0x1
+  new_value >>= 1
+  new_value |= carry << 7
+  flags := FlagsRegister{
+    zero: new_value == 0
+    subtract: false
+    half_carry: false
+    carry: carry == 1
+  }
+  cpu.registers.f = flag_to_u8(flags)
+  return new_value
+}
+
+/* Rotate the bits or register A to the left and set the carry to the right most bit of the register */
+fn (mut cpu Cpu) rlca () u8 {
+  mut new_value := cpu.registers.a
+  carry := new_value >> 7
+  new_value <<= 1
+  new_value |= carry
+  flags := FlagsRegister{
+    zero: new_value == 0
+    subtract: false
+    half_carry: false
+    carry: carry == 1
+  }
+  cpu.registers.f = flag_to_u8(flags)
+  return new_value
+}
+
+/* Toggle all the bits or register A */
+fn (mut cpu Cpu) cpl () u8 {
+  mut new_value := cpu.registers.a
+  new_value ^= 0xFF
+  mut flags := u8_to_flag(cpu.registers.f)
+  flags.subtract = true
+  flags.half_carry = true
+  cpu.registers.f = flag_to_u8(flags)
+  return new_value
+}
+
+/* Toggle the value of the carry flag */
 fn (mut cpu Cpu) ccf () {
   mut flags := u8_to_flag(cpu.registers.f)
   flags.carry = !flags.carry
   cpu.registers.f = flag_to_u8(flags)
 }
 
+/* Set the value of the carry flag to true */
 fn (mut cpu Cpu) scf () {
   mut flags := u8_to_flag(cpu.registers.f)
   flags.carry = true
   cpu.registers.f = flag_to_u8(flags)
+}
+
+/* Set zero flag to the value of the provided bit position in provided register */
+fn (mut cpu Cpu) bit (bit u8, value u8) {
+  mut flags := u8_to_flag(cpu.registers.f)
+  flags.zero = (value & (1 << bit)) == 0
+  flags.subtract = false
+  flags.half_carry = true
+  cpu.registers.f = flag_to_u8(flags)
+}
+
+/* Set the value of the provided bit position in provided register to 0 */
+fn (mut cpu Cpu) res (bit u8, value u8) u8 {
+  return value^(1 << bit)
+}
+
+/* Set the value of the provided bit position in provided register to 1 */
+fn (mut cpu Cpu) set (bit u8, value u8) u8 {
+  return value | (1 << bit)
 }
 
 fn (mut cpu Cpu) push (value u16) {
