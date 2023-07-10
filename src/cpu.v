@@ -15,6 +15,7 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
           cpu.pc++
         }
         .halt {
+          // should maybe be a flag on a register not sure of that
           // THIS IS A TEMPORARY MEASURE IT SHOULD AND WILL NOT STAY LIKE THIS
         }
       }

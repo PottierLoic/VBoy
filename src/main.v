@@ -15,4 +15,14 @@ fn main() {
   println("Test l = a . . . ")
   cpu.execute(InstructionLoad{.ld, .byte, .a, .l})
   cpu.registers.print()
+
+  cpu.registers.set_bc(541)
+  cpu.execute(InstructionStack{.push, .bc})
+  cpu.registers.set_bc(497)
+  cpu.execute(InstructionStack{.push, .bc})
+  println(cpu.pop())
+  cpu.registers.set_bc(124)
+  cpu.execute(InstructionStack{.push, .bc})
+  println(cpu.pop())
+  println(cpu.pop())
 }

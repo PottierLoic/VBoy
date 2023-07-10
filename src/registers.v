@@ -28,7 +28,7 @@ fn (reg Registers) get_hl() u16 {
 
 fn (mut reg Registers) set_af(value u16) {
   reg.a = u8((value & 0xFF00) >> 8)
-  reg.h = u8(value & 0xFF)
+  reg.f = u8(value & 0xFF)
 }
 
 fn (mut reg Registers) set_bc(value u16) {
@@ -46,7 +46,7 @@ fn (mut reg Registers) set_hl(value u16) {
   reg.l = u8(value & 0xFF)
 }
 
-/* Need a rework to use a pointer to the destination register (maybe) istead of a string that need a big match case bloc */
+/* Add value to the target and handle overflow */
 fn (mut reg Registers) overflowing_add (target u8, value u8) (u8, bool){
   mut new_value := u16(target) + u16(value)
   new_value = new_value >> 8

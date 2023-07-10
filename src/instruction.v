@@ -3,9 +3,63 @@ enum ArithmeticTarget {
   a b c d e h l d8 hli
 }
 enum RegistersInstruction {
+  // Arithmetic instr
   add
   decr
   inc
+  adc
+  addhl
+  addsp
+  sub
+  sbc
+  and
+  or_
+  xor
+  cp
+
+  ccf
+  scf
+
+  rra
+  rla
+  rrca
+  rlca
+  cpl
+  daa
+
+  // Prefix instr
+  bit
+  res
+  set
+  srl
+  rr
+  rl
+  rrc
+  sra
+  sla
+  swap
+
+  // Jump instr
+  jp
+  jr
+  jpi
+
+  // Load instr
+  ld
+
+  // Stack instr
+  push
+  pop
+  call
+  ret
+  reti
+  rst
+
+  // Control instr
+  halt
+  nop
+  di
+  ei
 }
 struct InstructionTarget {
   reg_instruction RegistersInstruction
@@ -36,6 +90,17 @@ enum LoadByteTarget {
 }
 enum LoadByteSource {
 	a b c d e h l d8 hli
+}
+enum LoadWordTarget {
+  bc de hl sp
+}
+enum Indirect {
+  bc_indirect
+  de_indirect
+  hl_indirect_minus
+  hl_indirect_plus
+  word_indirect
+  last_byte_indirect
 }
 enum LoadType {
 	byte                  // done
