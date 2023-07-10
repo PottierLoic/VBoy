@@ -95,6 +95,14 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
           }
           cpu.pc++
         }
+        .ccf {
+          cpu.ccf()
+          cpu.pc++
+        }
+        .scf {
+          cpu.scf()
+          cpu.pc++
+        }
         /* TODO: Support all remaining instructions. */
         else { println("not supported instruction") }
       }
@@ -321,6 +329,18 @@ fn (mut cpu Cpu) decr (reg RegisterU8) u8 {
   flags.half_carry = (cpu.registers.a & 0xF) < 1
   cpu.registers.f = flag_to_u8(flags)
   return new_value
+}
+
+fn (mut cpu Cpu) ccf () {
+  mut flags := u8_to_flag(cpu.registers.f)
+  flags.carry = !flags.carry
+  cpu.registers.f = flag_to_u8(flags)
+}
+
+fn (mut cpu Cpu) scf () {
+  mut flags := u8_to_flag(cpu.registers.f)
+  flags.carry = true
+  cpu.registers.f = flag_to_u8(flags)
 }
 
 fn (mut cpu Cpu) push (value u16) {

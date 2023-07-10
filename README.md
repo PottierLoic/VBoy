@@ -1,4 +1,4 @@
-# Game Boy emulator  
+# Game Boy emulator
 
 ## 8-Bit CPU :
 - 0000 0000  
@@ -9,7 +9,7 @@ D -> u8
 E -> u8  
 F -> u8  
 G -> u8  
-H -> u8 
+H -> u8  
 
 ## 4 "Virtual" 16 bit registers
 
@@ -25,7 +25,7 @@ HL -> u16 = u16(H) << 8 + L
 ## Flags register
 
 ### F contains flags on bytes 4, 5, 6 and 7
-- Bit 7: zero
-- Bit 6: subtraction
-- Bit 5: half carry
-- Bit 4: carry
+- Bit 7: zero  
+- Bit 6: subtraction  
+- Bit 5: half carry  
+- Bit 4: carry  

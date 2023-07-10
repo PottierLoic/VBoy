@@ -1,5 +1,7 @@
 # Roadmap
 
+Find a way to stop repeating cpu.pc++ for every casxe, maybe put it in the respecting functions ?
+
 Rename / rework the instructions file, specifically the struct / enum part.
 Naming is really bad and lead to missunderstandings.
 
@@ -16,8 +18,8 @@ Implement the following cpu instructions that act on register data:
 - [x] CP (compare) - just like SUB except the result of the subtraction is not stored back into A
 - [x] INC (increment) - increment the value in a specific register by 1
 - [x] DEC (decrement) - decrement the value in a specific register by 1
-- [ ] CCF (complement carry flag) - toggle the value of the carry flag
-- [ ] SCF (set carry flag) - set the carry flag to true
+- [x] CCF (complement carry flag) - toggle the value of the carry flag
+- [x] SCF (set carry flag) - set the carry flag to true
 - [ ] RRA (rotate right A register) - bit rotate A register right through the carry flag
 - [ ] RLA (rotate left A register) - bit rotate A register left through the carry flag
 - [ ] RRCA (rotate right A register) - bit rotate A register right (not through the carry flag)

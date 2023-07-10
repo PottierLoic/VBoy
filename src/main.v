@@ -9,6 +9,6 @@ fn main() {
 
   cpu.registers.print()
   println("Test a - c . . . ")
-  cpu.execute(InstructionTarget{.decr, .a})
+  cpu.execute(InstructionTarget{.scf, .a})
   cpu.registers.print()
 }
