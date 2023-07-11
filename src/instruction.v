@@ -36,13 +36,14 @@ enum Instruction_ {
   bit     //yeah
   res     //yeah
   set     //yeah
-  srl     //NOPE
-  rr      //NOPE
-  rl      //NOPE
-  rrc     //NOPE
-  sra     //NOPE
-  sla     //NOPE
-  swap    //NOPE
+  srl     //yeah
+  rr      //yeah
+  rl      //yeah
+  rrc     //yeah
+  rlc     //yeah
+  sra     //yeah
+  sla     //yeah
+  swap    //yeah
 
   // Jump instr
   jp      //yeah
@@ -61,7 +62,7 @@ enum Instruction_ {
   rst     //NOPE
 
   // Control instr
-  halt    //yeah
+  halt    // A VOIR SI CA RESTE COMME CA
   nop     //yeah
   di      //NOPE
   ei      //NOPE

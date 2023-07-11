@@ -1,6 +1,8 @@
 # Roadmap
 
-Find a way to stop repeating cpu.pc++ for every case, maybe put it in the respecting functions ?
+Find a way to stop repeating cpu.pc++ for every case, maybe put it in each respecting functions ?
+
+Leave the FlagsRegister struct and only work with u8, set/reset them with the corresponding cpu functions
 
 Implement the following cpu instructions that act on register data:
 
@@ -27,12 +29,12 @@ Implement the following cpu instructions that act on register data:
 - [x] SET (bit set) - set a specific bit of a specific register to 1
 - [x] SRL (shift right logical) - bit shift a specific register right by 1
 - [x] RR (rotate right) - bit rotate a specific register right by 1 through the carry flag
-- [ ] RL (rotate left) - bit rotate a specific register left by 1 through the carry flag
-- [ ] RRC (rorate right) - bit rotate a specific register right by 1 (not through the carry flag)
-- [ ] RLC (rorate left) - bit rotate a specific register left by 1 (not through the carry flag)
-- [ ] SRA (shift right arithmetic) - arithmetic shift a specific register right by 1
-- [ ] SLA (shift left arithmetic) - arithmetic shift a specific register left by 1
-- [ ] SWAP (swap nibbles) - switch upper and lower nibble of a specific register
+- [x] RL (rotate left) - bit rotate a specific register left by 1 through the carry flag
+- [x] RRC (rorate right) - bit rotate a specific register right by 1 (not through the carry flag)
+- [x] RLC (rorate left) - bit rotate a specific register left by 1 (not through the carry flag)
+- [x] SRA (shift right arithmetic) - arithmetic shift a specific register right by 1
+- [x] SLA (shift left arithmetic) - arithmetic shift a specific register left by 1
+- [x] SWAP (swap nibbles) - switch upper and lower nibble of a specific register
 
 Implement remaining memory loading / reading instructions.
 

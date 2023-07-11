@@ -138,65 +138,125 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
     }
     .res {
       match instr.target_u8 {
-        .a { cpu.registers.a = cpu.res(instr.bit_position, cpu.registers.target_to_reg8(instr.target_u8)) }
-        .b { cpu.registers.b = cpu.res(instr.bit_position, cpu.registers.target_to_reg8(instr.target_u8)) }
-        .c { cpu.registers.c = cpu.res(instr.bit_position, cpu.registers.target_to_reg8(instr.target_u8)) }
-        .d { cpu.registers.d = cpu.res(instr.bit_position, cpu.registers.target_to_reg8(instr.target_u8)) }
-        .e { cpu.registers.e = cpu.res(instr.bit_position, cpu.registers.target_to_reg8(instr.target_u8)) }
-        .h { cpu.registers.h = cpu.res(instr.bit_position, cpu.registers.target_to_reg8(instr.target_u8)) }
-        .l { cpu.registers.l = cpu.res(instr.bit_position, cpu.registers.target_to_reg8(instr.target_u8)) }
+        .a { cpu.registers.a = cpu.res(instr.bit_position, cpu.registers.a) }
+        .b { cpu.registers.b = cpu.res(instr.bit_position, cpu.registers.b) }
+        .c { cpu.registers.c = cpu.res(instr.bit_position, cpu.registers.c) }
+        .d { cpu.registers.d = cpu.res(instr.bit_position, cpu.registers.d) }
+        .e { cpu.registers.e = cpu.res(instr.bit_position, cpu.registers.e) }
+        .h { cpu.registers.h = cpu.res(instr.bit_position, cpu.registers.h) }
+        .l { cpu.registers.l = cpu.res(instr.bit_position, cpu.registers.l) }
         else { panic("Not supported target for res instruction: ${instr.target_u8}") }
       }
       cpu.pc++
     }
     .set {
       match instr.target_u8 {
-        .a { cpu.registers.a = cpu.set(instr.bit_position, cpu.registers.target_to_reg8(instr.target_u8)) }
-        .b { cpu.registers.b = cpu.set(instr.bit_position, cpu.registers.target_to_reg8(instr.target_u8)) }
-        .c { cpu.registers.c = cpu.set(instr.bit_position, cpu.registers.target_to_reg8(instr.target_u8)) }
-        .d { cpu.registers.d = cpu.set(instr.bit_position, cpu.registers.target_to_reg8(instr.target_u8)) }
-        .e { cpu.registers.e = cpu.set(instr.bit_position, cpu.registers.target_to_reg8(instr.target_u8)) }
-        .h { cpu.registers.h = cpu.set(instr.bit_position, cpu.registers.target_to_reg8(instr.target_u8)) }
-        .l { cpu.registers.l = cpu.set(instr.bit_position, cpu.registers.target_to_reg8(instr.target_u8)) }
+        .a { cpu.registers.a = cpu.set(instr.bit_position, cpu.registers.a) }
+        .b { cpu.registers.b = cpu.set(instr.bit_position, cpu.registers.b) }
+        .c { cpu.registers.c = cpu.set(instr.bit_position, cpu.registers.c) }
+        .d { cpu.registers.d = cpu.set(instr.bit_position, cpu.registers.d) }
+        .e { cpu.registers.e = cpu.set(instr.bit_position, cpu.registers.e) }
+        .h { cpu.registers.h = cpu.set(instr.bit_position, cpu.registers.h) }
+        .l { cpu.registers.l = cpu.set(instr.bit_position, cpu.registers.l) }
         else { panic("Not supported target for set instruction: ${instr.target_u8}") }
       }
       cpu.pc++
     }
     .srl {
       match instr.target_u8 {
-        .a { cpu.registers.a = cpu.srl(cpu.registers.target_to_reg8(instr.target_u8)) }
-        .b { cpu.registers.b = cpu.srl(cpu.registers.target_to_reg8(instr.target_u8)) }
-        .c { cpu.registers.c = cpu.srl(cpu.registers.target_to_reg8(instr.target_u8)) }
-        .d { cpu.registers.d = cpu.srl(cpu.registers.target_to_reg8(instr.target_u8)) }
-        .e { cpu.registers.e = cpu.srl(cpu.registers.target_to_reg8(instr.target_u8)) }
-        .h { cpu.registers.h = cpu.srl(cpu.registers.target_to_reg8(instr.target_u8)) }
-        .l { cpu.registers.l = cpu.srl(cpu.registers.target_to_reg8(instr.target_u8)) }
+        .a { cpu.registers.a = cpu.srl(cpu.registers.a) }
+        .b { cpu.registers.b = cpu.srl(cpu.registers.b) }
+        .c { cpu.registers.c = cpu.srl(cpu.registers.c) }
+        .d { cpu.registers.d = cpu.srl(cpu.registers.d) }
+        .e { cpu.registers.e = cpu.srl(cpu.registers.e) }
+        .h { cpu.registers.h = cpu.srl(cpu.registers.h) }
+        .l { cpu.registers.l = cpu.srl(cpu.registers.l) }
         else { panic("Not supported target for srl instruction: ${instr.target_u8}") }
       }
       cpu.pc++
     }
     .rr {
       match instr.target_u8 {
-        .a { cpu.registers.a = cpu.rr(cpu.registers.target_to_reg8(instr.target_u8)) }
-        .b { cpu.registers.b = cpu.rr(cpu.registers.target_to_reg8(instr.target_u8)) }
-        .c { cpu.registers.c = cpu.rr(cpu.registers.target_to_reg8(instr.target_u8)) }
-        .d { cpu.registers.d = cpu.rr(cpu.registers.target_to_reg8(instr.target_u8)) }
-        .e { cpu.registers.e = cpu.rr(cpu.registers.target_to_reg8(instr.target_u8)) }
-        .h { cpu.registers.h = cpu.rr(cpu.registers.target_to_reg8(instr.target_u8)) }
-        .l { cpu.registers.l = cpu.rr(cpu.registers.target_to_reg8(instr.target_u8)) }
+        .a { cpu.registers.a = cpu.rr(cpu.registers.a) }
+        .b { cpu.registers.b = cpu.rr(cpu.registers.b) }
+        .c { cpu.registers.c = cpu.rr(cpu.registers.c) }
+        .d { cpu.registers.d = cpu.rr(cpu.registers.d) }
+        .e { cpu.registers.e = cpu.rr(cpu.registers.e) }
+        .h { cpu.registers.h = cpu.rr(cpu.registers.h) }
+        .l { cpu.registers.l = cpu.rr(cpu.registers.l) }
         else { panic("Not supported target for rr instruction: ${instr.target_u8}") }
       }
     }
     .rl {
       match instr.target_u8 {
-        .a { cpu.registers.a = cpu.rl(cpu.registers.target_to_reg8(instr.target_u8)) }
-        .b { cpu.registers.b = cpu.rl(cpu.registers.target_to_reg8(instr.target_u8)) }
-        .c { cpu.registers.c = cpu.rl(cpu.registers.target_to_reg8(instr.target_u8)) }
-        .d { cpu.registers.d = cpu.rl(cpu.registers.target_to_reg8(instr.target_u8)) }
-        .e { cpu.registers.e = cpu.rl(cpu.registers.target_to_reg8(instr.target_u8)) }
-        .h { cpu.registers.h = cpu.rl(cpu.registers.target_to_reg8(instr.target_u8)) }
-        .l { cpu.registers.l = cpu.rl(cpu.registers.target_to_reg8(instr.target_u8)) }
+        .a { cpu.registers.a = cpu.rl(cpu.registers.a) }
+        .b { cpu.registers.b = cpu.rl(cpu.registers.b) }
+        .c { cpu.registers.c = cpu.rl(cpu.registers.c) }
+        .d { cpu.registers.d = cpu.rl(cpu.registers.d) }
+        .e { cpu.registers.e = cpu.rl(cpu.registers.e) }
+        .h { cpu.registers.h = cpu.rl(cpu.registers.h) }
+        .l { cpu.registers.l = cpu.rl(cpu.registers.l) }
         else { panic("Not supported target for rl instruction: ${instr.target_u8}") }
+      }
+    }
+    .rrc {
+      match instr.target_u8 {
+        .a { cpu.registers.a = cpu.rrc(cpu.registers.a) }
+        .b { cpu.registers.b = cpu.rrc(cpu.registers.b) }
+        .c { cpu.registers.c = cpu.rrc(cpu.registers.c) }
+        .d { cpu.registers.d = cpu.rrc(cpu.registers.d) }
+        .e { cpu.registers.e = cpu.rrc(cpu.registers.e) }
+        .h { cpu.registers.h = cpu.rrc(cpu.registers.h) }
+        .l { cpu.registers.l = cpu.rrc(cpu.registers.l) }
+        else { panic("Not supported target for rrc instruction: ${instr.target_u8}") }
+      }
+    }
+    .rlc {
+      match instr.target_u8 {
+        .a { cpu.registers.a = cpu.rlc(cpu.registers.a) }
+        .b { cpu.registers.b = cpu.rlc(cpu.registers.b) }
+        .c { cpu.registers.c = cpu.rlc(cpu.registers.c) }
+        .d { cpu.registers.d = cpu.rlc(cpu.registers.d) }
+        .e { cpu.registers.e = cpu.rlc(cpu.registers.e) }
+        .h { cpu.registers.h = cpu.rlc(cpu.registers.h) }
+        .l { cpu.registers.l = cpu.rlc(cpu.registers.l) }
+        else { panic("Not supported target for rlc instruction: ${instr.target_u8}") }
+      }
+    }
+    .sra {
+      match instr.target_u8 {
+        .a { cpu.registers.a = cpu.sra(cpu.registers.a) }
+        .b { cpu.registers.b = cpu.sra(cpu.registers.b) }
+        .c { cpu.registers.c = cpu.sra(cpu.registers.c) }
+        .d { cpu.registers.d = cpu.sra(cpu.registers.d) }
+        .e { cpu.registers.e = cpu.sra(cpu.registers.e) }
+        .h { cpu.registers.h = cpu.sra(cpu.registers.h) }
+        .l { cpu.registers.l = cpu.sra(cpu.registers.l) }
+        else { panic("Not supported target for sra instruction: ${instr.target_u8}") }
+      }
+    }
+    .sla {
+      match instr.target_u8 {
+        .a { cpu.registers.a = cpu.sla(cpu.registers.a) }
+        .b { cpu.registers.b = cpu.sla(cpu.registers.b) }
+        .c { cpu.registers.c = cpu.sla(cpu.registers.c) }
+        .d { cpu.registers.d = cpu.sla(cpu.registers.d) }
+        .e { cpu.registers.e = cpu.sla(cpu.registers.e) }
+        .h { cpu.registers.h = cpu.sla(cpu.registers.h) }
+        .l { cpu.registers.l = cpu.sla(cpu.registers.l) }
+        else { panic("Not supported target for sla instruction: ${instr.target_u8}") }
+      }
+    }
+    .swap {
+      match instr.target_u8 {
+        .a { cpu.registers.a = cpu.swap(cpu.registers.a) }
+        .b { cpu.registers.b = cpu.swap(cpu.registers.b) }
+        .c { cpu.registers.c = cpu.swap(cpu.registers.c) }
+        .d { cpu.registers.d = cpu.swap(cpu.registers.d) }
+        .e { cpu.registers.e = cpu.swap(cpu.registers.e) }
+        .h { cpu.registers.h = cpu.swap(cpu.registers.h) }
+        .l { cpu.registers.l = cpu.swap(cpu.registers.l) }
+        else { panic("Not supported target for swap instruction: ${instr.target_u8}") }
       }
     }
     .ld {
@@ -554,6 +614,82 @@ fn (mut cpu Cpu) rl (value u8) u8 {
     subtract: false
     half_carry: false
     carry: carry == 1
+  }
+  cpu.registers.f = flag_to_u8(flags)
+  return new_value
+}
+
+fn (mut cpu Cpu) rrc (value u8) u8 {
+  mut new_value := value
+  carry := new_value & 0x1
+  new_value >>= 1
+  new_value |= carry << 7
+  flags := FlagsRegister{
+    zero: new_value == 0
+    subtract: false
+    half_carry: false
+    carry: carry == 1
+  }
+  cpu.registers.f = flag_to_u8(flags)
+  return new_value
+}
+
+fn (mut cpu Cpu) rlc (value u8) u8 {
+  mut new_value := value
+  carry := new_value >> 7
+  new_value <<= 1
+  new_value |= carry
+  flags := FlagsRegister{
+    zero: new_value == 0
+    subtract: false
+    half_carry: false
+    carry: carry == 1
+  }
+  cpu.registers.f = flag_to_u8(flags)
+  return new_value
+}
+
+fn (mut cpu Cpu) sra (value u8) u8 {
+  mut new_value := value
+  carry := value & 0x1
+  msb := (value >> 7) & 0x1
+  new_value >>= 1
+  new_value |= (msb << 7)
+  flags := FlagsRegister{
+    zero: new_value == 0
+    subtract: false
+    half_carry: false
+    carry: carry == 1
+  }
+  cpu.registers.f = flag_to_u8(flags)
+  return new_value
+}
+
+fn (mut cpu Cpu) sla (value u8) u8 {
+  mut new_value := value
+  carry := (value >> 7) & 0x1
+  lsb := value & 0x1
+  new_value <<= 1
+  new_value |= lsb
+  flags := FlagsRegister{
+    zero: new_value == 0
+    subtract: false
+    half_carry: false
+    carry: carry == 1
+  }
+  cpu.registers.f = flag_to_u8(flags)
+  return new_value
+}
+
+fn (mut cpu Cpu) swap (value u8) u8 {
+  upper := (value >> 4) & 0xF
+  lower := value & 0xF
+  new_value := (lower << 4) + upper
+  flags := FlagsRegister{
+    zero: new_value == 0
+    subtract: false
+    half_carry: false
+    carry: false
   }
   cpu.registers.f = flag_to_u8(flags)
   return new_value
