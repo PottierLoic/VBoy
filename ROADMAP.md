@@ -1,9 +1,6 @@
 # Roadmap
 
-Find a way to stop repeating cpu.pc++ for every casxe, maybe put it in the respecting functions ?
-
-Rename / rework the instructions file, specifically the struct / enum part.
-Naming is really bad and lead to missunderstandings.
+Find a way to stop repeating cpu.pc++ for every case, maybe put it in the respecting functions ?
 
 Implement the following cpu instructions that act on register data:
 
@@ -25,11 +22,11 @@ Implement the following cpu instructions that act on register data:
 - [x] RRCA (rotate right A register) - bit rotate A register right (not through the carry flag)
 - [x] RRLA (rotate left A register) - bit rotate A register left (not through the carry flag)
 - [x] CPL (complement) - toggle every bit of the A register
-- [Need to find a way to call it correctly but works] BIT (bit test) - test to see if a specific bit of a specific register is set
-- [Need to find a way to call it correctly but works] RESET (bit reset) - set a specific bit of a specific register to 0
-- [Need to find a way to call it correctly but works] SET (bit set) - set a specific bit of a specific register to 1
-- [ ] SRL (shift right logical) - bit shift a specific register right by 1
-- [ ] RR (rotate right) - bit rotate a specific register right by 1 through the carry flag
+- [x] BIT (bit test) - test to see if a specific bit of a specific register is set
+- [x] RESET (bit reset) - set a specific bit of a specific register to 0
+- [x] SET (bit set) - set a specific bit of a specific register to 1
+- [x] SRL (shift right logical) - bit shift a specific register right by 1
+- [x] RR (rotate right) - bit rotate a specific register right by 1 through the carry flag
 - [ ] RL (rotate left) - bit rotate a specific register left by 1 through the carry flag
 - [ ] RRC (rorate right) - bit rotate a specific register right by 1 (not through the carry flag)
 - [ ] RLC (rorate left) - bit rotate a specific register left by 1 (not through the carry flag)

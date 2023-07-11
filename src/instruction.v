@@ -7,68 +7,64 @@ enum RegisterU16 {
   af bc de hl sp
 }
 
-enum RegisterInstruction {
+enum Instruction_ {
   // Arithmetic instr
-  add
-  decr
-  inc
-  adc
-  addhl
-  addsp
-  sub
-  sbc
-  and
-  or_
-  xor
-  cp
+  add     //yeah
+  decr    //yeah
+  inc     //yeah
+  adc     //yeah
+  addhl   //NOPE
+  addsp   //NOPE
+  sub     //yeah
+  sbc     //yeah
+  and     //yeah
+  or_     //yeah
+  xor     //yeah
+  cp      //yeah
 
-  ccf
-  scf
+  ccf     //yeah
+  scf     //yeah
 
-  rra
-  rla
-  rrca
-  rlca
-  cpl
-  daa
+  rra     //yeah
+  rla     //yeah
+  rrca    //yeah
+  rlca    //yeah
+  cpl     //yeah
+  daa     //NOPE
 
   // Prefix instr
-  bit
-  res
-  set
-  srl
-  rr
-  rl
-  rrc
-  sra
-  sla
-  swap
+  bit     //yeah
+  res     //yeah
+  set     //yeah
+  srl     //NOPE
+  rr      //NOPE
+  rl      //NOPE
+  rrc     //NOPE
+  sra     //NOPE
+  sla     //NOPE
+  swap    //NOPE
 
   // Jump instr
-  jp
-  jr
-  jpi
+  jp      //yeah
+  jr      //NOPE
+  jpi     //NOPE
 
   // Load instr
-  ld
+  ld      //yeah
 
   // Stack instr
-  push
-  pop
-  call
-  ret
-  reti
-  rst
+  push    //yeah
+  pop     //yeah
+  call    //NOPE
+  ret     //yeah
+  reti    //NOPE
+  rst     //NOPE
 
   // Control instr
-  halt
-  nop
-  di
-  ei
-}
-struct InstructionTarget {
-  instruction RegisterInstruction
-  target RegisterU8
+  halt    //yeah
+  nop     //yeah
+  di      //NOPE
+  ei      //NOPE
 }
 
 /* Jump instructions part, each jump instruction is composed of an instruction and a condition */
@@ -78,10 +74,6 @@ enum JumpTest {
   not_carry
   carry
   always
-}
-struct InstructionCondition {
-  instruction RegisterInstruction
-  condition JumpTest
 }
 
 /* Memory reading / writing part */
@@ -113,47 +105,46 @@ enum LoadType {
   hl_from_spn           // not done
   indirect_from_sp      // not done
 }
-struct InstructionLoad {
-	instruction RegisterInstruction
-	load_type LoadType
-	source LoadByteSource
-	target LoadByteTarget
-}
 
 /* Stack targets and Instruction/Target struct */
 enum StackTarget {
 	bc de hl af
 }
-struct InstructionStack {
-	instruction RegisterInstruction
-	target StackTarget
+
+enum Position {
+  b0 b1 b2 b3 b4 b5 b6 b7
 }
 
-/* Waiting instructions, they have no targets */
-enum WaitingInstruction {
-	nop
-	halt
+struct Instruction {
+  instruction Instruction_
+  target_u8 RegisterU8
+  target_u16 RegisterU16
+  jump_test JumpTest
+  byte_target LoadByteTarget
+  byte_source LoadByteSource
+  word_target LoadWordTarget
+  indirect Indirect
+  load_type LoadType
+  stack_target StackTarget
+  bit_position Position
 }
-
-/* An instruction can be a jump, an arithmetic instruction, or a memory reading/writing */
-type Instruction = InstructionTarget | InstructionCondition | InstructionLoad | InstructionStack | WaitingInstruction
 
 /* Choose the correct method to read the instruction */
-fn instruction_from_byte(value u8, prefixed bool) InstructionTarget {
+fn instruction_from_byte(value u8, prefixed bool) Instruction {
   if prefixed { return instruction_from_byte_prefixed(value) }
   else { return instruction_from_byte_not_prefixed(value) }
 }
 
-fn instruction_from_byte_prefixed(value u8) InstructionTarget {
+fn instruction_from_byte_prefixed(value u8) Instruction {
   match value {
-    0x00 { return InstructionTarget{RegisterInstruction.inc, RegisterU8.b} }
+    0x00 { return Instruction{instruction: .add, target_u8: .c} }
     else { panic("Instruction not found: ${value}") } // add all remaining instruct
   }
 }
 
-fn instruction_from_byte_not_prefixed(value u8) InstructionTarget {
+fn instruction_from_byte_not_prefixed(value u8) Instruction {
   match value {
-    0x02 { return InstructionTarget{RegisterInstruction.inc, RegisterU8.b} }
+    0x02 { return Instruction{instruction: .add, target_u8: .c} }
     else { panic("Instruction not found: ${value}") } // add all remaining instruct
   }
 }
