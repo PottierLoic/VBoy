@@ -2,7 +2,9 @@
 
 Find a way to stop repeating cpu.pc++ for every case, maybe put it in each respecting functions ?
 
-Leave the FlagsRegister struct and only work with u8, set/reset them with the corresponding cpu functions
+Don't stay with target_u8 and target_u16 and collapse the enums OR check which of them is filled before entering match
+
+Leave the FlagsRegister struct and only work with u8, set/reset them with the corresponding cpu functions (set, res)
 
 Implement the following cpu instructions that act on register data:
 

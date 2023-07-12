@@ -1,3 +1,5 @@
+import os
+
 const boot_rom_begin = 0x00
 const boot_rom_end = 0xFF
 const boot_rom_size = boot_rom_end - boot_rom_begin + 1
@@ -50,6 +52,13 @@ const timer_vector = 0x50
 struct MemoryBus {
 mut:
   memory [65536]u8
+}
+
+fn (mut bus MemoryBus) load_rom(path string) {
+  file := os.read_bytes(path) or { panic("File not found: ${path}") }
+  for i in 0 .. file.len {
+    bus.memory[i] = file[i]
+  }
 }
 
 fn (bus MemoryBus) read_byte(address u16) u8 {

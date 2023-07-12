@@ -91,16 +91,16 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
       }
       cpu.pc++
     }
-    .decr {
+    .dec {
       match instr.target_u8 {
-        .a { cpu.registers.a = cpu.decr(instr.target_u8) }
-        .b { cpu.registers.b = cpu.decr(instr.target_u8) }
-        .c { cpu.registers.c = cpu.decr(instr.target_u8) }
-        .d { cpu.registers.d = cpu.decr(instr.target_u8) }
-        .e { cpu.registers.e = cpu.decr(instr.target_u8) }
-        .h { cpu.registers.h = cpu.decr(instr.target_u8) }
-        .l { cpu.registers.l = cpu.decr(instr.target_u8) }
-        else { panic("Not supported target for decr instruction: ${instr.target_u8}") }
+        .a { cpu.registers.a = cpu.dec(instr.target_u8) }
+        .b { cpu.registers.b = cpu.dec(instr.target_u8) }
+        .c { cpu.registers.c = cpu.dec(instr.target_u8) }
+        .d { cpu.registers.d = cpu.dec(instr.target_u8) }
+        .e { cpu.registers.e = cpu.dec(instr.target_u8) }
+        .h { cpu.registers.h = cpu.dec(instr.target_u8) }
+        .l { cpu.registers.l = cpu.dec(instr.target_u8) }
+        else { panic("Not supported target for dec instruction: ${instr.target_u8}") }
       }
       cpu.pc++
     }
@@ -464,8 +464,8 @@ fn (mut cpu Cpu) inc (reg RegisterU8) u8 {
   return new_value
 }
 
-/* Decrement the value of the target register and change flags */
-fn (mut cpu Cpu) decr (reg RegisterU8) u8 {
+/* decement the value of the target register and change flags */
+fn (mut cpu Cpu) dec (reg RegisterU8) u8 {
   mut new_value := cpu.registers.target_to_reg8(reg)
   new_value--
   mut flags := u8_to_flag(cpu.registers.f)

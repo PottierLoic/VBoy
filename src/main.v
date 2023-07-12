@@ -3,6 +3,7 @@ fn main() {
   println("Initializing CPU...")
   mut cpu := Cpu{}
   println("CPU Initialized succesfully.")
+  cpu.bus.load_rom("01-special.gb")
 
   cpu.registers.a = 159
   cpu.registers.c = 1
