@@ -68,7 +68,7 @@ enum Instruction_ {
   ei
 }
 
-/* Jump instructions part, each jump instruction is composed of an instruction and a condition */
+/* Jump conditions */
 enum JumpTest {
   not_zero
   zero
@@ -107,7 +107,7 @@ enum LoadType {
   indirect_from_sp      // not done
 }
 
-/* Stack targets and Instruction/Target struct */
+/* Stack part*/
 enum StackTarget {
 	bc de hl af
 }
@@ -127,6 +127,7 @@ enum RSTLocation {
   x38
 }
 
+/* Instruction struct that can hold multiple optional values, it can represent any of the instruction, prefixed or not */
 struct Instruction {
   instruction Instruction_
   target_u8 RegisterU8
