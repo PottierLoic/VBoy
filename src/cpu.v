@@ -318,7 +318,13 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
   return cpu.pc
 }
 
-/* Jump to next address if the condition is met */
+/* Initialize the cpu with default values. */
+fn (mut cpu Cpu) init () {
+  cpu.registers.a = 0x01
+  cpu.pc = 0x100
+}
+
+/* Jump to next address if the condition is met. */
 fn (mut cpu Cpu) jump (should_jump bool) {
   if should_jump {
     mut least_significant_byte := u16(cpu.bus.read_byte(cpu.pc + 1))
@@ -332,6 +338,7 @@ fn (mut cpu Cpu) jump (should_jump bool) {
 /* Extract the next instruction and execute it. */
 fn (mut cpu Cpu) step() {
   mut instruction_byte := cpu.bus.read_byte(cpu.pc)
+  println(instruction_byte)
   prefixed := instruction_byte == 0xCB
   if prefixed {
     instruction_byte = cpu.bus.read_byte(cpu.pc + 1)

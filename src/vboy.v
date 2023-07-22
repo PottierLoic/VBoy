@@ -36,10 +36,22 @@ fn main() {
 
 
   /* Cpu initialization */
+  println("Initializing CPU")
+  vboy.cpu.init()
+  println("CPU initialized succesfully")
 
+  vboy.cpu.registers.print()
 
+  /* Starting emulation */
+  // vboy.running = true
+
+  /* Cpu loop */
+  for vboy.running {
+    if vboy.paused { delay(10) } else {
+      vboy.cpu.step()
+    }
+  }
 }
-
 
 fn delay(ms u32) {
   // Do the delay with sdl wrapper / gg / sokol once graphics are added
