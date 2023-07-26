@@ -40,7 +40,7 @@ fn main() {
   vboy.cpu.init()
   println("CPU initialized succesfully")
 
-  vboy.cpu.registers.print()
+  vboy.cpu.print()
 
   /* Starting emulation */
   // vboy.running = true

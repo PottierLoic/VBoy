@@ -320,8 +320,8 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
 
 /* Initialize the cpu with default values. */
 fn (mut cpu Cpu) init () {
-  cpu.registers.a = 0x01
-  cpu.pc = 0x100
+  cpu.registers.a = 0x1
+  cpu.pc = 100
 }
 
 /* Jump to next address if the condition is met. */
@@ -733,4 +733,12 @@ fn (mut cpu Cpu) ret (should_jump bool) {
   } else {
     cpu.pc++
   }
+}
+
+
+fn (mut cpu Cpu) print () {
+  cpu.registers.print()
+  println("| PC: ${cpu.pc}")
+  println("| SP: ${cpu.sp}")
+  println("----------------------")
 }
