@@ -173,7 +173,7 @@ struct Cart {
 mut:
   filename string
   rom_size u32
-  rom_data[655360] u8 // need to fix this number, actual value is shit
+  rom_data[65536] u8 // need to fix this number, actual value is shit
   header   RomHeader
 }
 
@@ -198,7 +198,7 @@ fn (mut cart Cart) load_rom(rom_path string) bool {
   cart.rom_size = u32(os.file_size(rom_path))
 
   file := os.read_bytes(rom_path) or { return false }
-  for i in 0 .. file.len {
+  for i in 0 .. 65535 {
     cart.rom_data[i] = file[i]
   }
 

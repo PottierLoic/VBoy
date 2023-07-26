@@ -39,15 +39,20 @@ fn main() {
   println("Initializing CPU")
   vboy.cpu.init()
   println("CPU initialized succesfully")
-
   vboy.cpu.print()
 
   /* Starting emulation */
-  // vboy.running = true
+  println("Starting emulation")
+  vboy.running = true
+
+  for i in 0 .. 65536 {
+    vboy.cpu.bus.write_byte(i, vboy.cart.rom_data[i])
+  }
 
   /* Cpu loop */
   for vboy.running {
     if vboy.paused { delay(10) } else {
+      vboy.cpu.print()
       vboy.cpu.step()
     }
   }

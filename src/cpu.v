@@ -26,6 +26,17 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
       }
       cpu.jump(should_jump)
     }
+    .jr {
+      should_jump := match instr.jump_test {
+        .not_zero { !u8_to_flag(cpu.registers.f).zero }
+        .not_carry { !u8_to_flag(cpu.registers.f).carry }
+        .zero { u8_to_flag(cpu.registers.f).zero }
+        .carry { u8_to_flag (cpu.registers.f).carry }
+        .always { true }
+      }
+      // should call a separate function to handle the jump WITH OFFSET
+      panic("JR not implemented yet.")
+    }
     .call {
       should_jump := match instr.jump_test {
         .not_zero { !u8_to_flag(cpu.registers.f).zero }
@@ -288,6 +299,34 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
             else { cpu.pc++ }
           }
         }
+        .word {
+          match instr.word_target {
+            .bc {
+              least_significant_byte := cpu.bus.read_byte(cpu.pc + 1)
+              most_significant_byte := cpu.bus.read_byte(cpu.pc + 2)
+              cpu.registers.set_bc(most_significant_byte << 7 | least_significant_byte)
+              cpu.pc += 3
+            }
+            .de {
+              least_significant_byte := cpu.bus.read_byte(cpu.pc + 1)
+              most_significant_byte := cpu.bus.read_byte(cpu.pc + 2)
+              cpu.registers.set_de(most_significant_byte << 7 | least_significant_byte)
+              cpu.pc += 3
+            }
+            .hl {
+              least_significant_byte := cpu.bus.read_byte(cpu.pc + 1)
+              most_significant_byte := cpu.bus.read_byte(cpu.pc + 2)
+              cpu.registers.set_hl(most_significant_byte << 7 | least_significant_byte)
+              cpu.pc += 3
+            }
+            .sp {
+              least_significant_byte := cpu.bus.read_byte(cpu.pc + 1)
+              most_significant_byte := cpu.bus.read_byte(cpu.pc + 2)
+              cpu.sp = most_significant_byte << 7 | least_significant_byte
+              cpu.pc += 3
+            }
+          }
+        }
         else { panic("Unknown load type: ${instr.load_type}") }
       }
     }
@@ -338,7 +377,7 @@ fn (mut cpu Cpu) jump (should_jump bool) {
 /* Extract the next instruction and execute it. */
 fn (mut cpu Cpu) step() {
   mut instruction_byte := cpu.bus.read_byte(cpu.pc)
-  println(instruction_byte)
+  println("Instruction byte: ${instruction_byte}")
   prefixed := instruction_byte == 0xCB
   if prefixed {
     instruction_byte = cpu.bus.read_byte(cpu.pc + 1)
@@ -734,7 +773,6 @@ fn (mut cpu Cpu) ret (should_jump bool) {
     cpu.pc++
   }
 }
-
 
 fn (mut cpu Cpu) print () {
   cpu.registers.print()
