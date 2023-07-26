@@ -27,15 +27,15 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
       cpu.jump(should_jump)
     }
     .jr {
-      should_jump := match instr.jump_test {
-        .not_zero { !u8_to_flag(cpu.registers.f).zero }
-        .not_carry { !u8_to_flag(cpu.registers.f).carry }
-        .zero { u8_to_flag(cpu.registers.f).zero }
-        .carry { u8_to_flag (cpu.registers.f).carry }
-        .always { true }
-      }
-      // should call a separate function to handle the jump WITH OFFSET
-      panic("JR not implemented yet.")
+      panic("JR Not implemented yet")
+      // should_jump := match instr.jump_test {
+      //   .not_zero { !u8_to_flag(cpu.registers.f).zero }
+      //   .not_carry { !u8_to_flag(cpu.registers.f).carry }
+      //   .zero { u8_to_flag(cpu.registers.f).zero }
+      //   .carry { u8_to_flag (cpu.registers.f).carry }
+      //   .always { true }
+      // }
+      // cpu.jr(should_jump)
     }
     .call {
       should_jump := match instr.jump_test {
@@ -360,7 +360,7 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
 /* Initialize the cpu with default values. */
 fn (mut cpu Cpu) init () {
   cpu.registers.a = 0x1
-  cpu.pc = 100
+  cpu.pc = 0x0100
 }
 
 /* Jump to next address if the condition is met. */
@@ -369,6 +369,16 @@ fn (mut cpu Cpu) jump (should_jump bool) {
     mut least_significant_byte := u16(cpu.bus.read_byte(cpu.pc + 1))
     mut most_significant_byte := u16(cpu.bus.read_byte(cpu.pc + 2))
     cpu.pc = most_significant_byte << 8 | least_significant_byte
+  } else {
+    cpu.pc += 3
+  }
+}
+
+fn (mut cpu Cpu) jr (should_jump bool) {
+  if should_jump {
+    mut offset := cpu.bus.read_byte(cpu.pc + 1)
+    cpu.pc += 3
+    cpu.pc += u16(offset)
   } else {
     cpu.pc += 3
   }
@@ -760,7 +770,10 @@ fn (mut cpu Cpu) call (should_jump bool) {
   next_pc := cpu.pc + 3
   if should_jump {
     cpu.push(next_pc)
-    // MUST IMPLEMENT READ NEXT WORD
+    byte_low := u16(cpu.bus.read_byte(cpu.pc + 1))
+    byte_high := u16(cpu.bus.read_byte(cpu.pc + 2))
+    println("byte_low: ${byte_low}. byte_high: ${byte_high}")
+    cpu.pc = byte_high << 8 | byte_low
   } else {
     cpu.pc = next_pc
   }
