@@ -327,8 +327,19 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
             }
           }
         }
+        .a_from_byte_address {
+          address := cpu.bus.read_byte(cpu.pc + 1)
+          cpu.registers.a = cpu.bus.read_byte(0xFF00 | address)
+          cpu.pc += 2
+        }
+        .byte_address_from_a {
+          address := cpu.bus.read_byte(cpu.pc + 1)
+          cpu.bus.write_byte(0xFF00 | address, cpu.registers.a)
+          cpu.pc += 2
+        }
         else { panic("Unknown load type: ${instr.load_type}") }
       }
+      
     }
     .push {
       value := match instr.target_u16 {
@@ -359,8 +370,12 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
 
 /* Initialize the cpu with default values. */
 fn (mut cpu Cpu) init () {
-  cpu.registers.a = 0x1
+  cpu.registers.set_af(0x01B0)
+  cpu.registers.set_bc(0x0013)
+  cpu.registers.set_de(0x00D8)
+  cpu.registers.set_hl(0x014D)
   cpu.pc = 0x0100
+  cpu.sp = 0xFFFE
 }
 
 /* Jump to next address if the condition is met. */

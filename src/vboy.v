@@ -39,7 +39,6 @@ fn main() {
   println("Initializing CPU")
   vboy.cpu.init()
   println("CPU initialized succesfully")
-  vboy.cpu.print()
 
   /* Starting emulation */
   println("Starting emulation")

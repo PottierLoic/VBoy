@@ -49,14 +49,14 @@ fn (mut reg Registers) set_hl(value u16) {
 fn (reg Registers) print () {
   flag := u8_to_flag(reg.f)
   println("----------------------")
-  print("| a | ") print_full_b2(reg.a) print(" | ") print_full_b10(reg.a) println(" |")
-  print("| b | ") print_full_b2(reg.b) print(" | ") print_full_b10(reg.b) println(" |")
-  print("| c | ") print_full_b2(reg.c) print(" | ") print_full_b10(reg.c) println(" |")
-  print("| d | ") print_full_b2(reg.d) print(" | ") print_full_b10(reg.d) println(" |")
-  print("| e | ") print_full_b2(reg.e) print(" | ") print_full_b10(reg.e) println(" |")
-  print("| f | ") print_full_b2(reg.f) print(" | ") print_full_b10(reg.f) println(" |")
-  print("| h | ") print_full_b2(reg.h) print(" | ") print_full_b10(reg.h) println(" |")
-  print("| l | ") print_full_b2(reg.l) print(" | ") print_full_b10(reg.l) println(" |")
+  print("| a | ") print_full_b2(reg.a) print(" | ") print_hex(reg.a) println(" |")
+  print("| b | ") print_full_b2(reg.b) print(" | ") print_hex(reg.b) println(" |")
+  print("| c | ") print_full_b2(reg.c) print(" | ") print_hex(reg.c) println(" |")
+  print("| d | ") print_full_b2(reg.d) print(" | ") print_hex(reg.d) println(" |")
+  print("| e | ") print_full_b2(reg.e) print(" | ") print_hex(reg.e) println(" |")
+  print("| f | ") print_full_b2(reg.f) print(" | ") print_hex(reg.f) println(" |")
+  print("| h | ") print_full_b2(reg.h) print(" | ") print_hex(reg.h) println(" |")
+  print("| l | ") print_full_b2(reg.l) print(" | ") print_hex(reg.l) println(" |")
   println("----------------------")
   print("| zero       | ${flag.zero} ") if flag.zero { print(" ")} println("|")
   print("| subtract   | ${flag.subtract} ") if flag.subtract { print(" ")} println("|")
@@ -80,6 +80,11 @@ fn print_full_b10 (nb u8) {
   }
   for _ in 0 .. 3 - digits - int(nb == 0) { print("0") }
   print(nb)
+}
+
+fn print_hex (nb u8) {
+  print(nb.hex())
+  print(" ")
 }
 
 fn (reg Registers) target_to_reg8 (target RegisterU8) u8 {
