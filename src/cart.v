@@ -250,6 +250,14 @@ fn (mut cart Cart) load_rom(rom_path string) bool {
   return true
 }
 
+fn (cart Cart) read_byte(address u16) u8 {
+  return cart.rom_data[address]
+}
+
+fn (mut cart Cart) write_byte(address u16, value u8) u16 {
+  panic("Cart writting not implemented yet")
+}
+
 fn (header RomHeader) print() {
   println("Title:          ${header.title}")
   println("Type:           ${rom_types[header.rom_type]}")

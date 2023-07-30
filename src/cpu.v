@@ -1,9 +1,10 @@
 struct Cpu {
 mut:
+  vboy &VBoy = unsafe { nil }
   registers Registers
   pc u16
   sp u16
-  bus MemoryBus
+  //bus MemoryBus
 }
 
 /* Execute the provided instruction and return next program counter. */
@@ -281,8 +282,8 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
             .e { cpu.registers.e }
             .h { cpu.registers.h }
             .l { cpu.registers.l }
-            .d8 { cpu.bus.read_byte(cpu.pc + 1) }
-            .hli { cpu.bus.read_byte(cpu.registers.get_hl()) }
+            .d8 { cpu.read_byte(cpu.pc + 1) }
+            .hli { cpu.read_byte(cpu.registers.get_hl()) }
           }
           match instr.byte_target {
             .a { cpu.registers.a = source_value }
@@ -292,7 +293,7 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
             .e { cpu.registers.e = source_value }
             .h { cpu.registers.h = source_value }
             .l { cpu.registers.l = source_value }
-            .hli { cpu.bus.write_byte(cpu.registers.get_hl(), source_value) }
+            .hli { cpu.write_byte(cpu.registers.get_hl(), source_value) }
           }
           match instr.byte_source {
             .d8 { cpu.pc += 2 }
@@ -302,39 +303,39 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
         .word {
           match instr.word_target {
             .bc {
-              least_significant_byte := cpu.bus.read_byte(cpu.pc + 1)
-              most_significant_byte := cpu.bus.read_byte(cpu.pc + 2)
+              least_significant_byte := cpu.read_byte(cpu.pc + 1)
+              most_significant_byte := cpu.read_byte(cpu.pc + 2)
               cpu.registers.set_bc(most_significant_byte << 7 | least_significant_byte)
               cpu.pc += 3
             }
             .de {
-              least_significant_byte := cpu.bus.read_byte(cpu.pc + 1)
-              most_significant_byte := cpu.bus.read_byte(cpu.pc + 2)
+              least_significant_byte := cpu.read_byte(cpu.pc + 1)
+              most_significant_byte := cpu.read_byte(cpu.pc + 2)
               cpu.registers.set_de(most_significant_byte << 7 | least_significant_byte)
               cpu.pc += 3
             }
             .hl {
-              least_significant_byte := cpu.bus.read_byte(cpu.pc + 1)
-              most_significant_byte := cpu.bus.read_byte(cpu.pc + 2)
+              least_significant_byte := cpu.read_byte(cpu.pc + 1)
+              most_significant_byte := cpu.read_byte(cpu.pc + 2)
               cpu.registers.set_hl(most_significant_byte << 7 | least_significant_byte)
               cpu.pc += 3
             }
             .sp {
-              least_significant_byte := cpu.bus.read_byte(cpu.pc + 1)
-              most_significant_byte := cpu.bus.read_byte(cpu.pc + 2)
+              least_significant_byte := cpu.read_byte(cpu.pc + 1)
+              most_significant_byte := cpu.read_byte(cpu.pc + 2)
               cpu.sp = most_significant_byte << 7 | least_significant_byte
               cpu.pc += 3
             }
           }
         }
         .a_from_byte_address {
-          address := cpu.bus.read_byte(cpu.pc + 1)
-          cpu.registers.a = cpu.bus.read_byte(0xFF00 | address)
+          address := cpu.read_byte(cpu.pc + 1)
+          cpu.registers.a = cpu.read_byte(0xFF00 | address)
           cpu.pc += 2
         }
         .byte_address_from_a {
-          address := cpu.bus.read_byte(cpu.pc + 1)
-          cpu.bus.write_byte(0xFF00 | address, cpu.registers.a)
+          address := cpu.read_byte(cpu.pc + 1)
+          cpu.write_byte(0xFF00 | address, cpu.registers.a)
           cpu.pc += 2
         }
         else { panic("Unknown load type: ${instr.load_type}") }
@@ -381,8 +382,8 @@ fn (mut cpu Cpu) init () {
 /* Jump to next address if the condition is met. */
 fn (mut cpu Cpu) jump (should_jump bool) {
   if should_jump {
-    mut least_significant_byte := u16(cpu.bus.read_byte(cpu.pc + 1))
-    mut most_significant_byte := u16(cpu.bus.read_byte(cpu.pc + 2))
+    mut least_significant_byte := u16(cpu.read_byte(cpu.pc + 1))
+    mut most_significant_byte := u16(cpu.read_byte(cpu.pc + 2))
     cpu.pc = most_significant_byte << 8 | least_significant_byte
   } else {
     cpu.pc += 3
@@ -391,7 +392,7 @@ fn (mut cpu Cpu) jump (should_jump bool) {
 
 fn (mut cpu Cpu) jr (should_jump bool) {
   if should_jump {
-    mut offset := cpu.bus.read_byte(cpu.pc + 1)
+    mut offset := cpu.read_byte(cpu.pc + 1)
     cpu.pc += 3
     cpu.pc += u16(offset)
   } else {
@@ -401,11 +402,11 @@ fn (mut cpu Cpu) jr (should_jump bool) {
 
 /* Extract the next instruction and execute it. */
 fn (mut cpu Cpu) step() {
-  mut instruction_byte := cpu.bus.read_byte(cpu.pc)
+  mut instruction_byte := cpu.read_byte(cpu.pc)
   println("Instruction byte: ${instruction_byte}")
   prefixed := instruction_byte == 0xCB
   if prefixed {
-    instruction_byte = cpu.bus.read_byte(cpu.pc + 1)
+    instruction_byte = cpu.read_byte(cpu.pc + 1)
   }
   instruction := instruction_from_byte(instruction_byte, prefixed)
   next_pc := if instruction == instruction_from_byte(instruction_byte, prefixed) {
@@ -768,15 +769,15 @@ fn (mut cpu Cpu) swap (value u8) u8 {
 
 fn (mut cpu Cpu) push (value u16) {
   cpu.sp--
-  cpu.bus.write_byte(cpu.sp, u8((value & 0xFF00) >> 8))
+  cpu.write_byte(cpu.sp, u8((value & 0xFF00) >> 8))
   cpu.sp--
-  cpu.bus.write_byte(cpu.sp, u8(value & 0xFF))
+  cpu.write_byte(cpu.sp, u8(value & 0xFF))
 }
 
 fn (mut cpu Cpu) pop () u16 {
-  lsb := u16(cpu.bus.read_byte(cpu.sp))
+  lsb := u16(cpu.read_byte(cpu.sp))
   cpu.sp++
-  msb := u16(cpu.bus.read_byte(cpu.sp))
+  msb := u16(cpu.read_byte(cpu.sp))
   cpu.sp++
   return (msb << 8) | lsb
 }
@@ -785,9 +786,8 @@ fn (mut cpu Cpu) call (should_jump bool) {
   next_pc := cpu.pc + 3
   if should_jump {
     cpu.push(next_pc)
-    byte_low := u16(cpu.bus.read_byte(cpu.pc + 1))
-    byte_high := u16(cpu.bus.read_byte(cpu.pc + 2))
-    println("byte_low: ${byte_low}. byte_high: ${byte_high}")
+    byte_low := u16(cpu.read_byte(cpu.pc + 1))
+    byte_high := u16(cpu.read_byte(cpu.pc + 2))
     cpu.pc = byte_high << 8 | byte_low
   } else {
     cpu.pc = next_pc
@@ -799,6 +799,22 @@ fn (mut cpu Cpu) ret (should_jump bool) {
     cpu.pop()
   } else {
     cpu.pc++
+  }
+}
+
+fn (mut cpu Cpu) read_byte (address u16) u8 {
+  if address < 0x8000 {
+    return cpu.vboy.cart.read_byte(address)
+  } else {
+    panic("Memory reading not implemented on address ${address}")
+  }
+}
+
+fn (mut cpu Cpu) write_byte (address u16, value u8) {
+  if address < 0x8000 {
+    cpu.vboy.cart.write_byte (address, value)
+  } else {
+    panic("Memory writing not implemented on address ${address}")
   }
 }
 

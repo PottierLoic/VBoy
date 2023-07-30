@@ -38,15 +38,18 @@ fn main() {
   /* Cpu initialization */
   println("Initializing CPU")
   vboy.cpu.init()
+  vboy.cpu.vboy = &vboy
   println("CPU initialized succesfully")
 
   /* Starting emulation */
   println("Starting emulation")
   vboy.running = true
 
-  for i in 0 .. 65536 {
-    vboy.cpu.bus.write_byte(i, vboy.cart.rom_data[i])
-  }
+  // // This should not stay like this, just for testing
+  // // write rom to memory bus for now
+  // for i in 0 .. 65536 {
+  //   vboy.memory.write_byte(i, vboy.cart.rom_data[i])
+  // }
 
   /* Cpu loop */
   for vboy.running {
