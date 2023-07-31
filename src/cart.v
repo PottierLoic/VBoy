@@ -152,6 +152,27 @@ const lic_codes = [
   'Konami (Yu-Gi-Oh!)',
 ]
 
+const rom_sizes = [
+  "32 KiB"
+  "64 KiB"
+  "128 KiB"
+  "256 KiB"
+  "512 KiB"
+  "1 MiB"
+  "2 MiB"
+  "4 MiB"
+  "8 MiB"
+]
+
+const ram_sizes = [
+  "0"
+  "-"
+  "8 KiB"
+  "32 KiB"
+  "128 KiB"
+  "64 KiB"
+]
+
 struct RomHeader {
 mut:
   entry           [4]u8
@@ -173,11 +194,12 @@ struct Cart {
 mut:
   filename string
   rom_size u32
-  rom_data[65536] u8 // need to fix this number, actual value is shit
+  rom_data[65536] u8 // Not sure if this is the maximum size a cart can be
   header   RomHeader
 }
 
-fn (cart Cart) cart_lic_name() string {
+/* Return the licence code corresponding to the cart informations. */
+fn (cart Cart) cart_lic() string {
   if cart.header.new_lic_code <= 0xa4 {
     return lic_codes[cart.header.lic_code]
   } else {
@@ -185,7 +207,8 @@ fn (cart Cart) cart_lic_name() string {
   }
 }
 
-fn (cart Cart) cart_type_name() string {
+/* Return the Rom type corresponding to the cart informations. */
+fn (cart Cart) cart_type() string {
   if cart.header.rom_type <= 0x22 {
     return rom_types[cart.header.rom_type]
   } else {
@@ -193,26 +216,46 @@ fn (cart Cart) cart_type_name() string {
   }
 }
 
+fn (cart Cart) cart_rom_size() string {
+  if cart.header.rom_size <= 0x8 {
+    return rom_sizes[cart.header.rom_size]
+  } else {
+    return 'UNKNOWN ROM SIZE: ${cart.header.rom_size}'
+  }
+}
+
+fn (cart Cart) cart_ram_size() string {
+  if cart.header.ram_size <= 0x5 {
+    return ram_sizes[cart.header.ram_size]
+  } else {
+    return 'UNKNOWN ROM SIZE: ${cart.header.ram_size}'
+  }
+}
+
+/* Load the cartridge information from the rom (.gb) file.
+Return true on succes and false if the loading failed. */
 fn (mut cart Cart) load_rom(rom_path string) bool {
+  file := os.read_bytes(rom_path) or {
+    println("File not found: ${rom_path}")
+    return false
+  }
+
   cart.filename = rom_path
   cart.rom_size = u32(os.file_size(rom_path))
 
-  file := os.read_bytes(rom_path) or { return false }
+  // Parsing cartidge data
   for i in 0 .. 65535 {
     cart.rom_data[i] = file[i]
   }
 
   /* Extract entry */
-  for i in 0..4 { cart.header.entry[i] = cart.rom_data[0x100 + i] }
-
+  for i in 0 .. 4 { cart.header.entry[i] = cart.rom_data[0x100 + i] }
   /* Extract logo */
-  for i in 0..0x30 { cart.header.logo[i] = cart.rom_data[0x104 + i] }
-
+  for i in 0 .. 0x30 { cart.header.logo[i] = cart.rom_data[0x104 + i] }
   /* Title */
-  for i in 0..16 {
+  for i in 0 .. 16 {
     cart.header.title += cart.rom_data[0x134 + i].ascii_str()
   }
-
   /* New license code */
   cart.header.new_lic_code = cart.rom_data[0x144] << 7 | cart.rom_data[0x145]
   /* SGB Flag */
@@ -222,7 +265,7 @@ fn (mut cart Cart) load_rom(rom_path string) bool {
   /* ROM Size */
   cart.header.rom_size = cart.rom_data[0x148]
   /* RAM Size */
-  cart.header.ram_size = cart.rom_data[0x149]  
+  cart.header.ram_size = cart.rom_data[0x149]
   /* Destination code */
   cart.header.dest_code = cart.rom_data[0x14a]
   /* Old license code */
@@ -234,7 +277,7 @@ fn (mut cart Cart) load_rom(rom_path string) bool {
   /* Global checksum */
   cart.header.global_checksum = cart.rom_data[0x14e] << 7 | cart.rom_data[0x14f]
 
-  cart.header.print()
+  cart.print()
 
   mut x := u16(0)
   for i := 0x134; i <= 0x14c; i++ {
@@ -250,19 +293,23 @@ fn (mut cart Cart) load_rom(rom_path string) bool {
   return true
 }
 
+/* Return the u8 value stored at provided address */
 fn (cart Cart) read_byte(address u16) u8 {
   return cart.rom_data[address]
 }
 
+/* Write u8 value on the provided address in rom.
+This does not save a new file but just modify the values in the cart struct. */
 fn (mut cart Cart) write_byte(address u16, value u8) u16 {
   panic("Cart writting not implemented yet")
 }
 
-fn (header RomHeader) print() {
-  println("Title:          ${header.title}")
-  println("Type:           ${rom_types[header.rom_type]}")
-  println("ROM Size:       ${header.rom_size}")
-  println("RAM Size:       ${header.ram_size}")
-  println("LIC Code:       ${lic_codes[header.lic_code]}")
-  println("Rom Version:    ${header.version}")
+/* Display rom header informations */
+fn (cart Cart) print() {
+  println("Title:          ${cart.header.title}")
+  println("Type:           ${cart.cart_type()}")
+  println("ROM Size:       ${cart.cart_rom_size()}")
+  println("RAM Size:       ${cart.cart_ram_size()}")
+  println("LIC Code:       ${cart.cart_lic()}")
+  println("Rom Version:    ${cart.header.version}")
 }

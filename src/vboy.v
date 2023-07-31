@@ -1,14 +1,15 @@
 import os
+import time
 
 struct VBoy {
-  // Emulator components
 mut:
+  // Emulator components
   cart Cart
   cpu Cpu
   memory MemoryBus
   ppu Ppu
 
-
+  // Emulator states
   paused bool
   running bool
   tick u64
@@ -45,12 +46,6 @@ fn main() {
   println("Starting emulation")
   vboy.running = true
 
-  // // This should not stay like this, just for testing
-  // // write rom to memory bus for now
-  // for i in 0 .. 65536 {
-  //   vboy.memory.write_byte(i, vboy.cart.rom_data[i])
-  // }
-
   /* Cpu loop */
   for vboy.running {
     if vboy.paused { delay(10) } else {
@@ -61,5 +56,5 @@ fn main() {
 }
 
 fn delay(ms u32) {
-  // Do the delay with sdl wrapper / gg / sokol once graphics are added
+  time.sleep(ms)
 }
