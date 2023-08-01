@@ -804,18 +804,81 @@ fn (mut cpu Cpu) ret (should_jump bool) {
 
 fn (mut cpu Cpu) read_byte (address u16) u8 {
   if address < 0x8000 {
+    // ROM Data
     return cpu.vboy.cart.read_byte(address)
+  } else if address < 0xA000 {
+    // Char/map data
+    panic("PPU vram writing not implemented")
+  } else if address < 0xC000 {
+    // Cart RAM
+    return cpu.vboy.cart.read_byte(address)
+  } else if address < 0xE000 {
+    // WRAM
+    panic("WRAM writing not implemented")
+  } else if address < 0xFE00 {
+    // Reserved echo ram
+    return 0
+  } else if address < 0xFEA0 {
+    // OAM
+    panic("PPU OAM writing not implemented")
+  } else if address < 0xFF00 {
+    // Reserved unusable
+    return 0
+  } else if address < 0xFF80 {
+    // IO Registers
+    panic("IO read not implemented")
+  } else if address < 0xFFFF {
+    // CPU enable register
+    panic("CPU Get IE Register not implemented")
   } else {
-    panic("Memory reading not implemented on address ${address}")
+    // Temporary fix to debug
+    // panic("HRAM Read not implemented")
+    return cpu.vboy.cart.read_byte(address)
   }
 }
 
 fn (mut cpu Cpu) write_byte (address u16, value u8) {
   if address < 0x8000 {
-    cpu.vboy.cart.write_byte (address, value)
+    // ROM Data
+    cpu.vboy.cart.write_byte(address, value)
+  } else if address < 0xA000 {
+    // Char/map data
+    panic("ppu vram wrtiting not implemented")
+  } else if address < 0xC000 {
+    // Cart RAM
+    cpu.vboy.cart.write_byte(address, value)
+  } else if address < 0xE000 {
+    // WRAM
+    panic("WRAM writing not implemented")
+  } else if address < 0xFE00 {
+    // Reserved echo ram
+  } else if address < 0xFEA0 {
+    // OAM
+    panic("PPU OAM writing not implemented")
+  } else if address < 0xFF00 {
+    // Reserved unusable
+  } else if address < 0xFF80 {
+    // IO Registers
+    panic("IO read not implemented")
+  } else if address < 0xFFFF {
+    // CPU enable register
+    panic("CPU Set IE Register not implemented")
   } else {
-    panic("Memory writing not implemented on address ${address}")
+    // Temporary fix to debug
+    // panic("HRAM Writing not implemented")
+    cpu.vboy.cart.write_byte(address, value)
   }
+}
+
+fn (mut cpu Cpu) read_u16 (address u16) u16 {
+  low := u16(cpu.read_byte(address))
+  high := u16(cpu.read_byte(address + 1))
+  return low | high << 8
+}
+
+fn (mut cpu Cpu) write_u16 (address u16, value u16) {
+  cpu.write_byte(address + 1, u8(value >> 8))
+  cpu.write_byte(address, u8(value))
 }
 
 fn (mut cpu Cpu) print () {

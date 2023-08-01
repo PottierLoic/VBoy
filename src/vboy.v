@@ -1,12 +1,11 @@
 import os
-import time
+import sdl
 
 struct VBoy {
 mut:
   // Emulator components
   cart Cart
   cpu Cpu
-  memory MemoryBus
   ppu Ppu
 
   // Emulator states
@@ -16,6 +15,10 @@ mut:
 }
 
 fn main() {
+  sdl.init(sdl.init_video)
+	window := sdl.create_window('VBoy'.str, 300, 300, 500, 300, 0)
+	renderer := sdl.create_renderer(window, -1, u32(sdl.RendererFlags.accelerated) | u32(sdl.RendererFlags.presentvsync))
+
   args := os.args.clone()
   if args.len == 1 {
     println("Missing parameter: rom_path.")
@@ -52,9 +55,16 @@ fn main() {
       vboy.cpu.print()
       vboy.cpu.step()
     }
+    sdl.set_render_draw_color(renderer, 255, 255, 255, 255)
+		sdl.render_clear(renderer)
+		sdl.render_present(renderer)
   }
+
+  sdl.destroy_renderer(renderer)
+	sdl.destroy_window(window)
+	sdl.quit()
 }
 
 fn delay(ms u32) {
-  time.sleep(ms)
+  sdl.delay(ms)
 }
