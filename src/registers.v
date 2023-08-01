@@ -87,6 +87,13 @@ fn print_hex (nb u8) {
   print(" ")
 }
 
+/* used for debug, print all digits of u8 number */
+fn print_u8_b2(nb u8) {
+	for i in 0..8 {
+		print(nb >> i & 1)
+	}
+}
+
 fn (reg Registers) target_to_reg8 (target RegisterU8) u8 {
   return match target {
     .a { reg.a }

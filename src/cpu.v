@@ -340,7 +340,6 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
         }
         else { panic("Unknown load type: ${instr.load_type}") }
       }
-      
     }
     .push {
       value := match instr.target_u16 {
@@ -350,11 +349,11 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
         .af { cpu.registers.get_af() }
         else { panic("Target not supported for push instruction: ${instr.target_u16}") }
       }
-      cpu.push(value)
+      cpu.push_u16(value)
       cpu.pc++
     }
     .pop {
-      result := cpu.pop()
+      result := cpu.pop_u16()
       match instr.target_u16 {
         .bc { cpu.registers.set_bc(result) }
         .de { cpu.registers.set_de(result) }
@@ -767,25 +766,32 @@ fn (mut cpu Cpu) swap (value u8) u8 {
   return new_value
 }
 
-fn (mut cpu Cpu) push (value u16) {
+fn (mut cpu Cpu) push (value u8) {
   cpu.sp--
-  cpu.write_byte(cpu.sp, u8((value & 0xFF00) >> 8))
-  cpu.sp--
-  cpu.write_byte(cpu.sp, u8(value & 0xFF))
+  cpu.write_byte(cpu.sp, value)
 }
 
-fn (mut cpu Cpu) pop () u16 {
-  lsb := u16(cpu.read_byte(cpu.sp))
-  cpu.sp++
-  msb := u16(cpu.read_byte(cpu.sp))
-  cpu.sp++
-  return (msb << 8) | lsb
+fn (mut cpu Cpu) pop () u8 {
+  value := cpu.read_byte(cpu.sp)
+  cpu.sp--
+  return value
+}
+
+fn (mut cpu Cpu) push_u16 (value u16) {
+  cpu.push(u8((value & 0xFF00) >> 8))
+  cpu.push(u8(value))
+}
+
+fn (mut cpu Cpu) pop_u16 () u16 {
+  low := u16(cpu.pop())
+  high := u16(cpu.pop())
+  return (high << 8) | low
 }
 
 fn (mut cpu Cpu) call (should_jump bool) {
   next_pc := cpu.pc + 3
   if should_jump {
-    cpu.push(next_pc)
+    cpu.push_u16(next_pc)
     byte_low := u16(cpu.read_byte(cpu.pc + 1))
     byte_high := u16(cpu.read_byte(cpu.pc + 2))
     cpu.pc = byte_high << 8 | byte_low
@@ -796,7 +802,7 @@ fn (mut cpu Cpu) call (should_jump bool) {
 
 fn (mut cpu Cpu) ret (should_jump bool) {
   if should_jump {
-    cpu.pop()
+    cpu.pop_u16()
   } else {
     cpu.pc++
   }
@@ -879,6 +885,20 @@ fn (mut cpu Cpu) read_u16 (address u16) u16 {
 fn (mut cpu Cpu) write_u16 (address u16, value u16) {
   cpu.write_byte(address + 1, u8(value >> 8))
   cpu.write_byte(address, u8(value))
+}
+
+/* Add value to the target and handle overflow */
+fn overflowing_add (target u8, value u8) (u8, bool){
+  mut new_value := u16(target) + u16(value)
+  new_value = new_value >> 8
+  return u8(target + value), new_value > 0
+}
+
+/* Substract value to the target and handle underflow */
+fn underflowing_subtract (target u8, value u8) (u8, bool){
+  mut new_value := u16(target) - u16(value)
+  new_value = new_value >> 8
+  return u8(target - value), new_value > 0
 }
 
 fn (mut cpu Cpu) print () {

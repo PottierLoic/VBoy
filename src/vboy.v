@@ -15,19 +15,24 @@ mut:
 }
 
 fn main() {
-  sdl.init(sdl.init_video)
-	window := sdl.create_window('VBoy'.str, 300, 300, 500, 300, 0)
-	renderer := sdl.create_renderer(window, -1, u32(sdl.RendererFlags.accelerated) | u32(sdl.RendererFlags.presentvsync))
-
   args := os.args.clone()
   if args.len == 1 {
-    println("Missing parameter: rom_path.")
+    println("Missing parameter: rom_path")
     return
   } else if args.len > 2 {
-    println("Too many parameters, only specify rom_path.")
+    println("Too many parameters, only specify rom_path")
     return
   }
 
+  /* SDL initialization */
+  println("Starting SDL")
+  mut sdl_ctx := SdlContext{}
+  if sdl_ctx.init() == false {
+    println("Error initalizing SDL")
+    return
+  } else { println("SDL initialized succesfully") }
+
+  /* VBoy initialization */
   println("Starting VBoy")
   mut vboy := VBoy{}
 
@@ -38,7 +43,6 @@ fn main() {
     return
   } else { println("Rom loaded succesfully") }
 
-
   /* Cpu initialization */
   println("Initializing CPU")
   vboy.cpu.init()
@@ -48,23 +52,35 @@ fn main() {
   /* Starting emulation */
   println("Starting emulation")
   vboy.running = true
+  vboy.paused = true
 
-  /* Cpu loop */
+  /* Main loop */
   for vboy.running {
     if vboy.paused { delay(10) } else {
       vboy.cpu.print()
       vboy.cpu.step()
     }
-    sdl.set_render_draw_color(renderer, 255, 255, 255, 255)
-		sdl.render_clear(renderer)
-		sdl.render_present(renderer)
+    event := sdl.Event{}
+    for 0 < sdl.poll_event(&event) {
+      match event.@type {
+        .quit {
+          //Close everything
+          return
+        }
+        .keydown {
+          key := unsafe { sdl.KeyCode(event.key.keysym.sym) }
+          if key == sdl.KeyCode.escape {
+						//Close everything
+            return
+					}
+        }
+        else {}
+      }
+    }
   }
-
-  sdl.destroy_renderer(renderer)
-	sdl.destroy_window(window)
-	sdl.quit()
 }
 
+/* quite useless but prevent from importing sdl in each file */
 fn delay(ms u32) {
   sdl.delay(ms)
 }
