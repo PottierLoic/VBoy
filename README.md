@@ -8,8 +8,8 @@ C -> u8
 D -> u8  
 E -> u8  
 F -> u8  
-G -> u8  
 H -> u8  
+L -> u8  
 
 ## 4 "Virtual" 16 bit registers
 

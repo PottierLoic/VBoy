@@ -832,14 +832,13 @@ fn (mut cpu Cpu) read_byte (address u16) u8 {
     return 0
   } else if address < 0xFF80 {
     // IO Registers
-    panic("IO read not implemented")
+    return cpu.vboy.io.read_io(address)
   } else if address < 0xFFFF {
     // CPU enable register
     panic("CPU Get IE Register not implemented")
   } else {
     // HRAM
     return cpu.vboy.ram.read_hram(address)
-    //return cpu.vboy.cart.read_byte(address)
   }
 }
 
@@ -865,14 +864,13 @@ fn (mut cpu Cpu) write_byte (address u16, value u8) {
     // Reserved unusable
   } else if address < 0xFF80 {
     // IO Registers
-    panic("IO read not implemented")
+    cpu.vboy.io.write_io(address, value)
   } else if address < 0xFFFF {
     // CPU enable register
     panic("CPU Set IE Register not implemented")
   } else {
     // HRAM
     cpu.vboy.ram.write_hram(address, value)
-    // cpu.vboy.cart.write_byte(address, value)
   }
 }
 

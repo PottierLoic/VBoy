@@ -1,10 +1,10 @@
 // TODO:Maybe remove this quite useless struct
-struct Io_data {
+struct Io {
 mut:
 	data [2]u8	// Supposed to be a char, will change later
 }
 
-fn (io Io_data) io_read(address u16) u8 {
+fn (io Io) read_io(address u16) u8 {
 	return match address {
 		0xFF00 {
 			// TODO: Gamepad
@@ -40,8 +40,7 @@ fn (io Io_data) io_read(address u16) u8 {
 	}
 }
 
-
-fn (mut io Io_data) io_write(address u16, value u8) {
+fn (mut io Io) write_io(address u16, value u8) {
 	match address {
 		0xFF00 {
 			// TODO: Gamepad
