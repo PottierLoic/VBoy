@@ -28,7 +28,7 @@ fn main() {
 
 	// SDL initialization
 	println('Starting SDL')
-	mut sdl_ctx := SdlContext{}
+	mut sdl_ctx := Sdl_context{}
 	if sdl_ctx.init() == false {
 		println('Error initalizing SDL')
 		return
@@ -58,6 +58,7 @@ fn main() {
 	// Starting emulation
 	println('Starting emulation')
 	vboy.running = true
+	vboy.paused = true
 
 	// Main loop
 	for vboy.running {
@@ -70,19 +71,12 @@ fn main() {
 		event := sdl.Event{}
 		for 0 < sdl.poll_event(&event) {
 			match event.@type {
-				.quit {
-					// Close everything
-					return
-				}
-				.keydown {
-					key := unsafe { sdl.KeyCode(event.key.keysym.sym) }
-					if key == sdl.KeyCode.escape {
-						// Close everything
-						return
-					}
-				}
+				.quit {	return }				
+				.keydown { sdl_ctx.handle_keydown(event) }
+				.keyup { sdl_ctx.handle_keyup(event) }
 				else {}
 			}
+			if sdl_ctx.quit { return }
 		}
 	}
 }
