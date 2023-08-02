@@ -12,12 +12,30 @@ fn (mut timer Timer) timer_init() {
 
 fn (mut timer Timer) timer_tick() {
 	// TODO: implement timer
+	last_div := timer.div
+	timer.div++
+	mut update := false
+	match timer.tac & 0x03 {
+		0x00 { update = (((last_div & 0b1000000000) >> 9) == 1) && (((timer.div & 0b1000000000) >> 9) == 1) }
+		0x01 { update = (((last_div & 0b1000) >> 3) == 1) && (((timer.div & 0b1000) >> 3) == 1) }
+		0x02 { update = (((last_div & 0b100000) >> 5) == 1) && (((timer.div & 0b100000) >> 5) == 1) }
+		0x03 { update = (((last_div & 0b10000000) >> 7) == 1) && (((timer.div & 0b10000000) >> 7) == 1) }
+		else {}
+	}
+
+	if update && (timer.tac & 0b100) == 0b100 {
+		timer.tima++
+
+		if timer.tima == 0xFF {
+			timer.tima = timer.tma
+			// TODO: implement interrupt
+		}	
+	}
 }
 
-// TODO: Check if return type u16 is good
-fn (mut timer Timer) timer_read(address u16) u16 {
+fn (mut timer Timer) timer_read(address u16) u8 {
 	return match address {
-		0xFF04 { timer.div >> 8 }
+		0xFF04 { u8(timer.div >> 8) }
 		0xFF05 { timer.tima }
 		0xFF06 { timer.tma }
 		0xFF07 { timer.tac }
