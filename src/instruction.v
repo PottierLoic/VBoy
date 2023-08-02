@@ -79,10 +79,10 @@ enum JumpTest {
 
 /* Memory reading / writing part */
 enum LoadByteTarget {
-	a b c d e h l hli
+  a b c d e h l hli
 }
 enum LoadByteSource {
-	a b c d e h l d8 hli
+  a b c d e h l d8 hli
 }
 enum LoadWordTarget {
   bc de hl sp
@@ -96,12 +96,12 @@ enum Indirect {
   last_byte_indirect
 }
 enum LoadType {
-	byte                  // done
-	word                  // not done
-	a_from_indirect       // not done
-	indirect_from_a       // not done
-	a_from_byte_address   // not done
-	byte_address_from_a   // not done
+  byte                  // done
+  word                  // not done
+  a_from_indirect       // not done
+  indirect_from_a       // not done
+  a_from_byte_address   // not done
+  byte_address_from_a   // not done
   sp_from_hl            // not done
   hl_from_spn           // not done
   indirect_from_sp      // not done
@@ -109,7 +109,7 @@ enum LoadType {
 
 /* Stack part*/
 enum StackTarget {
-	bc de hl af
+  bc de hl af
 }
 
 enum Position {

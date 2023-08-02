@@ -65,36 +65,39 @@ fn (reg Registers) print () {
   println("----------------------")
 }
 
-fn print_full_b2 (nb u8) {
-	for i in 0 .. 8 {
-		print(nb >> (7 - i) & 1)
-	}
+
+fn print_full_b2(nb u8) {
+  for i in 0 .. 8 {
+    print(nb >> (7 - i) & 1)
+  }
 }
 
-fn print_full_b10 (nb u8) {
+fn print_full_b10(nb u8) {
   mut tmp := nb
   mut digits := 0
   for tmp != 0 {
     tmp /= 10
     digits++
   }
-  for _ in 0 .. 3 - digits - int(nb == 0) { print("0") }
+  for _ in 0 .. 3 - digits - int(nb == 0) {
+    print('0')
+  }
   print(nb)
 }
 
-fn print_hex (nb u8) {
+fn print_hex(nb u8) {
   print(nb.hex())
-  print(" ")
+  print(' ')
 }
 
-/* used for debug, print all digits of u8 number */
+// used for debug, print all digits of u8 number
 fn print_u8_b2(nb u8) {
-	for i in 0..8 {
-		print(nb >> i & 1)
-	}
+  for i in 0 .. 8 {
+    print(nb >> i & 1)
+  }
 }
 
-fn (reg Registers) target_to_reg8 (target RegisterU8) u8 {
+fn (reg Registers) target_to_reg8(target RegisterU8) u8 {
   return match target {
     .a { reg.a }
     .b { reg.b }
@@ -103,16 +106,16 @@ fn (reg Registers) target_to_reg8 (target RegisterU8) u8 {
     .e { reg.e }
     .h { reg.h }
     .l { reg.l }
-    else { panic("missing a case in target_to_reg8: ${target}") }
+    else { panic('missing a case in target_to_reg8: ${target}') }
   }
 }
 
-fn (reg Registers) target_to_reg16 (target RegisterU16) u16 {
+fn (reg Registers) target_to_reg16(target RegisterU16) u16 {
   return match target {
     .af { reg.get_af() }
     .bc { reg.get_bc() }
     .de { reg.get_de() }
     .hl { reg.get_hl() }
-    else { panic("missing a case in target_to_reg16: ${target}") }
+    else { panic('missing a case in target_to_reg16: ${target}') }
   }
 }

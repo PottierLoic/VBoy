@@ -820,7 +820,7 @@ fn (mut cpu Cpu) read_byte (address u16) u8 {
     return cpu.vboy.cart.read_byte(address)
   } else if address < 0xE000 {
     // WRAM
-    panic("WRAM writing not implemented")
+    return cpu.vboy.ram.read_wram(address)
   } else if address < 0xFE00 {
     // Reserved echo ram
     return 0
@@ -837,9 +837,9 @@ fn (mut cpu Cpu) read_byte (address u16) u8 {
     // CPU enable register
     panic("CPU Get IE Register not implemented")
   } else {
-    // Temporary fix to debug
-    // panic("HRAM Read not implemented")
-    return cpu.vboy.cart.read_byte(address)
+    // HRAM
+    return cpu.vboy.ram.read_hram(address)
+    //return cpu.vboy.cart.read_byte(address)
   }
 }
 
@@ -855,7 +855,7 @@ fn (mut cpu Cpu) write_byte (address u16, value u8) {
     cpu.vboy.cart.write_byte(address, value)
   } else if address < 0xE000 {
     // WRAM
-    panic("WRAM writing not implemented")
+    cpu.vboy.ram.write_wram(address, value)
   } else if address < 0xFE00 {
     // Reserved echo ram
   } else if address < 0xFEA0 {
@@ -870,9 +870,9 @@ fn (mut cpu Cpu) write_byte (address u16, value u8) {
     // CPU enable register
     panic("CPU Set IE Register not implemented")
   } else {
-    // Temporary fix to debug
-    // panic("HRAM Writing not implemented")
-    cpu.vboy.cart.write_byte(address, value)
+    // HRAM
+    cpu.vboy.ram.write_hram(address, value)
+    // cpu.vboy.cart.write_byte(address, value)
   }
 }
 

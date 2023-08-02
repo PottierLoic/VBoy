@@ -3,5 +3,4 @@ struct Ppu {
 }
 
 fn init_ppu() {}
-
 fn ppu_tick() {}
