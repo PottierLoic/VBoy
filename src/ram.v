@@ -20,5 +20,4 @@ fn (ram Ram) read_hram(address u16) u8 {
 
 fn (mut ram Ram) write_hram(address u16, value u8) {
 	ram.hram[address - 0xFF80] = value
-s - 0xFF80] = value
 }

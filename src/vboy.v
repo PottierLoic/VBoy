@@ -8,6 +8,7 @@ mut:
 	ppu  Ppu
 	cart Cart
 	ram  Ram
+  io   Io_data
 	// Emulator states
 	paused  bool
 	running bool
