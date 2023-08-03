@@ -32,15 +32,14 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
       cpu.jump(should_jump)
     }
     .jr {
-      panic("JR Not implemented yet")
-      // should_jump := match instr.jump_test {
-      //   .not_zero { !u8_to_flag(cpu.registers.f).zero }
-      //   .not_carry { !u8_to_flag(cpu.registers.f).carry }
-      //   .zero { u8_to_flag(cpu.registers.f).zero }
-      //   .carry { u8_to_flag (cpu.registers.f).carry }
-      //   .always { true }
-      // }
-      // cpu.jr(should_jump)
+      should_jump := match instr.jump_test {
+        .not_zero { !u8_to_flag(cpu.registers.f).zero }
+        .not_carry { !u8_to_flag(cpu.registers.f).carry }
+        .zero { u8_to_flag(cpu.registers.f).zero }
+        .carry { u8_to_flag (cpu.registers.f).carry }
+        .always { true }
+      }
+      cpu.jr(should_jump)
     }
     .call {
       should_jump := match instr.jump_test {
@@ -91,8 +90,16 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
       cpu.pc++
     }
     .cp {
-      cpu.cp(cpu.registers.target_to_reg8(instr.target_u8))
-      cpu.pc++
+      match instr.target_u8 {
+        .d8 {
+          cpu.cp(cpu.read_byte(cpu.pc + 1))
+          cpu.pc+=2
+        }
+        else {
+          cpu.cp(cpu.registers.target_to_reg8(instr.target_u8))
+          cpu.pc++
+        }
+      }
     }
     .inc {
       match instr.target_u8 {
@@ -408,9 +415,10 @@ fn (mut cpu Cpu) step() {
   mut instruction_byte := cpu.read_byte(cpu.pc)
   prefixed := instruction_byte == 0xCB
   if prefixed {
+    println("Prefixed instruction on ${cpu.pc}:")
     instruction_byte = cpu.read_byte(cpu.pc + 1)
-  }
-  println("Instruction byte: ${instruction_byte}")
+  } else { println("Unprefixed instruction on ${cpu.pc}:") }
+  println("${instruction_byte.hex()} | ${instruction_name_from_byte(instruction_byte, prefixed)}")
   instruction := instruction_from_byte(instruction_byte, prefixed)
   next_pc := if instruction == instruction_from_byte(instruction_byte, prefixed) {
     cpu.execute(instruction)
