@@ -64,7 +64,7 @@ fn main() {
 		if vboy.paused {
 			delay(10)
 		} else {
-			vboy.cpu.print()
+			// vboy.cpu.print()
 			vboy.cpu.step()
 		}
 		event := sdl.Event{}

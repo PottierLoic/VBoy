@@ -305,8 +305,8 @@ fn (cart Cart) read_byte(address u16) u8 {
 /*
 Write u8 value on the provided address in rom.
 This does not save a new file but just modify the values in the cart struct.*/
-fn (mut cart Cart) write_byte(address u16, value u8) u16 {
-  panic('Cart writting not implemented yet')
+fn (mut cart Cart) write_byte(address u16, value u8) {
+  cart.rom_data[address] = value
 }
 
 // Display rom header informations
