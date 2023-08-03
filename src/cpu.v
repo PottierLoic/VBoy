@@ -165,7 +165,7 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
 				.l { cpu.registers.l = cpu.res(instr.bit_position, cpu.registers.l) }
 				else { panic('Not supported target for res instruction: ${instr.target_u8}') }
 			}
-			cpu.pc++
+			cpu.pc+=2
 		}
 		.set {
 			match instr.target_u8 {
@@ -434,10 +434,10 @@ fn (mut cpu Cpu) jump(should_jump bool) {
 fn (mut cpu Cpu) jr(should_jump bool) {
 	if should_jump {
 		mut offset := cpu.read_byte(cpu.pc + 1)
-		cpu.pc += 3
+		cpu.pc += 2
 		cpu.pc += u16(offset)
 	} else {
-		cpu.pc += 3
+		cpu.pc += 2
 	}
 }
 
