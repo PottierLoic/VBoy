@@ -4,7 +4,11 @@ mut:
   registers Registers
   pc u16
   sp u16
-  //bus MemoryBus
+
+  halted bool
+
+  ie_register u8
+  interruption_flags u8
 }
 
 /* Execute the provided instruction and return next program counter. */
@@ -402,11 +406,11 @@ fn (mut cpu Cpu) jr (should_jump bool) {
 /* Extract the next instruction and execute it. */
 fn (mut cpu Cpu) step() {
   mut instruction_byte := cpu.read_byte(cpu.pc)
-  println("Instruction byte: ${instruction_byte}")
   prefixed := instruction_byte == 0xCB
   if prefixed {
     instruction_byte = cpu.read_byte(cpu.pc + 1)
   }
+  println("Instruction byte: ${instruction_byte}")
   instruction := instruction_from_byte(instruction_byte, prefixed)
   next_pc := if instruction == instruction_from_byte(instruction_byte, prefixed) {
     cpu.execute(instruction)
@@ -835,7 +839,7 @@ fn (mut cpu Cpu) read_byte (address u16) u8 {
     return cpu.vboy.io.read_io(address)
   } else if address < 0xFFFF {
     // CPU enable register
-    panic("CPU Get IE Register not implemented")
+    return cpu.ie_register
   } else {
     // HRAM
     return cpu.vboy.ram.read_hram(address)
@@ -848,7 +852,7 @@ fn (mut cpu Cpu) write_byte (address u16, value u8) {
     cpu.vboy.cart.write_byte(address, value)
   } else if address < 0xA000 {
     // Char/map data
-    panic("ppu vram wrtiting not implemented")
+    panic("ppu vram writing not implemented")
   } else if address < 0xC000 {
     // Cart RAM
     cpu.vboy.cart.write_byte(address, value)
@@ -867,7 +871,7 @@ fn (mut cpu Cpu) write_byte (address u16, value u8) {
     cpu.vboy.io.write_io(address, value)
   } else if address < 0xFFFF {
     // CPU enable register
-    panic("CPU Set IE Register not implemented")
+    cpu.ie_register = value
   } else {
     // HRAM
     cpu.vboy.ram.write_hram(address, value)

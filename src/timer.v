@@ -29,7 +29,7 @@ fn (mut timer Timer) timer_tick() {
 		if timer.tima == 0xFF {
 			timer.tima = timer.tma
 			// TODO: implement interrupt
-		}	
+		}
 	}
 }
 

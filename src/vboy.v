@@ -58,7 +58,6 @@ fn main() {
 	// Starting emulation
 	println('Starting emulation')
 	vboy.running = true
-	vboy.paused = true
 
 	// Main loop
 	for vboy.running {
@@ -71,7 +70,7 @@ fn main() {
 		event := sdl.Event{}
 		for 0 < sdl.poll_event(&event) {
 			match event.@type {
-				.quit {	return }				
+				.quit {	return }
 				.keydown { sdl_ctx.handle_keydown(event) }
 				.keyup { sdl_ctx.handle_keyup(event) }
 				else {}
