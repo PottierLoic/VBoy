@@ -1,5 +1,6 @@
 struct Timer {
 mut:
+	vboy &VBoy = unsafe { nil }
 	div  u16
 	tima u8
 	tma  u8
@@ -28,7 +29,7 @@ fn (mut timer Timer) timer_tick() {
 
 		if timer.tima == 0xFF {
 			timer.tima = timer.tma
-			// TODO: implement interrupt
+			timer.vboy.cpu.request_interrupt(.it_timer)
 		}
 	}
 }

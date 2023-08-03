@@ -55,6 +55,9 @@ fn main() {
 	vboy.cpu.vboy = &vboy
 	println('CPU initialized succesfully')
 
+	// Timer Initialization
+	vboy.timer.vboy = &vboy
+
 	// Starting emulation
 	println('Starting emulation')
 	vboy.running = true
@@ -64,7 +67,7 @@ fn main() {
 		if vboy.paused {
 			delay(10)
 		} else {
-			// vboy.cpu.print()
+			//vboy.cpu.print()
 			vboy.cpu.step()
 		}
 		event := sdl.Event{}
@@ -80,7 +83,18 @@ fn main() {
 	}
 }
 
-// quite useless but prevent from importing sdl in each file
+// Increment the differents timers.
+fn (mut vboy VBoy) timer_cycle(amount int) {
+	for _ in 0 .. amount {
+		for _ in 0 .. 4 {
+			vboy.tick++
+			vboy.timer.timer_tick()
+			// PPU tick once it is done
+		}
+		// DMA tick when it is done
+	}
+}
+
 fn delay(ms u32) {
 	sdl.delay(ms)
 }
