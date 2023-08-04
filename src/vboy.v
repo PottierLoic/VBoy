@@ -10,6 +10,7 @@ mut:
 	ram  Ram
   io   Io
   timer Timer
+	lcd Lcd
 	// Emulator states
 	paused  bool
 	running bool
@@ -57,6 +58,9 @@ fn main() {
 
 	// Timer Initialization
 	vboy.timer.vboy = &vboy
+
+	// IO Initialization
+	vboy.io.vboy = &vboy
 
 	// Starting emulation
 	println('Starting emulation')

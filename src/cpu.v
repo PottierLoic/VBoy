@@ -79,8 +79,8 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
 			cpu.registers.a = cpu.and(cpu.registers.target_to_reg8(instr.target_u8))
 			cpu.pc++
 		}
-		.or_ {
-			cpu.registers.a = cpu.or_(cpu.registers.target_to_reg8(instr.target_u8))
+		.@or {
+			cpu.registers.a = cpu.@or(cpu.registers.target_to_reg8(instr.target_u8))
 			cpu.pc++
 		}
 		.xor {
@@ -610,7 +610,7 @@ fn (mut cpu Cpu) and(value u8) u8 {
 }
 
 // Perform the or operation between register A and the target
-fn (mut cpu Cpu) or_(value u8) u8 {
+fn (mut cpu Cpu) @or(value u8) u8 {
 	new_value := cpu.registers.a | value
 	flags := FlagsRegister{
 		zero: new_value == 0
@@ -1028,4 +1028,12 @@ fn (mut cpu Cpu) print() {
 	println('| PC: ${cpu.pc.hex()}')
 	println('| SP: ${cpu.sp.hex()}')
 	println('----------------------')
+}
+
+fn (cpu Cpu) get_interruption_flags() u8 {
+	return cpu.interruption_flags
+}
+
+fn (mut cpu Cpu) set_interruption_flags(value u8) {
+	cpu.interruption_flags = value
 }

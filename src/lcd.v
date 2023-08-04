@@ -37,3 +37,11 @@ fn (mut lcd Lcd) init() {
 		lcd.sp2_colors[i] = colors[i]
 	}
 }
+
+fn (mut lcd Lcd) write(address u16, value u8) {
+// ouep
+}
+
+fn (lcd Lcd) read(address u16) u8 {
+	return 0
+}

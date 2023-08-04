@@ -47,15 +47,6 @@ const vblank_vector = 0x40
 const lcdstat_vector = 0x48
 const timer_vector = 0x50
 
-// struct MemoryBus {
-// mut:
-//   memory [65536]u8
-// }
-
-// fn (bus MemoryBus) read_byte(address u16) u8 {
-//   return bus.memory[address]
-// }
-
-// fn (mut bus MemoryBus) write_byte(address u16, value u8) {
-//   bus.memory[address] = value
-// }
+// File will be removed as it is no longer used
+// since read and write bytes are now in cpu.v
+// i may use it if i switch to global variables

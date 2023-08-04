@@ -440,15 +440,15 @@ fn unprefixed_instruction_name(value u8) string {
     0xe6 { return "and, d8" }
 
     /* OR instruction */
-    0xb7 { return "or_, a" }
-    0xb0 { return "or_, b" }
-    0xb1 { return "or_, c" }
-    0xb2 { return "or_, d" }
-    0xb3 { return "or_, e" }
-    0xb4 { return "or_, h" }
-    0xb5 { return "or_, l" }
-    0xb6 { return "or_, hli" }
-    0xf6 { return "or_, d8" }
+    0xb7 { return "@or, a" }
+    0xb0 { return "@or, b" }
+    0xb1 { return "@or, c" }
+    0xb2 { return "@or, d" }
+    0xb3 { return "@or, e" }
+    0xb4 { return "@or, h" }
+    0xb5 { return "@or, l" }
+    0xb6 { return "@or, hli" }
+    0xf6 { return "@or, d8" }
 
     /* XOR instruction */
     0xaf { return "xor, a" }

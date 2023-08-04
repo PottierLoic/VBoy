@@ -18,7 +18,7 @@ enum Instruction_ {
   sub
   sbc
   and
-  or_
+  @or
   xor
   cp
 
@@ -62,7 +62,7 @@ enum Instruction_ {
   rst
 
   // Control instr
-  halt    // A VOIR SI CA RESTE COMME CA
+  halt
   nop
   di
   ei
@@ -534,15 +534,15 @@ fn instruction_from_byte_not_prefixed(value u8) Instruction {
     0xe6 { return Instruction{instruction: .and, target_u8: .d8} }
 
     /* OR instruction */
-    0xb7 { return Instruction{instruction: .or_, target_u8: .a} }
-    0xb0 { return Instruction{instruction: .or_, target_u8: .b} }
-    0xb1 { return Instruction{instruction: .or_, target_u8: .c} }
-    0xb2 { return Instruction{instruction: .or_, target_u8: .d} }
-    0xb3 { return Instruction{instruction: .or_, target_u8: .e} }
-    0xb4 { return Instruction{instruction: .or_, target_u8: .h} }
-    0xb5 { return Instruction{instruction: .or_, target_u8: .l} }
-    0xb6 { return Instruction{instruction: .or_, target_u8: .hli} }
-    0xf6 { return Instruction{instruction: .or_, target_u8: .d8} }
+    0xb7 { return Instruction{instruction: .@or, target_u8: .a} }
+    0xb0 { return Instruction{instruction: .@or, target_u8: .b} }
+    0xb1 { return Instruction{instruction: .@or, target_u8: .c} }
+    0xb2 { return Instruction{instruction: .@or, target_u8: .d} }
+    0xb3 { return Instruction{instruction: .@or, target_u8: .e} }
+    0xb4 { return Instruction{instruction: .@or, target_u8: .h} }
+    0xb5 { return Instruction{instruction: .@or, target_u8: .l} }
+    0xb6 { return Instruction{instruction: .@or, target_u8: .hli} }
+    0xf6 { return Instruction{instruction: .@or, target_u8: .d8} }
 
     /* XOR instruction */
     0xaf { return Instruction{instruction: .xor, target_u8: .a} }
