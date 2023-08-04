@@ -93,6 +93,7 @@ fn (mut vboy VBoy) timer_cycle(amount int) {
 		}
 		// DMA tick when it is done
 	}
+	println("cycle CRAMPTER ${vboy.tick}")
 }
 
 fn delay(ms u32) {

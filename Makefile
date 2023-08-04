@@ -12,3 +12,7 @@ prod:
 
 clean:
 	${CLEAN_CMD} vboy.exe
+
+# Target for running code faster
+zelda:
+	v run ./src ./roms/zelda.gb

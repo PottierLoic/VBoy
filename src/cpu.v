@@ -14,8 +14,11 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
 	match instr.instruction {
 		.nop {
 			cpu.pc++
+			cpu.vboy.timer_cycle(1)
 		}
-		.halt {}
+		.halt {
+			cpu.vboy.timer_cycle(1)
+		}
 		.jp {
 			should_jump := match instr.jump_test {
 				.not_zero { !u8_to_flag(cpu.registers.f).zero }
@@ -57,19 +60,19 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
 			cpu.ret(should_jump)
 		}
 		.add {
-			cpu.registers.a = cpu.add(cpu.registers.target_to_reg8(instr.target_u8))
+			cpu.registers.a = cpu.add(instr.target_u8)
 			cpu.pc++
 		}
 		.adc {
-			cpu.registers.a = cpu.adc(cpu.registers.target_to_reg8(instr.target_u8))
+			cpu.registers.a = cpu.adc(instr.target_u8)
 			cpu.pc++
 		}
 		.sub {
-			cpu.registers.a = cpu.sub(cpu.registers.target_to_reg8(instr.target_u8))
+			cpu.registers.a = cpu.sub(instr.target_u8)
 			cpu.pc++
 		}
 		.sbc {
-			cpu.registers.a = cpu.sbc(cpu.registers.target_to_reg8(instr.target_u8))
+			cpu.registers.a = cpu.sbc(instr.target_u8)
 			cpu.pc++
 		}
 		.and {
@@ -426,8 +429,10 @@ fn (mut cpu Cpu) jump(should_jump bool) {
 		mut least_significant_byte := u16(cpu.read_byte(cpu.pc + 1))
 		mut most_significant_byte := u16(cpu.read_byte(cpu.pc + 2))
 		cpu.pc = most_significant_byte << 8 | least_significant_byte
+		cpu.vboy.timer_cycle(4)
 	} else {
 		cpu.pc += 3
+		cpu.vboy.timer_cycle(3)
 	}
 }
 
@@ -436,8 +441,10 @@ fn (mut cpu Cpu) jr(should_jump bool) {
 		mut offset := cpu.read_byte(cpu.pc + 1)
 		cpu.pc += 2
 		cpu.pc += u16(offset)
+		cpu.vboy.timer_cycle(3)
 	} else {
 		cpu.pc += 2
+		cpu.vboy.timer_cycle(2)
 	}
 }
 
@@ -448,8 +455,7 @@ fn (mut cpu Cpu) step() {
 	if prefixed {
 		instruction_byte = cpu.read_byte(cpu.pc + 1)
 	}
-	println('pc ${cpu.pc.hex()}: ${instruction_byte.hex()} | ${instruction_name_from_byte(instruction_byte,
-		prefixed)}')
+	println('pc ${cpu.pc.hex()}: ${instruction_byte.hex()} | ${instruction_name_from_byte(instruction_byte,	prefixed)}')
 	instruction := instruction_from_byte(instruction_byte, prefixed)
 	next_pc := if instruction == instruction_from_byte(instruction_byte, prefixed) {
 		cpu.execute(instruction)
@@ -473,10 +479,24 @@ fn (mut cpu Cpu) rst(loc RSTLocation) {
 		.x30 { 0x0030 }
 		.x38 { 0x0038 }
 	}
+	cpu.vboy.timer_cycle(4)
 }
 
 // Add the target value to register A and change flags.
-fn (mut cpu Cpu) add(value u8) u8 {
+fn (mut cpu Cpu) add(reg RegisterU8) u8 {
+	value := match reg {
+		.hli {
+			cpu.vboy.timer_cycle(1)
+			cpu.read_byte(cpu.registers.get_hl())
+		}
+		.d8 {
+			cpu.vboy.timer_cycle(1)
+			cpu.read_byte(cpu.pc + 1)
+		}
+		else {
+			cpu.registers.target_to_reg8(reg)
+		}
+	}
 	new_value, did_overflow := overflowing_add(cpu.registers.a, value)
 	flags := FlagsRegister{
 		zero: new_value == 0
@@ -485,11 +505,25 @@ fn (mut cpu Cpu) add(value u8) u8 {
 		carry: did_overflow
 	}
 	cpu.registers.f = flag_to_u8(flags)
+	cpu.vboy.timer_cycle(1)
 	return new_value
 }
 
 // Add the target value to register A, change flags and add carry value to register A.
-fn (mut cpu Cpu) adc(value u8) u8 {
+fn (mut cpu Cpu) adc(reg RegisterU8) u8 {
+	value := match reg {
+		.hli {
+			cpu.vboy.timer_cycle(1)
+			cpu.read_byte(cpu.registers.get_hl())
+		}
+		.d8 {
+			cpu.vboy.timer_cycle(1)
+			cpu.read_byte(cpu.pc + 1)
+		}
+		else {
+			cpu.registers.target_to_reg8(reg)
+		}
+	}
 	mut new_value, did_overflow := overflowing_add(cpu.registers.a, value)
 	if did_overflow {
 		new_value++
@@ -501,11 +535,25 @@ fn (mut cpu Cpu) adc(value u8) u8 {
 		carry: did_overflow
 	}
 	cpu.registers.f = flag_to_u8(flags)
+	cpu.vboy.timer_cycle(1)
 	return new_value
 }
 
 // Subtract the value from register A and change flags.
-fn (mut cpu Cpu) sub(value u8) u8 {
+fn (mut cpu Cpu) sub(reg RegisterU8) u8 {
+	value := match reg {
+		.hli {
+			cpu.vboy.timer_cycle(1)
+			cpu.read_byte(cpu.registers.get_hl())
+		}
+		.d8 {
+			cpu.vboy.timer_cycle(1)
+			cpu.read_byte(cpu.pc + 1)
+		}
+		else {
+			cpu.registers.target_to_reg8(reg)
+		}
+	}
 	new_value, did_underflow := underflowing_subtract(cpu.registers.a, value)
 	flags := FlagsRegister{
 		zero: new_value == 0
@@ -514,11 +562,25 @@ fn (mut cpu Cpu) sub(value u8) u8 {
 		carry: did_underflow
 	}
 	cpu.registers.f = flag_to_u8(flags)
+	cpu.vboy.timer_cycle(1)
 	return new_value
 }
 
 // Subtract the value from register A, change flags and subtract carry value from register A.
-fn (mut cpu Cpu) sbc(value u8) u8 {
+fn (mut cpu Cpu) sbc(reg RegisterU8) u8 {
+	value := match reg {
+		.hli {
+			cpu.vboy.timer_cycle(1)
+			cpu.read_byte(cpu.registers.get_hl())
+		}
+		.d8 {
+			cpu.vboy.timer_cycle(1)
+			cpu.read_byte(cpu.pc + 1)
+		}
+		else {
+			cpu.registers.target_to_reg8(reg)
+		}
+	}
 	mut new_value, did_underflow := underflowing_subtract(cpu.registers.a, value)
 	if did_underflow {
 		new_value--
@@ -530,6 +592,7 @@ fn (mut cpu Cpu) sbc(value u8) u8 {
 		carry: did_underflow
 	}
 	cpu.registers.f = flag_to_u8(flags)
+	cpu.vboy.timer_cycle(1)
 	return new_value
 }
 
