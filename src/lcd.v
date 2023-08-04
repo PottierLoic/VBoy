@@ -39,7 +39,7 @@ fn (mut lcd Lcd) init() {
 }
 
 fn (mut lcd Lcd) write(address u16, value u8) {
-// ouep
+
 }
 
 fn (lcd Lcd) read(address u16) u8 {
