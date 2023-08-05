@@ -9,21 +9,20 @@ enum Lcd_modes {
 
 struct Lcd {
 mut:
-	lcdc u8
-	lcds u8
-	scroll_y u8
-	scroll_x u8
-	ly u8
-	ly_compare u8
-	dma u8
-	bg_palette u8
-	obj_palette[2] u8
-	win_y u8
-	win_x u8
-
-	bg_colors[4] u32
-	sp1_colors[4] u32
-	sp2_colors[4] u32
+	lcdc        u8
+	lcds        u8
+	scroll_y    u8
+	scroll_x    u8
+	ly          u8
+	ly_compare  u8
+	dma         u8
+	bg_palette  u8
+	obj_palette [2]u8
+	win_y       u8
+	win_x       u8
+	bg_colors   [4]u32
+	sp1_colors  [4]u32
+	sp2_colors  [4]u32
 }
 
 fn (mut lcd Lcd) init() {
@@ -39,7 +38,6 @@ fn (mut lcd Lcd) init() {
 }
 
 fn (mut lcd Lcd) write(address u16, value u8) {
-
 }
 
 fn (lcd Lcd) read(address u16) u8 {
