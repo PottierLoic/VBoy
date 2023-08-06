@@ -438,7 +438,8 @@ fn (mut cpu Cpu) jump(should_jump bool) {
 
 fn (mut cpu Cpu) jr(should_jump bool) {
 	if should_jump {
-		mut offset := cpu.read_byte(cpu.pc + 1)
+		mut offset := int(cpu.read_byte(cpu.pc + 1))
+		if offset > 127 { offset -= 256 }
 		cpu.pc += 2
 		cpu.pc += u16(offset)
 		cpu.vboy.timer_cycle(3)

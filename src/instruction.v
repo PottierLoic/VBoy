@@ -143,7 +143,7 @@ struct Instruction {
   rst_location RSTLocation
 }
 
-/* Choose the correct method to read the instruction */
+/* Choose the correct method to get the instruction */
 fn instruction_from_byte(value u8, prefixed bool) Instruction {
   if prefixed { return instruction_from_byte_prefixed(value) }
   else { return instruction_from_byte_not_prefixed(value) }

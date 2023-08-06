@@ -1,3 +1,4 @@
+/* Number of timer cycles for each prefixed instruction (CB prefix) */
 const prefixed_cycles = [2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2,
                          2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2,
                          2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2,
@@ -15,6 +16,7 @@ const prefixed_cycles = [2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2,
                          2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2,
                          2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2]
 
+/* Number of timer cycles for each unprefixed instruction (First byte is the instruction) */
 const unprefixed_cycles = [1, 3, 2, 2, 1, 1, 2, 1, 5, 2, 2, 2, 1, 1, 2, 1,
                            1, 3, 2, 2, 1, 1, 2, 1, 3, 2, 2, 2, 1, 1, 2, 1,
                            2, 3, 2, 2, 1, 1, 2, 1, 2, 2, 2, 2, 1, 1, 2, 1,
@@ -32,6 +34,7 @@ const unprefixed_cycles = [1, 3, 2, 2, 1, 1, 2, 1, 5, 2, 2, 2, 1, 1, 2, 1,
                            3, 3, 2, 0, 0, 4, 2, 4, 4, 1, 4, 0, 0, 0, 2, 4,
                            3, 3, 2, 1, 0, 4, 2, 4, 3, 2, 4, 1, 0, 0, 2, 4]
 
+/* Number of timer cycles for each unprefixed instruction if they branch (jump condition is valid, etc..) */
 const unprefixed_cycles_branched = [1, 3, 2, 2, 1, 1, 2, 1, 5, 2, 2, 2, 1, 1, 2, 1,
                                     1, 3, 2, 2, 1, 1, 2, 1, 3, 2, 2, 2, 1, 1, 2, 1,
                                     3, 3, 2, 2, 1, 1, 2, 1, 3, 2, 2, 2, 1, 1, 2, 1,
@@ -49,7 +52,7 @@ const unprefixed_cycles_branched = [1, 3, 2, 2, 1, 1, 2, 1, 5, 2, 2, 2, 1, 1, 2,
                                     3, 3, 2, 0, 0, 4, 2, 4, 4, 1, 4, 0, 0, 0, 2, 4,
                                     3, 3, 2, 1, 0, 4, 2, 4, 3, 2, 4, 1, 0, 0, 2, 4]
 
-/* Choose the correct to get instruction name */
+/* Choose the correct method to get instruction name */
 fn instruction_name_from_byte(value u8, prefixed bool) string {
   if prefixed { return prefixed_instruction_name(value) }
   else { return unprefixed_instruction_name(value) }
