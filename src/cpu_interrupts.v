@@ -19,6 +19,7 @@ fn (mut cpu Cpu) interrupt(address u16, interrupt Interruption_types) bool {
 }
 
 fn (mut cpu Cpu) handle_interrupts() {
+	// Finding a way to loop on enum remove necessity for this function
 	if cpu.interrupt(0x40, .it_vblanks) {}
 	else if cpu.interrupt(0x48, .it_lcd_stat) {}
 	else if cpu.interrupt(0x50, .it_timer) {}
