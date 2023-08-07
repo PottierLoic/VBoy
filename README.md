@@ -41,7 +41,7 @@ vboy "./path/to/rom.gb"
 ## Warning and docs  
 
 VBoy is still in development, not well optimized and poorly written.  
-This may change in the futurem, but it is actually not a good emulator example (doesn't work until now ^^).  
+This may change in the future, but it is actually not a good emulator example (doesn't work until now ^^).  
 
 In case you want to develop one yourself, some websites and softwares are very useful:  
 - [Pandocs](https://gbdev.io/pandocs/): contains everything about the Gameboy.  

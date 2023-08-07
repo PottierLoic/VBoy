@@ -15,7 +15,6 @@ fn (mut cpu Cpu) interrupt(address u16, interrupt Interruption_types) bool {
 		// int master enabled ?
 		true
 	} else { false }
-
 }
 
 fn (mut cpu Cpu) handle_interrupts() {

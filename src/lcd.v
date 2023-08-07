@@ -37,9 +37,36 @@ fn (mut lcd Lcd) init() {
 	}
 }
 
-fn (mut lcd Lcd) write(address u16, value u8) {
+fn (lcd Lcd) read(address u16) u8 {
+	return match address {
+		0xFF40 { lcd.lcdc }
+		0xFF41 { lcd.lcds }
+		0xFF42 { lcd.scroll_y }
+		0xFF43 { lcd.scroll_x }
+		0xFF44 { lcd.ly }
+		0xFF45 { lcd.ly_compare }
+		0xFF46 { lcd.dma }
+		0xFF47 { lcd.bg_palette }
+		0xFF48 ... 0xFF49 { lcd.obj_palette[address - 0xFF48] }
+		0xFF4A { lcd.win_y }
+		0xFF4B { lcd.win_x }
+		else { panic("invalid lcd read on address: ${address}") }
+	}
 }
 
-fn (lcd Lcd) read(address u16) u8 {
-	return 0
+fn (mut lcd Lcd) write(address u16, value u8) {
+	match address {
+		0xFF40 { lcd.lcdc = value }
+		0xFF41 { lcd.lcds = value }
+		0xFF42 { lcd.scroll_y = value }
+		0xFF43 { lcd.scroll_x = value }
+		0xFF44 { lcd.ly = value }
+		0xFF45 { lcd.ly_compare = value }
+		0xFF46 { /* TODO: DMA should start here */ }
+		0xFF47 { lcd.bg_palette = value }
+		0xFF48 { /* TODO: set colors */ }
+		0xFF4A { lcd.win_y = value }
+		0xFF4B { lcd.win_x = value }
+		else { panic("invalid lcd write on address: ${address}") }
+	}
 }
