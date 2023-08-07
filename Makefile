@@ -1,7 +1,7 @@
 ifeq ($(OS),Windows_NT)
-    CLEAN_CMD = del
+    CLEAN_BUILD = del
 else
-    CLEAN_CMD = rm -f
+    CLEAN_BUILD = rm -f
 endif
 
 main:
@@ -11,8 +11,8 @@ prod:
 	v ./src -prod -o ./vboy.exe
 
 clean:
-	${CLEAN_CMD} vboy.exe
+	${CLEAN_BUILD} vboy.exe
 
-# Target for running code faster
+# Target for testing code faster
 zelda:
 	v run ./src ./roms/zelda.gb
