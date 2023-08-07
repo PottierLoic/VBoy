@@ -11,6 +11,7 @@ mut:
   io   Io
   timer Timer
 	lcd Lcd
+
 	// Emulator states
 	paused  bool
 	running bool
@@ -40,6 +41,7 @@ fn main() {
 	// VBoy initialization
 	println('Starting VBoy')
 	mut vboy := VBoy{}
+	sdl_ctx.vboy = &vboy
 
 	// Cart initialization
 	println('Loading ROM file: ${args[1]}')
@@ -65,14 +67,15 @@ fn main() {
 	// Starting emulation
 	println('Starting emulation')
 	vboy.running = true
+	vboy.paused = true
 
 	// Main loop
 	for vboy.running {
 		if vboy.paused {
 			delay(10)
 		} else {
-			//vboy.cpu.print()
 			vboy.cpu.step()
+			vboy.cpu.print()
 		}
 		event := sdl.Event{}
 		for 0 < sdl.poll_event(&event) {
@@ -85,6 +88,13 @@ fn main() {
 			if sdl_ctx.quit { return }
 		}
 	}
+}
+
+// Execute one processing step at a time.
+fn (mut vboy VBoy) debug_step() {
+	println("Manual step:")
+	vboy.cpu.step()
+	vboy.cpu.print()
 }
 
 // Increment the differents timers.

@@ -7,6 +7,7 @@ const (
 
 struct Sdl_context {
 mut:
+	vboy   &VBoy = unsafe { nil }
 	width  int = screen_width
 	height int = screen_height
 
@@ -43,9 +44,12 @@ fn (mut ctx Sdl_context) handle_keydown(event sdl.Event) {
 		println("Select key pressed")
 	} else if key == sdl.KeyCode.m {
 		println("Start key pressed")
+	} else if key == sdl.KeyCode.@return {
+		// Emulator next step
+		ctx.vboy.debug_step()
 	}
 }
 
 fn (mut ctx Sdl_context) handle_keyup(event sdl.Event) {
-	
+
 }
