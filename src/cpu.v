@@ -430,7 +430,7 @@ fn (mut cpu Cpu) step() {
 	if prefixed {
 		instruction_byte = cpu.read_byte(cpu.pc + 1)
 	}
-	println('pc ${cpu.pc.hex()}: ${instruction_byte.hex()} | ${instruction_name_from_byte(instruction_byte,	prefixed)}')
+	//println('pc ${cpu.pc.hex()}: ${instruction_byte.hex()} | ${instruction_name_from_byte(instruction_byte,	prefixed)}')
 	instruction := instruction_from_byte(instruction_byte, prefixed)
 	next_pc := if instruction == instruction_from_byte(instruction_byte, prefixed) {
 		cpu.execute(instruction)

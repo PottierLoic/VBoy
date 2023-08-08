@@ -7,6 +7,7 @@ enum States {
 }
 
 struct Oam {
+mut:
 	y                   u8
 	x                   u8
 	tile_index          u8
@@ -19,6 +20,7 @@ struct Oam {
 }
 
 struct Ppu {
+mut:
 	oam          [40]Oam
 	vram         [0x2000]u8
 	sprite_count u8
@@ -33,14 +35,16 @@ fn (mut ppu Ppu) ppu_tick() {
 	// Check mode and call the right ppu function
 }
 
-fn (ppu Ppu) read_oam(address u8) {}
-
-fn (mut ppu Ppu) write_oam(address u8, value u8) {}
-
-fn (ppu Ppu) read_vram(address u8) {
-	return ppu.wram[address - 0x8000]
+fn (ppu Ppu) read_oam(address u16) u8 {
+	return 0
 }
 
-fn (mut ppu Ppu) write_vram(address u8, value u8) {
-	ppu.wram[address - 0x8000] = value
+fn (mut ppu Ppu) write_oam(address u16, value u8) {}
+
+fn (ppu Ppu) read_vram(address u16) u8 {
+	return ppu.vram[address - 0x8000]
+}
+
+fn (mut ppu Ppu) write_vram(address u16, value u8) {
+	ppu.vram[address - 0x8000] = value
 }
