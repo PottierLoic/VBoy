@@ -29,12 +29,18 @@ struct Ppu {
 	buffer      u32
 }
 
-fn (mut ppu Ppu) ppu_tick() {}
+fn (mut ppu Ppu) ppu_tick() {
+	// Check mode and call the right ppu function
+}
 
 fn (ppu Ppu) read_oam(address u8) {}
 
 fn (mut ppu Ppu) write_oam(address u8, value u8) {}
 
-fn (ppu Ppu) read_vram(address u8) {}
+fn (ppu Ppu) read_vram(address u8) {
+	return ppu.wram[address - 0x8000]
+}
 
-fn (mut ppu Ppu) write_vram(address u8, value u8) {}
+fn (mut ppu Ppu) write_vram(address u8, value u8) {
+	ppu.wram[address - 0x8000] = value
+}
