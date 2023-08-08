@@ -1,5 +1,4 @@
-enum Interruption_types {
-  it_vblanks = 0b1
+enum Interruption_types {	  it_vblanks = 0b1
 	it_lcd_stat = 0b10
 	it_timer = 0b100
 	it_serial = 0b1000
