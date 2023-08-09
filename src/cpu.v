@@ -442,7 +442,6 @@ fn (mut cpu Cpu) step() {
 	cpu.pc = next_pc
 }
 
-
 fn (mut cpu Cpu) read_byte(address u16) u8 {
 	if address < 0x8000 {
 		// ROM Data

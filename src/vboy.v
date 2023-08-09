@@ -72,23 +72,6 @@ fn main() {
 	mut instruction_count := 0
 	mut time_count := time.new_stopwatch()
 
-	// // TEST about instruction mapping speed
-	// for _ in 0 .. 5 {
-	// 	for _ in 0 .. 1000000 {
-	// 		_ = instruction_from_byte_prefixed(0xFF)
-	// 	}
-	// }
-	// println("time took for 1 000 000 match case function: ${time_count.elapsed()}")
-
-	// time_count2 := time.new_stopwatch()
-	// for _ in 0 .. 5 {
-	// 	for _ in 0 .. 1000000 {
-	// 		_ = get_instruction_prefixed(0xFF)
-	// 	}
-	// }
-	// println("time took for 1 000 000 constant array access: ${time_count2.elapsed()}")
-
-
 	// Main loop
 	for vboy.running {
 		if vboy.paused {
