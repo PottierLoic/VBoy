@@ -4,15 +4,16 @@ else
     CLEAN_BUILD = rm -f
 endif
 
-main:
+dev:
 	v ./src -o ./vboy.exe
 
 prod:
 	v ./src -prod -o ./vboy.exe
 
-clean:
-	${CLEAN_BUILD} vboy.exe
-
 # Target for testing code faster
 zelda:
 	v run ./src ./roms/zelda.gb
+
+# Profiler to test vboy speed
+profile:
+	v -prod -profile profile.txt run ./src ./roms/zelda.gb
