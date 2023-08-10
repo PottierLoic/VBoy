@@ -68,6 +68,8 @@ fn main() {
 	// Starting emulation
 	println('Starting emulation')
 	vboy.running = true
+	vboy.paused = true
+
 
 	mut instruction_count := 0
 	mut time_count := time.new_stopwatch()

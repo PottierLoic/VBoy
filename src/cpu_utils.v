@@ -56,13 +56,11 @@ fn (mut cpu Cpu) add(reg RegisterU8) u8 {
 		}
 	}
 	new_value, did_overflow := overflowing_add(cpu.registers.a, value)
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: false
-		half_carry: (cpu.registers.a & 0xf) + (value & 0xf) > 0xf
-		carry: did_overflow
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, (cpu.registers.a & 0xf) + (value & 0xf) > 0xf)
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, did_overflow)
+
 	cpu.vboy.timer_cycle(1)
 	return new_value
 }
@@ -83,16 +81,11 @@ fn (mut cpu Cpu) adc(reg RegisterU8) u8 {
 		}
 	}
 	mut new_value, did_overflow := overflowing_add(cpu.registers.a, value)
-	if did_overflow {
-		new_value++
-	}
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: false
-		half_carry: (cpu.registers.a & 0xf) + (value & 0xf) > 0xf
-		carry: did_overflow
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	if did_overflow {	new_value++	}
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, (cpu.registers.a & 0xf) + (value & 0xf) > 0xf)
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, did_overflow)
 	cpu.vboy.timer_cycle(1)
 	return new_value
 }
@@ -113,13 +106,10 @@ fn (mut cpu Cpu) sub(reg RegisterU8) u8 {
 		}
 	}
 	new_value, did_underflow := underflowing_subtract(cpu.registers.a, value)
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: true
-		half_carry: (cpu.registers.a & 0xF) < (value & 0xF)
-		carry: did_underflow
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, true)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, (cpu.registers.a & 0xF) < (value & 0xF))
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, did_underflow)
 	cpu.vboy.timer_cycle(1)
 	return new_value
 }
@@ -143,13 +133,10 @@ fn (mut cpu Cpu) sbc(reg RegisterU8) u8 {
 	if did_underflow {
 		new_value--
 	}
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: true
-		half_carry: (cpu.registers.a & 0xF) < (value & 0xF)
-		carry: did_underflow
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, true)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, (cpu.registers.a & 0xF) < (value & 0xF))
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, did_underflow)
 	cpu.vboy.timer_cycle(1)
 	return new_value
 }
@@ -157,63 +144,49 @@ fn (mut cpu Cpu) sbc(reg RegisterU8) u8 {
 // Perform the and operation between register A and the target
 fn (mut cpu Cpu) and(value u8) u8 {
 	new_value := cpu.registers.a & value
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: false
-		half_carry: true
-		carry: false
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, true)
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, false)
 	return new_value
 }
 
 // Perform the or operation between register A and the target
 fn (mut cpu Cpu) @or(value u8) u8 {
 	new_value := cpu.registers.a | value
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: false
-		half_carry: false
-		carry: false
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, false)
 	return new_value
 }
 
 // Perform the xor operation between register A and the target
 fn (mut cpu Cpu) xor(value u8) u8 {
 	new_value := cpu.registers.a ^ value
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: false
-		half_carry: false
-		carry: false
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, false)
 	return new_value
 }
 
 // Subtract target value from register A and change flags but don't change A value
 fn (mut cpu Cpu) cp(value u8) {
 	new_value, did_underflow := underflowing_subtract(cpu.registers.a, value)
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: true
-		half_carry: (cpu.registers.a & 0xF) < (value & 0xF)
-		carry: did_underflow
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, true)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, (cpu.registers.a & 0xF) < (value & 0xF))
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, did_underflow)
 }
 
 // Increment the value of the target register and change flags
 fn (mut cpu Cpu) inc(reg RegisterU8) u8 {
 	mut new_value := cpu.registers.target_to_reg8(reg)
 	new_value++
-	mut flags := u8_to_flag(cpu.registers.f)
-	flags.zero = new_value == 0
-	flags.subtract = false
-	flags.half_carry = (cpu.registers.a & 0xf) + 1 > 0xf
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, (cpu.registers.a & 0xf) + 1 > 0xf)
 	return new_value
 }
 
@@ -221,11 +194,9 @@ fn (mut cpu Cpu) inc(reg RegisterU8) u8 {
 fn (mut cpu Cpu) dec(reg RegisterU8) u8 {
 	mut new_value := cpu.registers.target_to_reg8(reg)
 	new_value--
-	mut flags := u8_to_flag(cpu.registers.f)
-	flags.zero = new_value == 0
-	flags.subtract = true
-	flags.half_carry = (cpu.registers.a & 0xF) < 1
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, true)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, (cpu.registers.a & 0xF) < 1)
 	return new_value
 }
 
@@ -235,13 +206,10 @@ fn (mut cpu Cpu) rra() u8 {
 	carry := new_value & 0x1
 	new_value >>= 1
 	new_value |= carry << 7
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: false
-		half_carry: false
-		carry: carry == 1
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, carry == 1)
 	return new_value
 }
 
@@ -251,13 +219,10 @@ fn (mut cpu Cpu) rla() u8 {
 	carry := new_value >> 7
 	new_value <<= 1
 	new_value |= carry
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: false
-		half_carry: false
-		carry: carry == 1
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, carry == 1)
 	return new_value
 }
 
@@ -267,13 +232,10 @@ fn (mut cpu Cpu) rrca() u8 {
 	carry := new_value & 0x1
 	new_value >>= 1
 	new_value |= carry << 7
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: false
-		half_carry: false
-		carry: carry == 1
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, carry == 1)
 	return new_value
 }
 
@@ -283,13 +245,10 @@ fn (mut cpu Cpu) rlca() u8 {
 	carry := new_value >> 7
 	new_value <<= 1
 	new_value |= carry
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: false
-		half_carry: false
-		carry: carry == 1
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, carry == 1)
 	return new_value
 }
 
@@ -297,34 +256,27 @@ fn (mut cpu Cpu) rlca() u8 {
 fn (mut cpu Cpu) cpl() u8 {
 	mut new_value := cpu.registers.a
 	new_value ^= 0xFF
-	mut flags := u8_to_flag(cpu.registers.f)
-	flags.subtract = true
-	flags.half_carry = true
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, true)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, true)
 	return new_value
 }
 
 // Toggle the value of the carry flag
 fn (mut cpu Cpu) ccf() {
-	mut flags := u8_to_flag(cpu.registers.f)
-	flags.carry = !flags.carry
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, bit(cpu.registers.f, zero_flag_byte_position))
 }
 
 // Set the value of the carry flag to true
 fn (mut cpu Cpu) scf() {
-	mut flags := u8_to_flag(cpu.registers.f)
-	flags.carry = true
-	cpu.registers.f = flag_to_u8(flags)
+		cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, true)
+
 }
 
 // Set zero flag to the value of the provided bit position in provided register
 fn (mut cpu Cpu) bit(bit Position, value u8) {
-	mut flags := u8_to_flag(cpu.registers.f)
-	flags.zero = (value & (1 << int(bit))) == 0
-	flags.subtract = false
-	flags.half_carry = true
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, (value & (1 << int(bit))) == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, true)
 }
 
 // Set the value of the provided bit position in provided register to 0
@@ -347,13 +299,10 @@ fn (mut cpu Cpu) rr(value u8) u8 {
 	carry := new_value & 0x1
 	new_value >>= 1
 	new_value |= carry << 7
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: false
-		half_carry: false
-		carry: carry == 1
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, carry == 1)
 	return new_value
 }
 
@@ -362,13 +311,10 @@ fn (mut cpu Cpu) rl(value u8) u8 {
 	carry := new_value >> 7
 	new_value <<= 1
 	new_value |= carry
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: false
-		half_carry: false
-		carry: carry == 1
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, carry == 1)
 	return new_value
 }
 
@@ -377,13 +323,10 @@ fn (mut cpu Cpu) rrc(value u8) u8 {
 	carry := new_value & 0x1
 	new_value >>= 1
 	new_value |= carry << 7
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: false
-		half_carry: false
-		carry: carry == 1
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, carry == 1)
 	return new_value
 }
 
@@ -392,13 +335,10 @@ fn (mut cpu Cpu) rlc(value u8) u8 {
 	carry := new_value >> 7
 	new_value <<= 1
 	new_value |= carry
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: false
-		half_carry: false
-		carry: carry == 1
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, carry == 1)
 	return new_value
 }
 
@@ -408,13 +348,10 @@ fn (mut cpu Cpu) sra(value u8) u8 {
 	msb := (value >> 7) & 0x1
 	new_value >>= 1
 	new_value |= (msb << 7)
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: false
-		half_carry: false
-		carry: carry == 1
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, carry == 1)
 	return new_value
 }
 
@@ -424,13 +361,10 @@ fn (mut cpu Cpu) sla(value u8) u8 {
 	lsb := value & 0x1
 	new_value <<= 1
 	new_value |= lsb
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: false
-		half_carry: false
-		carry: carry == 1
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, carry == 1)
 	return new_value
 }
 
@@ -438,13 +372,10 @@ fn (mut cpu Cpu) swap(value u8) u8 {
 	upper := (value >> 4) & 0xF
 	lower := value & 0xF
 	new_value := (lower << 4) + upper
-	flags := FlagsRegister{
-		zero: new_value == 0
-		subtract: false
-		half_carry: false
-		carry: false
-	}
-	cpu.registers.f = flag_to_u8(flags)
+	cpu.registers.f = bit_set(cpu.registers.f, zero_flag_byte_position, new_value == 0)
+	cpu.registers.f = bit_set(cpu.registers.f, subtract_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, half_carry_flag_byte_position, false)
+	cpu.registers.f = bit_set(cpu.registers.f, carry_flag_byte_position, false)
 	return new_value
 }
 
@@ -482,7 +413,7 @@ fn (mut cpu Cpu) call(should_jump bool) {
 	}
 }
 
-// At the end of a call, get the top value of the stack and 
+// At the end of a call, get the top value of the stack and
 fn (mut cpu Cpu) ret(should_jump bool) {
 	if should_jump {
 		cpu.pc = cpu.pop_u16()

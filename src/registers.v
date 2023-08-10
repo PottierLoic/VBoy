@@ -1,3 +1,10 @@
+const (
+  zero_flag_byte_position       = 7
+  subtract_flag_byte_position   = 6
+  half_carry_flag_byte_position = 5
+  carry_flag_byte_position      = 4
+)
+
 struct Registers {
 mut:
   a u8
@@ -46,56 +53,6 @@ fn (mut reg Registers) set_hl(value u16) {
   reg.l = u8(value & 0xFF)
 }
 
-fn (reg Registers) print () {
-  flag := u8_to_flag(reg.f)
-  println("----------------------")
-  print("| a | ") print_full_b2(reg.a) print(" | ") print_hex(reg.a) println(" |")
-  print("| b | ") print_full_b2(reg.b) print(" | ") print_hex(reg.b) println(" |")
-  print("| c | ") print_full_b2(reg.c) print(" | ") print_hex(reg.c) println(" |")
-  print("| d | ") print_full_b2(reg.d) print(" | ") print_hex(reg.d) println(" |")
-  print("| e | ") print_full_b2(reg.e) print(" | ") print_hex(reg.e) println(" |")
-  print("| f | ") print_full_b2(reg.f) print(" | ") print_hex(reg.f) println(" |")
-  print("| h | ") print_full_b2(reg.h) print(" | ") print_hex(reg.h) println(" |")
-  print("| l | ") print_full_b2(reg.l) print(" | ") print_hex(reg.l) println(" |")
-  println("----------------------")
-  print("| zero       | ${flag.zero} ") if flag.zero { print(" ")} println("|")
-  print("| subtract   | ${flag.subtract} ") if flag.subtract { print(" ")} println("|")
-  print("| half-carry | ${flag.half_carry} ") if flag.half_carry { print(" ")} println("|")
-  print("| carry      | ${flag.carry} ") if flag.carry { print(" ")} println("|")
-  println("----------------------")
-}
-
-
-fn print_full_b2(nb u8) {
-  for i in 0 .. 8 {
-    print(nb >> (7 - i) & 1)
-  }
-}
-
-fn print_full_b10(nb u8) {
-  mut tmp := nb
-  mut digits := 0
-  for tmp != 0 {
-    tmp /= 10
-    digits++
-  }
-  for _ in 0 .. 3 - digits - int(nb == 0) {
-    print('0')
-  }
-  print(nb)
-}
-
-fn print_hex(nb u8) {
-  print(nb.hex())
-  print(' ')
-}
-
-// used for debug, print all digits of u8 number
-fn print_u8_b2(nb u8) {
-  for i in 0 .. 8 {
-    print(nb >> i & 1)
-  }
-}
 
 fn (reg Registers) target_to_reg8(target RegisterU8) u8 {
   return match target {
@@ -118,4 +75,42 @@ fn (reg Registers) target_to_reg16(target RegisterU16) u16 {
     .hl { reg.get_hl() }
     else { panic('missing a case in target_to_reg16: ${target}') }
   }
+}
+
+
+fn bit_set(nb u8, idx u8, value bool) u8 {
+	return if value { nb |  1 << idx } else { nb & ~(1 << idx) }
+}
+
+fn bit(nb u8, idx u8) bool {
+  return if nb >> idx & 1 == 1 { true } else { false }
+}
+
+fn (reg Registers) print () {
+  println("----------------------")
+  print("| a | ") print_full_b2(reg.a) print(" | ") print("${reg.a.hex()} ") println(" |")
+  print("| b | ") print_full_b2(reg.b) print(" | ") print("${reg.b.hex()} ") println(" |")
+  print("| c | ") print_full_b2(reg.c) print(" | ") print("${reg.c.hex()} ") println(" |")
+  print("| d | ") print_full_b2(reg.d) print(" | ") print("${reg.d.hex()} ") println(" |")
+  print("| e | ") print_full_b2(reg.e) print(" | ") print("${reg.e.hex()} ") println(" |")
+  print("| f | ") print_full_b2(reg.f) print(" | ") print("${reg.f.hex()} ") println(" |")
+  print("| h | ") print_full_b2(reg.h) print(" | ") print("${reg.h.hex()} ") println(" |")
+  print("| l | ") print_full_b2(reg.l) print(" | ") print("${reg.l.hex()} ") println(" |")
+  println("----------------------")
+  print("| zero       | ${bit(reg.f, zero_flag_byte_position)} ") if bit(reg.f, zero_flag_byte_position) { print(" ")} println("|")
+  print("| subtract   | ${bit(reg.f, subtract_flag_byte_position)} ") if bit(reg.f, subtract_flag_byte_position) { print(" ")} println("|")
+  print("| half-carry | ${bit(reg.f, half_carry_flag_byte_position)} ") if bit(reg.f, half_carry_flag_byte_position) { print(" ")} println("|")
+  print("| carry      | ${bit(reg.f, carry_flag_byte_position)} ") if bit(reg.f, carry_flag_byte_position) { print(" ")} println("|")
+  println("----------------------")
+}
+
+fn print_full_b2(nb u8) {
+  for i in 0 .. 8 {
+    print(nb >> (7 - i) & 1)
+  }
+}
+
+fn print_hex(nb u8) {
+  print(nb.hex())
+  print(' ')
 }

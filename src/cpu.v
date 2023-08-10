@@ -21,40 +21,40 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
 		}
 		.jp {
 			should_jump := match instr.jump_test {
-				.not_zero { !u8_to_flag(cpu.registers.f).zero }
-				.not_carry { !u8_to_flag(cpu.registers.f).carry }
-				.zero { u8_to_flag(cpu.registers.f).zero }
-				.carry { u8_to_flag(cpu.registers.f).carry }
+				.not_zero { !bit(cpu.registers.f, zero_flag_byte_position) }
+				.not_carry { !bit(cpu.registers.f, carry_flag_byte_position) }
+				.zero { bit(cpu.registers.f, zero_flag_byte_position) }
+				.carry { bit(cpu.registers.f, carry_flag_byte_position) }
 				.always { true }
 			}
 			cpu.jump(should_jump)
 		}
 		.jr {
 			should_jump := match instr.jump_test {
-				.not_zero { !u8_to_flag(cpu.registers.f).zero }
-				.not_carry { !u8_to_flag(cpu.registers.f).carry }
-				.zero { u8_to_flag(cpu.registers.f).zero }
-				.carry { u8_to_flag(cpu.registers.f).carry }
+				.not_zero { !bit(cpu.registers.f, zero_flag_byte_position) }
+				.not_carry { !bit(cpu.registers.f, carry_flag_byte_position) }
+				.zero { bit(cpu.registers.f, zero_flag_byte_position) }
+				.carry { bit(cpu.registers.f, carry_flag_byte_position) }
 				.always { true }
 			}
 			cpu.jr(should_jump)
 		}
 		.call {
 			should_jump := match instr.jump_test {
-				.not_zero { !u8_to_flag(cpu.registers.f).zero }
-				.not_carry { !u8_to_flag(cpu.registers.f).carry }
-				.zero { u8_to_flag(cpu.registers.f).zero }
-				.carry { u8_to_flag(cpu.registers.f).carry }
+				.not_zero { !bit(cpu.registers.f, zero_flag_byte_position) }
+				.not_carry { !bit(cpu.registers.f, carry_flag_byte_position) }
+				.zero { bit(cpu.registers.f, zero_flag_byte_position) }
+				.carry { bit(cpu.registers.f, carry_flag_byte_position) }
 				.always { true }
 			}
 			cpu.call(should_jump)
 		}
 		.ret {
 			should_jump := match instr.jump_test {
-				.not_zero { !u8_to_flag(cpu.registers.f).zero }
-				.not_carry { !u8_to_flag(cpu.registers.f).carry }
-				.zero { u8_to_flag(cpu.registers.f).zero }
-				.carry { u8_to_flag(cpu.registers.f).carry }
+				.not_zero { !bit(cpu.registers.f, zero_flag_byte_position) }
+				.not_carry { !bit(cpu.registers.f, carry_flag_byte_position) }
+				.zero { bit(cpu.registers.f, zero_flag_byte_position) }
+				.carry { bit(cpu.registers.f, carry_flag_byte_position) }
 				.always { true }
 			}
 			cpu.ret(should_jump)
