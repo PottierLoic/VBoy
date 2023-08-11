@@ -290,21 +290,19 @@ fn (mut cart Cart) load_rom(rom_path string) bool {
 
   valid := if x & 0xff != cart.header.checksum { 'PASSED' } else { 'FAILED' }
   println('Checksum:       ${cart.header.checksum.hex()}  ${valid}')
-  if valid == 'FAILED' {
-    return false
-  }
+  if valid == 'FAILED' { return false }
 
   return true
 }
 
 // Return the u8 value stored at provided address
+[direct_array_access]
 fn (cart Cart) read_byte(address u16) u8 {
   return cart.rom_data[address]
 }
 
-/*
-Write u8 value on the provided address in rom.
-This does not save a new file but just modify the values in the cart struct.*/
+/* Write u8 value on the provided address in rom.
+This does not save a new file but just modify the values in the cart struct. */
 fn (mut cart Cart) write_byte(address u16, value u8) {
   cart.rom_data[address] = value
 }

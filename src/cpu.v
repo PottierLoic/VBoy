@@ -425,7 +425,7 @@ fn (mut cpu Cpu) init() {
 
 // Extract the next instruction and execute it.
 fn (mut cpu Cpu) step() {
-	mut instruction_byte := cpu.read_byte(cpu.pc)
+	mut instruction_byte := u8(0)//cpu.read_byte(cpu.pc)
 	prefixed := instruction_byte == 0xCB
 	if prefixed {
 		instruction_byte = cpu.read_byte(cpu.pc + 1)
@@ -446,33 +446,33 @@ fn (mut cpu Cpu) read_byte(address u16) u8 {
 	if address < 0x8000 {
 		// ROM Data
 		return cpu.vboy.cart.read_byte(address)
-	} else if address < 0xA000 {
+	}	else if address < 0xA000 {
 		// Char/map data
-		panic('PPU vram writing not implemented')
+		return 0//panic('PPU vram writing not implemented')
 	} else if address < 0xC000 {
 		// Cart RAM
-		return cpu.vboy.cart.read_byte(address)
+		return 0//cpu.vboy.cart.read_byte(address)
 	} else if address < 0xE000 {
 		// WRAM
-		return cpu.vboy.ram.read_wram(address)
+		return 0//cpu.vboy.ram.read_wram(address)
 	} else if address < 0xFE00 {
 		// Reserved echo ram
 		return 0
 	} else if address < 0xFEA0 {
 		// OAM
-		panic('PPU OAM writing not implemented')
+		return 0//panic('PPU OAM writing not implemented')
 	} else if address < 0xFF00 {
 		// Reserved unusable
 		return 0
 	} else if address < 0xFF80 {
 		// IO Registers
-		return cpu.vboy.io.read_io(address)
+		return 0//cpu.vboy.io.read_io(address)
 	} else if address < 0xFFFF {
 		// CPU enable register
-		return cpu.ie_register
+		return 0//cpu.ie_register
 	} else {
 		// HRAM
-		return cpu.vboy.ram.read_hram(address)
+		return 0//cpu.vboy.ram.read_hram(address)
 	}
 }
 

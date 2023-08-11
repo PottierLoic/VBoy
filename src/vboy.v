@@ -68,11 +68,11 @@ fn main() {
 	// Starting emulation
 	println('Starting emulation')
 	vboy.running = true
-	vboy.paused = true
-
+	vboy.paused = false
 
 	mut instruction_count := 0
 	mut time_count := time.new_stopwatch()
+	mut sec_timer := time.new_stopwatch()
 
 	// Main loop
 	for vboy.running {
@@ -84,18 +84,21 @@ fn main() {
 			//vboy.cpu.print()
 		}
 		event := sdl.Event{}
-		for 0 < sdl.poll_event(&event) {
-			match event.@type {
-				.quit {
-					println("The program took ${time_count.elapsed().milliseconds()} ms to run ${instruction_count} instructions.")
+		if sec_timer.elapsed().milliseconds() > 16 { // Used to check input every ~1/60 seconds and reduce lag.
+			for 0 < sdl.poll_event(&event) {
+				match event.@type {
+					.quit {
+						println("The program took ${time_count.elapsed().milliseconds()} ms to run ${instruction_count} instructions.")
 
-					return
-				 }
-				.keydown { sdl_ctx.handle_keydown(event) }
-				.keyup { sdl_ctx.handle_keyup(event) }
-				else {}
+						return
+					}
+					.keydown { sdl_ctx.handle_keydown(event) }
+					.keyup { sdl_ctx.handle_keyup(event) }
+					else {}
+				}
+				if sdl_ctx.quit { return }
 			}
-			if sdl_ctx.quit { return }
+			sec_timer.restart()
 		}
 	}
 }
