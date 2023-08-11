@@ -89,7 +89,6 @@ fn main() {
 				match event.@type {
 					.quit {
 						println("The program took ${time_count.elapsed().milliseconds()} ms to run ${instruction_count} instructions.")
-
 						return
 					}
 					.keydown { sdl_ctx.handle_keydown(event) }

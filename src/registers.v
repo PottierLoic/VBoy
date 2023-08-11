@@ -53,7 +53,6 @@ fn (mut reg Registers) set_hl(value u16) {
   reg.l = u8(value & 0xFF)
 }
 
-
 fn (reg Registers) target_to_reg8(target RegisterU8) u8 {
   return match target {
     .a { reg.a }
@@ -76,7 +75,6 @@ fn (reg Registers) target_to_reg16(target RegisterU16) u16 {
     else { panic('missing a case in target_to_reg16: ${target}') }
   }
 }
-
 
 fn bit_set(nb u8, idx u8, value bool) u8 {
 	return if value { nb |  1 << idx } else { nb & ~(1 << idx) }
@@ -108,9 +106,4 @@ fn print_full_b2(nb u8) {
   for i in 0 .. 8 {
     print(nb >> (7 - i) & 1)
   }
-}
-
-fn print_hex(nb u8) {
-  print(nb.hex())
-  print(' ')
 }
