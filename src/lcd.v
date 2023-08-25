@@ -1,14 +1,16 @@
+module vboy
+
 const colors = [u32(0xFFFFFFFF), u32(0xFFAAAAAA), u32(0xFF555555), u32(0xFF000000)]
 
-enum Lcd_modes {
+pub enum Lcd_modes {
 	hblank
 	vblank
 	oam
 	xfer
 }
 
-struct Lcd {
-mut:
+pub struct Lcd {
+pub mut:
 	lcdc        u8
 	lcds        u8
 	scroll_y    u8
@@ -25,7 +27,7 @@ mut:
 	sp2_colors  [4]u32
 }
 
-fn (mut lcd Lcd) init() {
+pub fn (mut lcd Lcd) init() {
 	lcd.lcdc = 0x91
 	lcd.bg_palette = 0xFC
 	lcd.obj_palette[0], lcd.obj_palette[1] = u8(0xFF), u8(0xFF)
@@ -37,7 +39,7 @@ fn (mut lcd Lcd) init() {
 	}
 }
 
-fn (lcd Lcd) read(address u16) u8 {
+pub fn (lcd Lcd) read(address u16) u8 {
 	return match address {
 		0xFF40 { lcd.lcdc }
 		0xFF41 { lcd.lcds }
@@ -54,7 +56,7 @@ fn (lcd Lcd) read(address u16) u8 {
 	}
 }
 
-fn (mut lcd Lcd) color_update(data u8, address u16) {
+pub fn (mut lcd Lcd) color_update(data u8, address u16) {
 	match address {
 		0xFF47 {
 			lcd.bg_colors[0] = colors[data & 0b11]
@@ -80,7 +82,7 @@ fn (mut lcd Lcd) color_update(data u8, address u16) {
 	}
 }
 
-fn (mut lcd Lcd) write(address u16, value u8) {
+pub fn (mut lcd Lcd) write(address u16, value u8) {
 	match address {
 		0xFF40 { lcd.lcdc = value }
 		0xFF41 { lcd.lcds = value }

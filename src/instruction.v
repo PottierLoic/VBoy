@@ -1,13 +1,15 @@
+module vboy
+
 /* Register instructions part, each register instruction is composed of an instruction and a target */
-enum RegisterU8 {
+pub enum RegisterU8 {
   a b c d e h l d8 hli
 }
 
-enum RegisterU16 {
+pub enum RegisterU16 {
   bc de hl af sp
 }
 
-enum Instruction_ {
+pub enum Instruction_ {
   // Arithmetic instr
   add
   dec
@@ -69,7 +71,7 @@ enum Instruction_ {
 }
 
 /* Jump conditions */
-enum JumpTest {
+pub enum JumpTest {
   not_zero
   zero
   not_carry
@@ -78,16 +80,16 @@ enum JumpTest {
 }
 
 /* Memory reading / writing part */
-enum LoadByteTarget {
+pub enum LoadByteTarget {
   a b c d e h l hli
 }
-enum LoadByteSource {
+pub enum LoadByteSource {
   a b c d e h l d8 hli
 }
-enum LoadWordTarget {
+pub enum LoadWordTarget {
   bc de hl sp
 }
-enum Indirect {
+pub enum Indirect {
   bc_indirect
   de_indirect
   hl_indirect_minus
@@ -95,7 +97,7 @@ enum Indirect {
   word_indirect
   last_byte_indirect
 }
-enum LoadType {
+pub enum LoadType {
   byte                  // done
   word                  // not done
   a_from_indirect       // not done
@@ -108,15 +110,15 @@ enum LoadType {
 }
 
 /* Stack part*/
-enum StackTarget {
+pub enum StackTarget {
   bc de hl af
 }
 
-enum Position {
+pub enum Position {
   b0 b1 b2 b3 b4 b5 b6 b7
 }
 
-enum RSTLocation {
+pub enum RSTLocation {
   x00
   x10
   x20
@@ -128,7 +130,8 @@ enum RSTLocation {
 }
 
 /* Instruction struct that can hold multiple optional values, it can represent any of the instruction, prefixed or not */
-struct Instruction {
+pub struct Instruction {
+pub:
   instruction Instruction_
   target_u8 RegisterU8
   target_u16 RegisterU16
@@ -145,12 +148,12 @@ struct Instruction {
 
 /* return the right instruction */
 [direct_array_access]
-fn instruction_from_byte(value u8, prefixed bool) Instruction {
+pub fn instruction_from_byte(value u8, prefixed bool) Instruction {
   return if prefixed { instruction_prefixed[value] }
   else { instruction_not_prefixed[value] }
 }
 
-const instruction_prefixed = [
+pub const instruction_prefixed = [
   /* RLC instruction */
   Instruction{instruction: .rlc, target_u8: .b},
   Instruction{instruction: .rlc, target_u8: .c},

@@ -1,3 +1,5 @@
+module vboy
+
 import os
 
 const rom_types = [
@@ -173,8 +175,8 @@ const ram_sizes = [
   '64 KiB',
 ]
 
-struct RomHeader {
-mut:
+pub struct RomHeader {
+pub mut:
   entry           [4]u8
   logo            [0x30]u8
   title           string
@@ -190,8 +192,8 @@ mut:
   global_checksum u16
 }
 
-struct Cart {
-mut:
+pub struct Cart {
+pub mut:
   filename string
   rom_size u32
   rom_data [65536]u8 // Not sure if this is the maximum size a cart can be
@@ -199,7 +201,7 @@ mut:
 }
 
 // Return the licence code corresponding to the cart informations.
-fn (cart Cart) cart_lic() string {
+pub fn (cart Cart) cart_lic() string {
   if cart.header.new_lic_code <= 0xa4 {
     return lic_codes[cart.header.lic_code]
   } else {
@@ -208,7 +210,7 @@ fn (cart Cart) cart_lic() string {
 }
 
 // Return the Rom type corresponding to the cart informations.
-fn (cart Cart) cart_type() string {
+pub fn (cart Cart) cart_type() string {
   if cart.header.rom_type <= 0x22 {
     return rom_types[cart.header.rom_type]
   } else {
@@ -216,7 +218,7 @@ fn (cart Cart) cart_type() string {
   }
 }
 
-fn (cart Cart) cart_rom_size() string {
+pub fn (cart Cart) cart_rom_size() string {
   if cart.header.rom_size <= 0x8 {
     return rom_sizes[cart.header.rom_size]
   } else {
@@ -224,7 +226,7 @@ fn (cart Cart) cart_rom_size() string {
   }
 }
 
-fn (cart Cart) cart_ram_size() string {
+pub fn (cart Cart) cart_ram_size() string {
   if cart.header.ram_size <= 0x5 {
     return ram_sizes[cart.header.ram_size]
   } else {
@@ -235,7 +237,7 @@ fn (cart Cart) cart_ram_size() string {
 /*
 Load the cartridge information from the rom (.gb) file.
 Return true on succes and false if the loading failed.*/
-fn (mut cart Cart) load_rom(rom_path string) bool {
+pub fn (mut cart Cart) load_rom(rom_path string) bool {
   file := os.read_bytes(rom_path) or {
     println('File not found: ${rom_path}')
     return false
@@ -297,18 +299,18 @@ fn (mut cart Cart) load_rom(rom_path string) bool {
 
 // Return the u8 value stored at provided address
 [direct_array_access]
-fn (cart Cart) read_byte(address u16) u8 {
+pub fn (cart Cart) read_byte(address u16) u8 {
   return cart.rom_data[address]
 }
 
 /* Write u8 value on the provided address in rom.
 This does not save a new file but just modify the values in the cart struct. */
-fn (mut cart Cart) write_byte(address u16, value u8) {
+pub fn (mut cart Cart) write_byte(address u16, value u8) {
   cart.rom_data[address] = value
 }
 
 // Display rom header informations
-fn (cart Cart) print() {
+pub fn (cart Cart) print() {
   println('Title:          ${cart.header.title}')
   println('Type:           ${cart.cart_type()}')
   println('ROM Size:       ${cart.cart_rom_size()}')

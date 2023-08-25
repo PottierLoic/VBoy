@@ -1,3 +1,5 @@
+module vboy
+
 import sdl
 
 const (
@@ -5,8 +7,8 @@ const (
 	screen_height = 280
 )
 
-struct Sdl_context {
-mut:
+pub struct Sdl_context {
+pub mut:
 	vboy   &VBoy = unsafe { nil }
 	width  int = screen_width
 	height int = screen_height

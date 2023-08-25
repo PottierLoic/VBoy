@@ -1,11 +1,13 @@
+module vboy
+
 // TODO:Maybe remove this quite useless struct
-struct Io {
-mut:
+pub struct Io {
+pub mut:
 	vboy &VBoy = unsafe { nil }
 	data [2]u8	// Supposed to be a char, will change later
 }
 
-fn (io Io) read_io(address u16) u8 {
+pub fn (io Io) read_io(address u16) u8 {
 	return match address {
 		0xFF00 {
 			// TODO: Gamepad
@@ -47,7 +49,7 @@ fn (io Io) read_io(address u16) u8 {
 	}
 }
 
-fn (mut io Io) write_io(address u16, value u8) {
+pub fn (mut io Io) write_io(address u16, value u8) {
 	match address {
 		0xFF00 {
 			// TODO: Gamepad

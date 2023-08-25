@@ -5,15 +5,23 @@ else
 endif
 
 dev:
-	v ./src -o ./vboy.exe
+	v -shared ./src -o ./vboy.exe
 
 prod:
-	v ./src -prod -o ./vboy.exe
+	v -shared ./src -prod -o ./vboy.exe
+
+test-all:
+	v test ./tests/
+
+test-cpu:
+	v test ./tests/cpu/
 
 # Target for testing code faster
 zelda:
-	v run ./src ./roms/zelda.gb
+	v -shared ./src
+	vboy.exe ./roms/zelda.gb
 
 # Profiler to test vboy speed
+# Doesnt work anymore with -shared apparently
 profile:
-	v -prod -profile profile.txt run ./src ./roms/zelda.gb
+	v -shared -profile profile.txt run ./src ./roms/zelda.gb

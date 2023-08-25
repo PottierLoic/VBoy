@@ -1,4 +1,6 @@
-enum States {
+module vboy
+
+pub enum States {
 	tile
 	data_0
 	data_1
@@ -6,8 +8,8 @@ enum States {
 	push
 }
 
-struct Oam {
-mut:
+pub struct Oam {
+pub mut:
 	y                   u8
 	x                   u8
 	tile_index          u8
@@ -19,8 +21,8 @@ mut:
 	flag_bg             u8
 }
 
-struct Ppu {
-mut:
+pub struct Ppu {
+pub mut:
 	oam          [40]Oam
 	vram         [0x2000]u8
 	sprite_count u8
@@ -31,20 +33,20 @@ mut:
 	buffer      u32
 }
 
-fn (mut ppu Ppu) ppu_tick() {
+pub fn (mut ppu Ppu) ppu_tick() {
 	// Check mode and call the right ppu function
 }
 
-fn (ppu Ppu) read_oam(address u16) u8 {
+pub fn (ppu Ppu) read_oam(address u16) u8 {
 	return 0
 }
 
-fn (mut ppu Ppu) write_oam(address u16, value u8) {}
+pub fn (mut ppu Ppu) write_oam(address u16, value u8) {}
 
-fn (ppu Ppu) read_vram(address u16) u8 {
+pub fn (ppu Ppu) read_vram(address u16) u8 {
 	return ppu.vram[address - 0x8000]
 }
 
-fn (mut ppu Ppu) write_vram(address u16, value u8) {
+pub fn (mut ppu Ppu) write_vram(address u16, value u8) {
 	ppu.vram[address - 0x8000] = value
 }

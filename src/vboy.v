@@ -1,9 +1,11 @@
+module vboy
+
 import os
 import sdl
 import time
 
-struct VBoy {
-mut:
+pub struct VBoy {
+pub mut:
 	// Emulator components
 	cpu  Cpu
 	ppu  Ppu
@@ -19,7 +21,7 @@ mut:
 	tick    u64
 }
 
-fn main() {
+pub fn main() {
 	args := os.args.clone()
 	if args.len == 1 {
 		println('Missing parameter: rom_path')
@@ -103,14 +105,14 @@ fn main() {
 }
 
 // Execute one processing step at a time.
-fn (mut vboy VBoy) debug_step() {
+pub fn (mut vboy VBoy) debug_step() {
 	println("Manual step:")
 	vboy.cpu.step()
 	vboy.cpu.print()
 }
 
 // Increment the differents timers.
-fn (mut vboy VBoy) timer_cycle(amount int) {
+pub fn (mut vboy VBoy) timer_cycle(amount int) {
 	for _ in 0 .. amount {
 		for _ in 0 .. 4 {
 			vboy.tick++
@@ -121,6 +123,6 @@ fn (mut vboy VBoy) timer_cycle(amount int) {
 	}
 }
 
-fn delay(ms u32) {
+pub fn delay(ms u32) {
 	sdl.delay(ms)
 }

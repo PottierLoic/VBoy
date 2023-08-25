@@ -1,5 +1,7 @@
-struct Cpu {
-mut:
+module vboy
+
+pub struct Cpu {
+pub mut:
 	vboy               &VBoy = unsafe { nil }
 	registers          Registers
 	pc                 u16
@@ -10,7 +12,7 @@ mut:
 }
 
 // Execute the provided instruction and return next program counter.
-fn (mut cpu Cpu) execute(instr Instruction) u16 {
+pub fn (mut cpu Cpu) execute(instr Instruction) u16 {
 	match instr.instruction {
 		.nop {
 			cpu.pc++
@@ -414,7 +416,7 @@ fn (mut cpu Cpu) execute(instr Instruction) u16 {
 }
 
 // Initialize the cpu with default values.
-fn (mut cpu Cpu) init() {
+pub fn (mut cpu Cpu) init() {
 	cpu.registers.set_af(0x01B0)
 	cpu.registers.set_bc(0x0013)
 	cpu.registers.set_de(0x00D8)
@@ -424,7 +426,7 @@ fn (mut cpu Cpu) init() {
 }
 
 // Extract the next instruction and execute it.
-fn (mut cpu Cpu) step() {
+pub fn (mut cpu Cpu) step() {
 	mut instruction_byte := cpu.read_byte(cpu.pc)
 	prefixed := instruction_byte == 0xCB
 	if prefixed {
@@ -444,7 +446,7 @@ fn (mut cpu Cpu) step() {
 
 /* Select the struct to read in vboy componnents */
 /* TODO: ~80% of the execution time is wasted here. */
-fn (mut cpu Cpu) read_byte(address u16) u8 {
+pub fn (mut cpu Cpu) read_byte(address u16) u8 {
 	if address < 0x8000 {
 		// ROM Data
 		return cpu.vboy.cart.read_byte(address)
@@ -479,7 +481,7 @@ fn (mut cpu Cpu) read_byte(address u16) u8 {
 }
 
 /* Select the struct to write in vboy componnents */
-fn (mut cpu Cpu) write_byte(address u16, value u8) {
+pub fn (mut cpu Cpu) write_byte(address u16, value u8) {
 	if address < 0x8000 {
 		// ROM Data
 		cpu.vboy.cart.write_byte(address, value)
@@ -511,26 +513,26 @@ fn (mut cpu Cpu) write_byte(address u16, value u8) {
 	}
 }
 
-fn (mut cpu Cpu) read_u16(address u16) u16 {
+pub fn (mut cpu Cpu) read_u16(address u16) u16 {
 	low := u16(cpu.read_byte(address))
 	high := u16(cpu.read_byte(address + 1))
 	return low | high << 8
 }
 
-fn (mut cpu Cpu) write_u16(address u16, value u16) {
+pub fn (mut cpu Cpu) write_u16(address u16, value u16) {
 	cpu.write_byte(address + 1, u8(value >> 8))
 	cpu.write_byte(address, u8(value))
 }
 
-fn (cpu Cpu) get_interruption_flags() u8 {
+pub fn (cpu Cpu) get_interruption_flags() u8 {
 	return cpu.interruption_flags
 }
 
-fn (mut cpu Cpu) set_interruption_flags(value u8) {
+pub fn (mut cpu Cpu) set_interruption_flags(value u8) {
 	cpu.interruption_flags = value
 }
 
-fn (mut cpu Cpu) print() {
+pub fn (mut cpu Cpu) print() {
 	cpu.registers.print()
 	println('| PC: ${cpu.pc.hex()}')
 	println('| SP: ${cpu.sp.hex()}')

@@ -1,3 +1,5 @@
+module vboy
+
 /* Number of timer cycles for each prefixed instruction (CB prefix) */
 const prefixed_cycles = [2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2,
                          2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2,
@@ -53,12 +55,12 @@ const unprefixed_cycles_branched = [1, 3, 2, 2, 1, 1, 2, 1, 5, 2, 2, 2, 1, 1, 2,
                                     3, 3, 2, 1, 0, 4, 2, 4, 3, 2, 4, 1, 0, 0, 2, 4]
 
 /* Choose the correct method to get instruction name */
-fn instruction_name_from_byte(value u8, prefixed bool) string {
+pub fn instruction_name_from_byte(value u8, prefixed bool) string {
   if prefixed { return prefixed_instruction_name(value) }
   else { return unprefixed_instruction_name(value) }
 }
 
-fn prefixed_instruction_name(value u8) string {
+pub fn prefixed_instruction_name(value u8) string {
   match value {
     /* RLC instruction */
     0x00 { return "rlc, b" }
@@ -351,7 +353,7 @@ fn prefixed_instruction_name(value u8) string {
   }
 }
 
-fn unprefixed_instruction_name(value u8) string {
+pub fn unprefixed_instruction_name(value u8) string {
   match value {
     /* INC instruction */
     0x3c { return "inc, a" }

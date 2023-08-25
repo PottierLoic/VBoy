@@ -1,5 +1,7 @@
-struct Timer {
-mut:
+module vboy
+
+pub struct Timer {
+pub mut:
 	vboy &VBoy = unsafe { nil }
 	div  u16
 	tima u8
@@ -7,11 +9,11 @@ mut:
 	tac  u8
 }
 
-fn (mut timer Timer) timer_init() {
+pub fn (mut timer Timer) timer_init() {
 	timer.div = 0xAC00
 }
 
-fn (mut timer Timer) timer_tick() {
+pub fn (mut timer Timer) timer_tick() {
 	// TODO: implement timer
 	last_div := timer.div
 	timer.div++
@@ -34,7 +36,7 @@ fn (mut timer Timer) timer_tick() {
 	}
 }
 
-fn (mut timer Timer) timer_read(address u16) u8 {
+pub fn (mut timer Timer) timer_read(address u16) u8 {
 	return match address {
 		0xFF04 { u8(timer.div >> 8) }
 		0xFF05 { timer.tima }
@@ -44,7 +46,7 @@ fn (mut timer Timer) timer_read(address u16) u8 {
 	}
 }
 
-fn (mut timer Timer) timer_write(address u16, value u8) {
+pub fn (mut timer Timer) timer_write(address u16, value u8) {
 	match address {
 		0xFF04 { timer.div = 0 }
 		0xFF05 { timer.tima = value }
