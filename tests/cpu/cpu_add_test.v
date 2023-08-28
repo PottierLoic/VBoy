@@ -18,6 +18,4 @@ pub fn test_add() {
 	vb.cpu.execute(vboy.Instruction{instruction: .add, target_u8: .c})
 	assert vb.cpu.registers.a == 0
 	assert vb.cpu.registers.f == 0b10110000
-
-	// TODO: add tests for other modes
 }
