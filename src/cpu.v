@@ -9,6 +9,16 @@ pub mut:
 	halted             bool
 	ie_register        u8
 	interruption_flags u8
+
+	// used for splitting old execute function
+	fetched_opcode u8
+	fetched_instruction Instruction
+	fetched_data u16
+}
+
+pub fn (mut cpu Cpu) fetch_instruction() {
+	cpu.fetched_opcode = cpu.read_byte(cpu.pc)
+	cpu.fetched_instruction = instruction_from_byte(cpu.fetched_opcode, if cpu.fetched_opcode == 0xCB { true } else { false })
 }
 
 // Execute the provided instruction and return next program counter.

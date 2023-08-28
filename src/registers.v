@@ -10,13 +10,15 @@ const (
 pub struct Registers {
 pub mut:
   a u8
+  f u8
   b u8
   c u8
   d u8
   e u8
-  f u8
   h u8
   l u8
+  pc u16
+  sp u16
 }
 
 pub fn (reg Registers) get_af() u16 {
@@ -58,6 +60,7 @@ pub fn (mut reg Registers) set_hl(value u16) {
 pub fn (reg Registers) target_to_reg8(target RegisterU8) u8 {
   return match target {
     .a { reg.a }
+    .f { reg.f }
     .b { reg.b }
     .c { reg.c }
     .d { reg.d }
@@ -101,6 +104,9 @@ pub fn (reg Registers) print () {
   print("| subtract   | ${bit(reg.f, subtract_flag_byte_position)} ") if bit(reg.f, subtract_flag_byte_position) { print(" ")} println("|")
   print("| half-carry | ${bit(reg.f, half_carry_flag_byte_position)} ") if bit(reg.f, half_carry_flag_byte_position) { print(" ")} println("|")
   print("| carry      | ${bit(reg.f, carry_flag_byte_position)} ") if bit(reg.f, carry_flag_byte_position) { print(" ")} println("|")
+  println("----------------------")
+  println("| PC | ${reg.pc}")
+  println("| SP | ${reg.sp}")
   println("----------------------")
 }
 
