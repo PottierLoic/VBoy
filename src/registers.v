@@ -57,30 +57,6 @@ pub fn (mut reg Registers) set_hl(value u16) {
   reg.l = u8(value & 0xFF)
 }
 
-pub fn (reg Registers) target_to_reg8(target RegisterU8) u8 {
-  return match target {
-    .a { reg.a }
-    .f { reg.f }
-    .b { reg.b }
-    .c { reg.c }
-    .d { reg.d }
-    .e { reg.e }
-    .h { reg.h }
-    .l { reg.l }
-    else { panic('missing a case in target_to_reg8: ${target}') }
-  }
-}
-
-pub fn (reg Registers) target_to_reg16(target RegisterU16) u16 {
-  return match target {
-    .af { reg.get_af() }
-    .bc { reg.get_bc() }
-    .de { reg.get_de() }
-    .hl { reg.get_hl() }
-    else { panic('missing a case in target_to_reg16: ${target}') }
-  }
-}
-
 pub fn bit_set(nb u8, idx u8, value bool) u8 {
 	return if value { nb |  1 << idx } else { nb & ~(1 << idx) }
 }

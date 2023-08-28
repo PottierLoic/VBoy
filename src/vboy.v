@@ -83,7 +83,6 @@ pub fn main() {
 		} else {
 			vboy.cpu.step()
 			instruction_count++
-			//vboy.cpu.print()
 		}
 		event := sdl.Event{}
 		if sec_timer.elapsed().milliseconds() > 16 { // Used to check input every ~1/60 seconds and reduce lag.
@@ -108,7 +107,6 @@ pub fn main() {
 pub fn (mut vboy VBoy) debug_step() {
 	println("Manual step:")
 	vboy.cpu.step()
-	vboy.cpu.print()
 }
 
 // Increment the differents timers.

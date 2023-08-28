@@ -27,7 +27,7 @@ Don't forget to install the requirements:  [here](#requirements)
 Choose the way you prefer:
 ```bash
 make main // fast compilation
-make prod // slower compilationm, but gives better performance and more safety
+make prod // slower compilation, but gives better performance and more safety
 ```
 or  
 ```bash
