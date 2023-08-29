@@ -27,15 +27,6 @@ pub fn (mut cpu Cpu) fetch_data() {
 
 }
 
-pub fn (mut cpu Cpu) execute() {
-	// TODO: get processor function from instruction
-	// proc_fn := get_function_from_instruction(instr)
-	// if proc_fn == none { // Must be removed once all proc functions are done.
-	// 	 panic("Unknown function for cpu instruction: ${instr}")
-	// }
-	// proc_fn(cpu)
-}
-
 // Initialize the cpu with default values.
 pub fn (mut cpu Cpu) init() {
 	cpu.registers.set_af(0x01B0)
@@ -49,12 +40,11 @@ pub fn (mut cpu Cpu) init() {
 // Extract the next instruction and execute it.
 pub fn (mut cpu Cpu) step() {
 	if !cpu.halted {
-		pc := cpu.registers.pc
 		cpu.fetch_instruction()
 		cpu.vboy.timer_cycle(1) // must be verified
 		cpu.fetch_data()
 		// put compile time debug here
-		cpu.execute()
+		cpu.cpu_exec()
 	} else {
 		cpu.vboy.timer_cycle(1)
 		// if cpu.interruption_flags {

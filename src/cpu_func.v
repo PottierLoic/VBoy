@@ -5,7 +5,7 @@ fn (mut cpu Cpu) cpu_none () {
 	panic("Invalid instruction: ${cpu.fetched_instruction}")
 }
 
-/* Nop does nothing */
+/* Does nothing */
 fn (mut cpu Cpu) cpu_nop () {}
 
 /*  */
@@ -41,39 +41,76 @@ fn (mut cpu Cpu) cpu_sub () {}
 
 fn (mut cpu Cpu) cpu_sbc () {}
 
-/* Apply AND operation to between A register and fetched data */
+/* Apply AND operation between A register and fetched data */
 fn (mut cpu Cpu) cpu_and () {
 	cpu.registers.a &= u8(cpu.fetched_data)
 	cpu.set_flags(int(cpu.registers.a == 0), 0, 1, 0)
 }
 
-fn (mut cpu Cpu) cpu_xor () {}
+/* Apply XOR operation between A register and fetched data */
+fn (mut cpu Cpu) cpu_xor () {
+	cpu.registers.a ^= u8(cpu.fetched_data)
+	cpu.set_flags(int(cpu.registers.a == 0), 0, 0, 0)
+}
 
-fn (mut cpu Cpu) cpu_or () {}
+/* Apply OR operation between A register and fetched data */
+fn (mut cpu Cpu) cpu_or () {
+	cpu.registers.a |= u8(cpu.fetched_data)
+	cpu.set_flags(int(cpu.registers.a == 0), 0, 0, 0)
+}
 
 fn (mut cpu Cpu) cpu_cp () {}
 
 fn (mut cpu Cpu) cpu_cb () {}
 
-fn (mut cpu Cpu) cpu_rrca () {}
+/* Rotate register A to righ and keep carry */
+fn (mut cpu Cpu) cpu_rrca () {
+	mut carry := cpu.registers.a & 1
+	cpu.registers.a = (cpu.registers.a >> 1) | carry
+	cpu.set_flags(0, 0, 0, carry)
+}
 
-fn (mut cpu Cpu) cpu_rlca () {}
+/* Rotate register A to left and keep carry */
+fn (mut cpu Cpu) cpu_rlca () {
+	mut val := cpu.registers.a
+	mut carry := (cpu.registers.a >> 7) & 0x1
+	cpu.registers.a = (val << 1) | carry
+	cpu.set_flags(0, 0, 0, carry)
+}
 
-fn (mut cpu Cpu) cpu_rra () {}
+/* Rotate register A to right, add old carry and keep new carry */
+fn (mut cpu Cpu) cpu_rra () {
+	mut new_carry := cpu.registers.a & 1
+	cpu.registers.a = (cpu.registers.a >> 1) | (bit(cpu.registers.f, carry_flag_byte_position) << 7 )
+	cpu.set_flags(0, 0, 0, new_carry)
+}
 
-fn (mut cpu Cpu) cpu_rla () {}
+/* Rotate register A to left, add old carry and keep new carry */
+fn (mut cpu Cpu) cpu_rla () {
+	mut val := cpu.registers.a
+	mut new_carry := (cpu.registers.a >> 7) & 1
+	cpu.registers.a = (val << 1) | bit(cpu.registers.f, carry_flag_byte_position)
+	cpu.set_flags(0, 0, 0, new_carry)
+}
 
-fn (mut cpu Cpu) cpu_stop () {}
+/* Stop the emulator */
+fn (mut cpu Cpu) cpu_stop () { panic("Stop instruction received!") }
 
-fn (mut cpu Cpu) cpu_halt () {}
+fn (mut cpu Cpu) cpu_halt () { cpu.halted = true }
 
 fn (mut cpu Cpu) cpu_daa () {}
 
-fn (mut cpu Cpu) cpu_cpl () {}
+/* Invert A bits */
+fn (mut cpu Cpu) cpu_cpl () {
+	cpu.registers.a = ~cpu.registers.a
+	cpu.set_flags(-1, 1, 1, -1)
+}
 
-fn (mut cpu Cpu) cpu_scf () {}
+/* Set carry flag */
+fn (mut cpu Cpu) cpu_scf () { cpu.set_flags(-1, 0, 0, 1) }
 
-fn (mut cpu Cpu) cpu_ccf () {}
+/* Invert cary flag */
+fn (mut cpu Cpu) cpu_ccf () { cpu.set_flags(-1, 0, 0, bit(cpu.registers.f, carry_flag_byte_position) ^ 1) }
 
 fn (mut cpu Cpu) cpu_ei () {}
 
@@ -123,6 +160,6 @@ fn (mut cpu Cpu) init_functions () {
 }
 
 
-fn (mut cpu Cpu) cpu_exec (opcode u8)  {
-	cpu.func[opcode]()
+fn (mut cpu Cpu) cpu_exec ()  {
+	cpu.func[cpu.fetched_opcode]()
 }

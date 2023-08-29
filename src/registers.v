@@ -61,8 +61,8 @@ pub fn bit_set(nb u8, idx u8, value int) u8 {
 	return if value == 1 { nb |  1 << idx } else { nb & ~(1 << idx) }
 }
 
-pub fn bit(nb u8, idx u8) int {
-  return if nb >> idx & 1 == 1 { 1 } else { 0 }
+pub fn bit(nb u8, idx u8) u8 {
+  return if nb >> idx & 1 == 1 { u8(1) } else { u8(0) }
 }
 
 pub fn (reg Registers) print () {
