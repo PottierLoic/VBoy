@@ -24,7 +24,26 @@ pub fn (mut cpu Cpu) fetch_instruction() {
 }
 
 pub fn (mut cpu Cpu) fetch_data() {
-
+	match cpu.fetched_instruction.mode {
+		.am_imp {}
+		.am_r { cpu.fetched_data = cpu.get_reg(cpu.fetched_instruction.reg_1) }
+		.am_r_r { cpu.fetched_data = cpu.get_reg(cpu.fetched_instruction.reg_2) }
+		.am_r_d8 {
+			cpu.fetched_data = cpu.read_byte(cpu.registers.pc)
+			cpu.vboy.timer_cycle(1)
+			cpu.registers.pc++
+		}
+		.am_r_d16, .am_d16 {
+			u16 lower__byte := cpu.read_byte(cpu.registers.pc)
+			cpu.vboy.timer_cycle(1)
+			u16 higher_byte := cpu.read_byte(cpu.registers.pc + 1)
+			cpu.vboy.timer_cycle(1)
+			cpu.fetched_data = lower__byte | (higher_byte << 8)
+			cpu.registers.pc += 2
+		}
+		.
+		else {}
+	}
 }
 
 // Initialize the cpu with default values.
@@ -131,17 +150,6 @@ pub fn (mut cpu Cpu) write_byte(address u16, value u8) {
 	}
 }
 
-pub fn (mut cpu Cpu) read_u16(address u16) u16 {
-	low := u16(cpu.read_byte(address))
-	high := u16(cpu.read_byte(address + 1))
-	return low | high << 8
-}
-
-pub fn (mut cpu Cpu) write_u16(address u16, value u16) {
-	cpu.write_byte(address + 1, u8(value >> 8))
-	cpu.write_byte(address, u8(value))
-}
-
 pub fn (cpu Cpu) get_interruption_flags() u8 {
 	return cpu.interruption_flags
 }
@@ -155,4 +163,24 @@ pub fn (mut cpu Cpu) set_flags(z int, n int, h int, c int){
 	if n != -1 { bit_set(cpu.registers.f, subtract_flag_byte_position, n)}
 	if h != -1 { bit_set(cpu.registers.f, half_carry_flag_byte_position, h)}
 	if c != -1 { bit_set(cpu.registers.f, carry_flag_byte_position, c)}
+}
+
+fn (mut cpu Cpu) get_reg(reg Reg) u16 {
+	return match reg {
+		.reg_a { cpu.registers.a }
+		.reg_f { cpu.registers.f }
+		.reg_b { cpu.registers.b }
+		.reg_c { cpu.registers.c }
+		.reg_d { cpu.registers.d }
+		.reg_e { cpu.registers.e }
+		.reg_h { cpu.registers.h }
+		.reg_l { cpu.registers.l }
+		.reg_af { cpu.registers.get_af() }
+		.reg_bc { cpu.registers.get_bc() }
+		.reg_de { cpu.registers.get_de() }
+		.reg_hl { cpu.registers.get_hl() }
+		.reg_pc { cpu.registers.pc }
+		.reg_sp { cpu.registers.sp }
+		.reg_none { panic("Reg none should never happend, unless..") }
+	}
 }
