@@ -1,5 +1,6 @@
 module vboy
 
+[heap]
 pub struct Cpu {
 pub mut:
 	vboy               &VBoy = unsafe { nil }
@@ -10,7 +11,8 @@ pub mut:
 	int_master_enabled bool
 	ime_enabled 			 bool
 
-	// used for splitting old execute function
+	func							 [34]fn()
+
 	fetched_opcode u8
 	fetched_instruction Instruction
 	fetched_data u16
@@ -25,7 +27,6 @@ pub fn (mut cpu Cpu) fetch_data() {
 
 }
 
-// Execute the provided instruction and return next program counter.
 pub fn (mut cpu Cpu) execute() {
 	// TODO: get processor function from instruction
 	// proc_fn := get_function_from_instruction(instr)
@@ -157,4 +158,11 @@ pub fn (cpu Cpu) get_interruption_flags() u8 {
 
 pub fn (mut cpu Cpu) set_interruption_flags(value u8) {
 	cpu.interruption_flags = value
+}
+
+pub fn (mut cpu Cpu) set_flags(z int, n int, h int, c int){
+	if z != -1 { bit_set(cpu.registers.f, zero_flag_byte_position, z)}
+	if n != -1 { bit_set(cpu.registers.f, subtract_flag_byte_position, n)}
+	if h != -1 { bit_set(cpu.registers.f, half_carry_flag_byte_position, h)}
+	if c != -1 { bit_set(cpu.registers.f, carry_flag_byte_position, c)}
 }

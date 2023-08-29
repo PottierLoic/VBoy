@@ -57,12 +57,12 @@ pub fn (mut reg Registers) set_hl(value u16) {
   reg.l = u8(value & 0xFF)
 }
 
-pub fn bit_set(nb u8, idx u8, value bool) u8 {
-	return if value { nb |  1 << idx } else { nb & ~(1 << idx) }
+pub fn bit_set(nb u8, idx u8, value int) u8 {
+	return if value == 1 { nb |  1 << idx } else { nb & ~(1 << idx) }
 }
 
-pub fn bit(nb u8, idx u8) bool {
-  return if nb >> idx & 1 == 1 { true } else { false }
+pub fn bit(nb u8, idx u8) int {
+  return if nb >> idx & 1 == 1 { 1 } else { 0 }
 }
 
 pub fn (reg Registers) print () {
@@ -76,10 +76,10 @@ pub fn (reg Registers) print () {
   print("| h | ") print_full_b2(reg.h) print(" | ") print("${reg.h.hex()} ") println(" |")
   print("| l | ") print_full_b2(reg.l) print(" | ") print("${reg.l.hex()} ") println(" |")
   println("----------------------")
-  print("| zero       | ${bit(reg.f, zero_flag_byte_position)} ") if bit(reg.f, zero_flag_byte_position) { print(" ")} println("|")
-  print("| subtract   | ${bit(reg.f, subtract_flag_byte_position)} ") if bit(reg.f, subtract_flag_byte_position) { print(" ")} println("|")
-  print("| half-carry | ${bit(reg.f, half_carry_flag_byte_position)} ") if bit(reg.f, half_carry_flag_byte_position) { print(" ")} println("|")
-  print("| carry      | ${bit(reg.f, carry_flag_byte_position)} ") if bit(reg.f, carry_flag_byte_position) { print(" ")} println("|")
+  print("| zero       | ${bit(reg.f, zero_flag_byte_position)} ") if bit(reg.f, zero_flag_byte_position) == 1 { print(" ")} println("|")
+  print("| subtract   | ${bit(reg.f, subtract_flag_byte_position)} ") if bit(reg.f, subtract_flag_byte_position) == 1 { print(" ")} println("|")
+  print("| half-carry | ${bit(reg.f, half_carry_flag_byte_position)} ") if bit(reg.f, half_carry_flag_byte_position) == 1 { print(" ")} println("|")
+  print("| carry      | ${bit(reg.f, carry_flag_byte_position)} ") if bit(reg.f, carry_flag_byte_position) == 1 { print(" ")} println("|")
   println("----------------------")
   println("| PC | ${reg.pc}")
   println("| SP | ${reg.sp}")
