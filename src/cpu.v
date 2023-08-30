@@ -45,7 +45,7 @@ pub fn (mut cpu Cpu) fetch_data() {
 		.am_r_d16, .am_d16 {
 			lower__byte := cpu.read_byte(cpu.registers.pc)
 			cpu.vboy.timer_cycle(1)
-			higher_byte := cpu.read_byte(cpu.registers.pc + 1)
+			higher_byte := u16(cpu.read_byte(cpu.registers.pc + 1))
 			cpu.vboy.timer_cycle(1)
 			cpu.fetched_data = lower__byte | (higher_byte << 8)
 			cpu.registers.pc += 2
@@ -67,26 +67,83 @@ pub fn (mut cpu Cpu) fetch_data() {
 			cpu.fetched_data = cpu.read_byte(destination)
 		}
 		.am_r_hli {
-			cpu.fetched_data = cpu.vboy.read_byte(cpu.get_reg(fetched_instruction.reg_2))
+			cpu.fetched_data = cpu.read_byte(cpu.get_reg(cpu.fetched_instruction.reg_2))
 			cpu.vboy.timer_cycle(1)
-			cpu.registers.set_hl(cpu.get_reg(.reg_hl) + 1)
+			cpu.registers.set_hl(cpu.registers.get_hl() + 1)
 		}
-		.am_r_hld {}
-		.am_hli_r {}
-		.am_hld_r {}
-		.am_r_a8 {}
-		.am_a8_r {}
-		.am_hl_spr {}
-		.am_d8 {}
-		.am_a16_r, .am_d16_r {}
-		.am_mr_d8 {}
-		.am_mr {}
-		.am_r_a16 {}
+		.am_r_hld {
+			cpu.fetched_data = cpu.read_byte(cpu.get_reg(cpu.fetched_instruction.reg_2))
+			cpu.vboy.timer_cycle(1)
+			cpu.registers.set_hl(cpu.registers.get_hl() - 1)
+		}
+		.am_hli_r {
+			cpu.fetched_data = cpu.get_reg(cpu.fetched_instruction.reg_2)
+			cpu.destination = cpu.get_reg(cpu.fetched_instruction.reg_1)
+			cpu.memory = true
+			cpu.registers.set_hl(cpu.registers.get_hl() + 1 )
+		}
+		.am_hld_r {
+			cpu.fetched_data = cpu.get_reg(cpu.fetched_instruction.reg_2)
+			cpu.destination = cpu.get_reg(cpu.fetched_instruction.reg_1)
+			cpu.memory = true
+			cpu.registers.set_hl(cpu.registers.get_hl() + 1)
+		}
+		.am_r_a8 {
+			cpu.fetched_data = cpu.read_byte(cpu.registers.pc)
+			cpu.vboy.timer_cycle(1)
+			cpu.registers.pc++
+		}
+		.am_a8_r {
+			cpu.destination = cpu.read_byte(cpu.registers.pc)
+			cpu.memory = true
+			cpu.vboy.timer_cycle(1)
+			cpu.registers.pc++
+		}
+		.am_hl_spr {
+			cpu.fetched_data = cpu.read_byte(cpu.registers.pc)
+			cpu.vboy.timer_cycle(1)
+			cpu.registers.pc++
+		}
+		.am_d8 {
+			cpu.fetched_data = cpu.read_byte(cpu.registers.pc)
+			cpu.vboy.timer_cycle(1)
+			cpu.registers.pc++
+		}
+		.am_a16_r, .am_d16_r {
+			lower_byte := cpu.read_byte(cpu.registers.pc)
+			cpu.vboy.timer_cycle(1)
+			higher_byte := u16 (cpu.read_byte(cpu.registers.pc + 1))
+			cpu.vboy.timer_cycle(1)
+			cpu.destination = lower_byte | (higher_byte << 8)
+			cpu.fetched_data = cpu.get_reg(cpu.fetched_instruction.reg_2)
+			cpu.memory = true
+			cpu.registers.pc += 2
+
+		}
+		.am_mr_d8 {
+			cpu.fetched_data = cpu.read_byte(cpu.fetched_instruction.reg_1)
+			cpu.vboy.timer_cycle(1)
+			cpu.destination = cpu.get_reg(cpu.fetched_instruction.reg_1)
+			cpu.memory = true
+			cpu.registers.pc++
+		}
+		.am_mr {
+			cpu.fetched_data = cpu.read_byte(cpu.get_reg(cpu.fetched_instruction.reg_1))
+			cpu.destination = cpu.get_reg(cpu.fetched_instruction.reg_1)
+			cpu.memory = true
+			cpu.vboy.timer_cycle(1)
+		}
+		.am_r_a16 {
+			lower_byte := cpu.read_byte(cpu.registers.pc)
+			cpu.vboy.timer_cycle(1)
+			higher_byte := u16 (cpu.read_byte(cpu.registers.pc + 1))
+			cpu.vboy.timer_cycle(1)
+			cpu.fetched_data = lower__byte | (higher_byte << 8)
+			cpu.vboy.timer_cycle(1)
+			cpu.registers.pc++
+		}
 		.am_none {
 			panic('am_none, this should never happend.')
-		}
-		else {
-			panic('Unknown addressing mode: ${cpu.fetched_instruction.mode}')
 		}
 	}
 }
