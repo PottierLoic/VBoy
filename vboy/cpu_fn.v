@@ -15,7 +15,8 @@ fn (mut cpu Cpu) cpu_ldh () {}
 
 fn (mut cpu Cpu) cpu_jp () {}
 
-fn (mut cpu Cpu) cpu_di () {}
+/* Disable interrupts */
+fn (mut cpu Cpu) cpu_di () { cpu.int_master_enabled = false }
 
 fn (mut cpu Cpu) cpu_pop () {}
 
@@ -59,7 +60,11 @@ fn (mut cpu Cpu) cpu_or () {
 	cpu.set_flags(int(cpu.registers.a == 0), 0, 0, 0)
 }
 
-fn (mut cpu Cpu) cpu_cp () {}
+/* Compare reg A - fetched data */
+fn (mut cpu Cpu) cpu_cp () {
+	val := int(cpu.registers.a) - int(cpu.fetch_data)
+	cpu.set_flags(int(val == 0), 1, int((int(cpu.registers.a & 0x0F) - int(cpu.fetched_data & 0x0F)) < 0), int(val < 0))
+}
 
 fn (mut cpu Cpu) cpu_cb () {}
 
@@ -112,7 +117,8 @@ fn (mut cpu Cpu) cpu_scf () { cpu.set_flags(-1, 0, 0, 1) }
 /* Invert cary flag */
 fn (mut cpu Cpu) cpu_ccf () { cpu.set_flags(-1, 0, 0, bit(cpu.registers.f, carry_flag_byte_position) ^ 1) }
 
-fn (mut cpu Cpu) cpu_ei () {}
+/* Enable interrupts */
+fn (mut cpu Cpu) cpu_ei () { cpu.int_master_enabled = true }
 
 fn (mut cpu Cpu) cpu_reti () {}
 
@@ -122,6 +128,10 @@ fn (mut cpu Cpu) cpu_reti () {}
 /* it looks really ugly like that 																	*/
 /* Need to add: some fn that are not done yet */
 fn (mut cpu Cpu) init_functions () {
+	for i in 0 .. 255 {
+		cpu.func[i] = cpu.cpu_none
+	}
+
 	cpu.func[int(Instr.instr_none)] = cpu.cpu_none
 	cpu.func[int(Instr.instr_nop)] = cpu.cpu_nop
 	cpu.func[int(Instr.instr_ld)] = cpu.cpu_ld
@@ -159,7 +169,6 @@ fn (mut cpu Cpu) init_functions () {
 	cpu.func[int(Instr.instr_reti)] = cpu.cpu_reti
 }
 
-
 fn (mut cpu Cpu) cpu_exec ()  {
-	cpu.func[cpu.fetched_opcode]()
+	cpu.func[cpu.fetched_instruction.instr_type]()
 }

@@ -65,6 +65,16 @@ pub fn bit(nb u8, idx u8) u8 {
   return if nb >> idx & 1 == 1 { u8(1) } else { u8(0) }
 }
 
+pub fn is_16_bit(reg Reg) bool {
+  return match reg {
+    .reg_af { true }
+    .reg_bc { true }
+    .reg_de { true }
+    .reg_hl { true }
+    else { false }
+  }
+}
+
 pub fn (reg Registers) print () {
   println("----------------------")
   print("| a | ") print_full_b2(reg.a) print(" | ") print("${reg.a.hex()} ") println(" |")

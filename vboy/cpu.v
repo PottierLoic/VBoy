@@ -11,7 +11,7 @@ pub mut:
 	int_master_enabled bool
 	ime_enabled        bool
 
-	func [34]fn ()
+	func [256]fn ()
 
 	/* Step processing */
 	fetched_opcode      u8
@@ -27,7 +27,32 @@ pub fn (mut cpu Cpu) fetch_instruction() {
 	cpu.fetched_instruction = instruction_from_byte(cpu.fetched_opcode)
 }
 
-/* Get datas depending on the fetched instruction addressing mode */
+// Extract the next instruction and execute it.
+pub fn (mut cpu Cpu) step() {
+	if !cpu.halted {
+		cpu.fetch_instruction()
+		cpu.vboy.timer_cycle(1)
+		cpu.fetch_data()
+		// put compile time debug here
+		cpu.cpu_exec()
+	} else {
+		cpu.vboy.timer_cycle(1)
+		// if cpu.interruption_flags {
+		// 	cpu.halted = false
+		// }
+	}
+
+	if cpu.int_master_enabled {
+		cpu.handle_interrupts()
+		cpu.ime_enabled = false
+	}
+
+	if cpu.ime_enabled {
+		cpu.int_master_enabled = true
+	}
+}
+
+/* Get data depending on the fetched instruction addressing mode */
 pub fn (mut cpu Cpu) fetch_data() {
 	match cpu.fetched_instruction.mode {
 		.am_imp {}
@@ -121,7 +146,7 @@ pub fn (mut cpu Cpu) fetch_data() {
 
 		}
 		.am_mr_d8 {
-			cpu.fetched_data = cpu.read_byte(cpu.fetched_instruction.reg_1)
+			cpu.fetched_data = cpu.read_byte(cpu.get_reg(cpu.fetched_instruction.reg_1))
 			cpu.vboy.timer_cycle(1)
 			cpu.destination = cpu.get_reg(cpu.fetched_instruction.reg_1)
 			cpu.memory = true
@@ -138,7 +163,7 @@ pub fn (mut cpu Cpu) fetch_data() {
 			cpu.vboy.timer_cycle(1)
 			higher_byte := u16 (cpu.read_byte(cpu.registers.pc + 1))
 			cpu.vboy.timer_cycle(1)
-			cpu.fetched_data = lower__byte | (higher_byte << 8)
+			cpu.fetched_data = lower_byte | (higher_byte << 8)
 			cpu.vboy.timer_cycle(1)
 			cpu.registers.pc++
 		}
@@ -154,33 +179,9 @@ pub fn (mut cpu Cpu) init() {
 	cpu.registers.set_bc(0x0013)
 	cpu.registers.set_de(0x00D8)
 	cpu.registers.set_hl(0x014D)
-	cpu.registers.pc = 0x0100
+	cpu.registers.pc = 0x100
 	cpu.registers.sp = 0xFFFE
-}
-
-// Extract the next instruction and execute it.
-pub fn (mut cpu Cpu) step() {
-	if !cpu.halted {
-		cpu.fetch_instruction()
-		cpu.vboy.timer_cycle(1) // must be verified
-		cpu.fetch_data()
-		// put compile time debug here
-		cpu.cpu_exec()
-	} else {
-		cpu.vboy.timer_cycle(1)
-		// if cpu.interruption_flags {
-		// 	cpu.halted = false
-		// }
-	}
-
-	if cpu.int_master_enabled {
-		cpu.handle_interrupts()
-		cpu.ime_enabled = false
-	}
-
-	if cpu.ime_enabled {
-		cpu.int_master_enabled = true
-	}
+	cpu.init_functions()
 }
 
 /* Select the struct to read in vboy components */

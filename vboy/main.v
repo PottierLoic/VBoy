@@ -21,7 +21,7 @@ pub mut:
 	tick    u64
 }
 
-pub fn main() {
+pub fn run() {
 	args := os.args.clone()
 	if args.len == 1 {
 		println('Missing parameter: rom_path')
@@ -70,7 +70,6 @@ pub fn main() {
 	// Starting emulation
 	println('Starting emulation')
 	vboy.running = true
-	vboy.paused = false
 
 	mut instruction_count := 0
 	mut time_count := time.new_stopwatch()
