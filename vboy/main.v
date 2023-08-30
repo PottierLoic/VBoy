@@ -19,12 +19,15 @@ pub mut:
 	paused  bool
 	running bool
 	tick    u64
+
+	// debug informations (will be filled later)
+	debug_mode bool = true
 }
 
 pub fn run() {
 	args := os.args.clone()
 	if args.len == 1 {
-		println('Missing parameter: rom_path')
+		println('Missing parameters: rom_path')
 		return
 	} else if args.len > 2 {
 		println('Too many parameters, only specify rom_path')
@@ -70,6 +73,7 @@ pub fn run() {
 	// Starting emulation
 	println('Starting emulation')
 	vboy.running = true
+	vboy.paused = true
 
 	mut instruction_count := 0
 	mut time_count := time.new_stopwatch()
@@ -104,7 +108,7 @@ pub fn run() {
 
 // Execute one processing step at a time.
 pub fn (mut vboy VBoy) debug_step() {
-	println("Manual step:")
+	println("Manual step.")
 	vboy.cpu.step()
 }
 

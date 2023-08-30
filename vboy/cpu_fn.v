@@ -8,10 +8,40 @@ fn (mut cpu Cpu) cpu_none () {
 /* Does nothing */
 fn (mut cpu Cpu) cpu_nop () {}
 
-/*  */
-fn (mut cpu Cpu) cpu_ld () {}
+/* Load value from one point to another */
+fn (mut cpu Cpu) cpu_ld () {
+	/* If the instruction need to write values in memory */
+	if cpu.memory {
+		if is_16_bit(cpu.fetched_instruction.reg_2) {
+			cpu.vboy.timer_cycle(1)
+			cpu.write_u16_byte(cpu.destination, cpu.fetched_data)
+		} else {
+			cpu.write_byte(cpu.destination, u8(cpu.fetched_data))
+		}
+		cpu.vboy.timer_cycle(1)
+		return
+	}
 
-fn (mut cpu Cpu) cpu_ldh () {}
+	if cpu.fetched_instruction.mode == .am_hl_spr {
+		h := (cpu.get_reg(cpu.fetched_instruction.reg_2) & 0xF) + (cpu.fetched_data & 0xF) >= 0x10
+		c := (cpu.get_reg(cpu.fetched_instruction.reg_2) & 0xFF) + (cpu.fetched_data & 0xFF) >= 0x100
+		cpu.set_flags(0, 0, int(h), int (c))
+		cpu.set_reg(cpu.fetched_instruction.reg_1, cpu.get_reg(cpu.fetched_instruction.reg_2) + u8(cpu.fetched_data))
+		return
+	}
+
+	cpu.set_reg(cpu.fetched_instruction.reg_1, cpu.fetched_data)
+}
+
+/* Load fetched_data & 0xFF00 into destination */
+fn (mut cpu Cpu) cpu_ldh () {
+	if cpu.fetched_instruction.reg_1 == .reg_a {
+		cpu.registers.a = cpu.read_byte(cpu.fetched_data & 0xFF00)
+	} else {
+		cpu.write_byte(cpu.destination, cpu.registers.a)
+	}
+	cpu.vboy.timer_cycle(1)
+}
 
 fn (mut cpu Cpu) cpu_jp () {}
 
