@@ -25,6 +25,9 @@ test-all:
 test-cpu:
 	v test ./tests/cpu/
 
+test-reg:
+	v test ./tests/registers
+
 # Doesnt work anymore with -shared apparently
 profile:
 	make dev

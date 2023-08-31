@@ -36,8 +36,15 @@ pub fn (mut cpu Cpu) step() {
 		cpu.fetch_data()
 
 		// Compile time debugger
-		$if cpu.vboy.debug_mode {
+		$if debug_mode {
 			cpu.registers.print()
+			println("Last fetech : (will be applied on next print)")
+			println("fetched opcode: ${cpu.fetched_opcode}")
+			println("fetched instruction: ${cpu.fetched_instruction.instr_type}")
+			println("fetched data: ${cpu.fetched_data}")
+			println("fetched destination: ${cpu.destination}")
+			println("fetched in memory ?: ${cpu.memory}")
+
 		}
 
 		cpu.cpu_exec()
@@ -74,11 +81,11 @@ pub fn (mut cpu Cpu) fetch_data() {
 			cpu.registers.pc++
 		}
 		.am_r_d16, .am_d16 {
-			lower__byte := cpu.read_byte(cpu.registers.pc)
+			lower_byte := cpu.read_byte(cpu.registers.pc)
 			cpu.vboy.timer_cycle(1)
 			higher_byte := u16(cpu.read_byte(cpu.registers.pc + 1))
 			cpu.vboy.timer_cycle(1)
-			cpu.fetched_data = lower__byte | (higher_byte << 8)
+			cpu.fetched_data = lower_byte | (higher_byte << 8)
 			cpu.registers.pc += 2
 		}
 		.am_mr_r {
@@ -174,7 +181,7 @@ pub fn (mut cpu Cpu) fetch_data() {
 			cpu.registers.pc++
 		}
 		.am_none {
-			panic('am_none, this should never happend.')
+			panic('am_none, this should never happend.\nT\'es dans la merde mon crampter.')
 		}
 	}
 }

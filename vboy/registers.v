@@ -22,19 +22,19 @@ pub mut:
 }
 
 pub fn (reg Registers) get_af() u16 {
-  return u16(reg.a) << 8 | u16(reg.f)
+  return u16(reg.a) << 8 | reg.f
 }
 
 pub fn (reg Registers) get_bc() u16 {
-  return u16(reg.b) << 8 | u16(reg.c)
+  return u16(reg.b) << 8 | reg.c
 }
 
 pub fn (reg Registers) get_de() u16 {
-  return u16(reg.d) << 8 | u16(reg.e)
+  return u16(reg.d) << 8 | reg.e
 }
 
 pub fn (reg Registers) get_hl() u16 {
-  return u16(reg.h) << 8 | u16(reg.l)
+  return u16(reg.h) << 8 | reg.l
 }
 
 pub fn (mut reg Registers) set_af(value u16) {

@@ -4,6 +4,10 @@ import os
 import sdl
 import time
 
+const (
+	debug_mode = true
+)
+
 pub struct VBoy {
 pub mut:
 	// Emulator components
@@ -19,9 +23,6 @@ pub mut:
 	paused  bool
 	running bool
 	tick    u64
-
-	// debug informations (will be filled later)
-	debug_mode bool = true
 }
 
 pub fn run() {
@@ -73,7 +74,7 @@ pub fn run() {
 	// Starting emulation
 	println('Starting emulation')
 	vboy.running = true
-	vboy.paused = true
+	vboy.paused = debug_mode
 
 	mut instruction_count := 0
 	mut time_count := time.new_stopwatch()
