@@ -10,29 +10,31 @@ const (
 pub struct Registers {
 pub mut:
   a u8
+  f u8
   b u8
   c u8
   d u8
   e u8
-  f u8
   h u8
   l u8
+  pc u16
+  sp u16
 }
 
 pub fn (reg Registers) get_af() u16 {
-  return u16(reg.a) << 8 | u16(reg.f)
+  return u16(reg.a) << 8 | reg.f
 }
 
 pub fn (reg Registers) get_bc() u16 {
-  return u16(reg.b) << 8 | u16(reg.c)
+  return u16(reg.b) << 8 | reg.c
 }
 
 pub fn (reg Registers) get_de() u16 {
-  return u16(reg.d) << 8 | u16(reg.e)
+  return u16(reg.d) << 8 | reg.e
 }
 
 pub fn (reg Registers) get_hl() u16 {
-  return u16(reg.h) << 8 | u16(reg.l)
+  return u16(reg.h) << 8 | reg.l
 }
 
 pub fn (mut reg Registers) set_af(value u16) {
@@ -55,35 +57,22 @@ pub fn (mut reg Registers) set_hl(value u16) {
   reg.l = u8(value & 0xFF)
 }
 
-pub fn (reg Registers) target_to_reg8(target RegisterU8) u8 {
-  return match target {
-    .a { reg.a }
-    .b { reg.b }
-    .c { reg.c }
-    .d { reg.d }
-    .e { reg.e }
-    .h { reg.h }
-    .l { reg.l }
-    else { panic('missing a case in target_to_reg8: ${target}') }
+pub fn bit_set(nb u8, idx u8, value int) u8 {
+	return if value == 1 { nb |  1 << idx } else { nb & ~(1 << idx) }
+}
+
+pub fn bit(nb u8, idx u8) u8 {
+  return if nb >> idx & 1 == 1 { u8(1) } else { u8(0) }
+}
+
+pub fn is_16_bit(reg Reg) bool {
+  return match reg {
+    .reg_af { true }
+    .reg_bc { true }
+    .reg_de { true }
+    .reg_hl { true }
+    else { false }
   }
-}
-
-pub fn (reg Registers) target_to_reg16(target RegisterU16) u16 {
-  return match target {
-    .af { reg.get_af() }
-    .bc { reg.get_bc() }
-    .de { reg.get_de() }
-    .hl { reg.get_hl() }
-    else { panic('missing a case in target_to_reg16: ${target}') }
-  }
-}
-
-pub fn bit_set(nb u8, idx u8, value bool) u8 {
-	return if value { nb |  1 << idx } else { nb & ~(1 << idx) }
-}
-
-pub fn bit(nb u8, idx u8) bool {
-  return if nb >> idx & 1 == 1 { true } else { false }
 }
 
 pub fn (reg Registers) print () {
@@ -97,10 +86,13 @@ pub fn (reg Registers) print () {
   print("| h | ") print_full_b2(reg.h) print(" | ") print("${reg.h.hex()} ") println(" |")
   print("| l | ") print_full_b2(reg.l) print(" | ") print("${reg.l.hex()} ") println(" |")
   println("----------------------")
-  print("| zero       | ${bit(reg.f, zero_flag_byte_position)} ") if bit(reg.f, zero_flag_byte_position) { print(" ")} println("|")
-  print("| subtract   | ${bit(reg.f, subtract_flag_byte_position)} ") if bit(reg.f, subtract_flag_byte_position) { print(" ")} println("|")
-  print("| half-carry | ${bit(reg.f, half_carry_flag_byte_position)} ") if bit(reg.f, half_carry_flag_byte_position) { print(" ")} println("|")
-  print("| carry      | ${bit(reg.f, carry_flag_byte_position)} ") if bit(reg.f, carry_flag_byte_position) { print(" ")} println("|")
+  print("| zero       | ${bit(reg.f, zero_flag_byte_position)} ") if bit(reg.f, zero_flag_byte_position) == 1 { print(" ")} println("|")
+  print("| subtract   | ${bit(reg.f, subtract_flag_byte_position)} ") if bit(reg.f, subtract_flag_byte_position) == 1 { print(" ")} println("|")
+  print("| half-carry | ${bit(reg.f, half_carry_flag_byte_position)} ") if bit(reg.f, half_carry_flag_byte_position) == 1 { print(" ")} println("|")
+  print("| carry      | ${bit(reg.f, carry_flag_byte_position)} ") if bit(reg.f, carry_flag_byte_position) == 1 { print(" ")} println("|")
+  println("----------------------")
+  println("| PC | ${reg.pc}")
+  println("| SP | ${reg.sp}")
   println("----------------------")
 }
 

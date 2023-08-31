@@ -4,6 +4,10 @@ import os
 import sdl
 import time
 
+const (
+	debug_mode = true
+)
+
 pub struct VBoy {
 pub mut:
 	// Emulator components
@@ -21,10 +25,10 @@ pub mut:
 	tick    u64
 }
 
-pub fn main() {
+pub fn run() {
 	args := os.args.clone()
 	if args.len == 1 {
-		println('Missing parameter: rom_path')
+		println('Missing parameters: rom_path')
 		return
 	} else if args.len > 2 {
 		println('Too many parameters, only specify rom_path')
@@ -70,7 +74,7 @@ pub fn main() {
 	// Starting emulation
 	println('Starting emulation')
 	vboy.running = true
-	vboy.paused = false
+	vboy.paused = debug_mode
 
 	mut instruction_count := 0
 	mut time_count := time.new_stopwatch()
@@ -83,7 +87,6 @@ pub fn main() {
 		} else {
 			vboy.cpu.step()
 			instruction_count++
-			//vboy.cpu.print()
 		}
 		event := sdl.Event{}
 		if sec_timer.elapsed().milliseconds() > 16 { // Used to check input every ~1/60 seconds and reduce lag.
@@ -106,9 +109,8 @@ pub fn main() {
 
 // Execute one processing step at a time.
 pub fn (mut vboy VBoy) debug_step() {
-	println("Manual step:")
+	println("Manual step.")
 	vboy.cpu.step()
-	vboy.cpu.print()
 }
 
 // Increment the differents timers.
