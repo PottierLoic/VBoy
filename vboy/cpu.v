@@ -181,7 +181,8 @@ pub fn (mut cpu Cpu) fetch_data() {
 			cpu.registers.pc++
 		}
 		.am_none {
-			panic('am_none, this should never happend.\nT\'es dans la merde mon crampter.')
+			println("Warning: am_none shold never happend")
+			// panic('am_none, this should never happen.')
 		}
 	}
 }

@@ -43,7 +43,13 @@ fn (mut cpu Cpu) cpu_ldh () {
 	cpu.vboy.timer_cycle(1)
 }
 
-fn (mut cpu Cpu) cpu_jp () {}
+/* Jump to address if condition is valid */
+fn (mut cpu Cpu) cpu_jp () {
+	if cpu.cond_is_valid() {
+		cpu.registers.pc = cpu.fetched_data
+		cpu.vboy.timer_cycle(1)
+	}
+}
 
 /* Disable interrupts */
 fn (mut cpu Cpu) cpu_di () { cpu.int_master_enabled = false }
@@ -75,13 +81,47 @@ fn (mut cpu Cpu) cpu_push () {
 	cpu.vboy.timer_cycle(1)
 }
 
-fn (mut cpu Cpu) cpu_jr () {}
+/* Jump by a certain number if condition is valid*/
+fn (mut cpu Cpu) cpu_jr () {
+	delta := cpu.fetched_data & 0xFF
+	if cpu.cond_is_valid() {
+		cpu.registers.pc += delta
+		cpu.vboy.timer_cycle(1)
+	}
+}
 
-fn (mut cpu Cpu) cpu_call () {}
+/* Jump and save pc to stack if condition is valid */
+fn (mut cpu Cpu) cpu_call () {
+	if cpu.cond_is_valid() {
+		cpu.push_u16(cpu.registers.pc)
+		cpu.vboy.timer_cycle(2)
+		cpu.registers.pc = cpu.fetched_data
+		cpu.vboy.timer_cycle(1)
+	}
+}
 
-fn (mut cpu Cpu) cpu_ret () {}
+/* Return to the last pc pushed in stack if condition is valid */
+fn (mut cpu Cpu) cpu_ret () {
+	if cpu.fetched_instruction.cond_type != .cond_none {
+		cpu.vboy.timer_cycle(1)
+	}
+	if cpu.cond_is_valid() {
+		address := cpu.pop_u16()
+		cpu.vboy.timer_cycle(2)
+		cpu.registers.pc = address
+		cpu.vboy.timer_cycle(1)
+	}
+}
 
-fn (mut cpu Cpu) cpu_rst () {}
+/* set pc to a specific value (0x00, 0x008 etc..) */
+fn (mut cpu Cpu) cpu_rst () {
+	if cpu.cond_is_valid() {
+		cpu.push_u16(cpu.registers.pc)
+		cpu.vboy.timer_cycle(2)
+		cpu.registers.pc = cpu.fetched_instruction.parameter
+		cpu.vboy.timer_cycle(1)
+	}
+}
 
 /* Decrement a register */
 fn (mut cpu Cpu) cpu_dec () {
@@ -164,9 +204,27 @@ fn (mut cpu Cpu) cpu_adc () {
 	cpu.registers.a = value
 }
 
-fn (mut cpu Cpu) cpu_sub () {}
+/* Subtract fetched value from target register */
+fn (mut cpu Cpu) cpu_sub () {
+	value := cpu.get_reg(cpu.fetched_instruction.reg_1) - cpu.fetched_data
 
-fn (mut cpu Cpu) cpu_sbc () {}
+	half_carry := int((cpu.get_reg(cpu.fetched_instruction.reg_1) & 0xF) - (cpu.fetched_data & 0xF) < 0)
+	carry := int(cpu.get_reg(cpu.fetched_instruction.reg_1) - cpu.fetched_data < 0)
+	cpu.set_reg(cpu.fetched_instruction.reg_1, value)
+
+	cpu.set_flags(int(value == 0), 1, half_carry, carry)
+}
+
+/* Subtract fetched value and carry flag value from target register */
+fn (mut cpu Cpu) cpu_sbc () {
+	value := cpu.get_reg(cpu.fetched_instruction.reg_1) - cpu.fetched_data - bit(cpu.registers.f, carry_flag_byte_position)
+
+	half_carry := int((cpu.get_reg(cpu.fetched_instruction.reg_1) & 0xF) - (cpu.fetched_data & 0xF) - bit(cpu.registers.f, carry_flag_byte_position) < 0)
+	carry := int((cpu.get_reg(cpu.fetched_instruction.reg_1)) - (cpu.fetched_data) - bit(cpu.registers.f, carry_flag_byte_position) < 0)
+
+	cpu.set_reg(cpu.fetched_instruction.reg_1, value)
+	cpu.set_flags(int(value == 0), 1, half_carry, carry)
+}
 
 /* Apply AND operation between A register and fetched data */
 fn (mut cpu Cpu) cpu_and () {
@@ -192,7 +250,72 @@ fn (mut cpu Cpu) cpu_cp () {
 	cpu.set_flags(int(val == 0), 1, int((int(cpu.registers.a & 0x0F) - int(cpu.fetched_data & 0x0F)) < 0), int(val < 0))
 }
 
-fn (mut cpu Cpu) cpu_cb () {}
+/* Prefixed instruction: determine which action to do */
+fn (mut cpu Cpu) cpu_cb () {
+	// Everything is shifted by one byte because first byte is the prefix
+	opcode := cpu.fetched_data
+	// The lowest 3 bits of the opcode represent the target register
+	reg := match opcode & 0b111 {
+		0b0 { Reg.reg_b }
+		0b1 { Reg.reg_c }
+		0b10 { Reg.reg_d }
+		0b11 { Reg.reg_e }
+		0b100 { Reg.reg_h }
+		0b101 { Reg.reg_l }
+		0b110 { Reg.reg_hl }
+		0b111 { Reg.reg_a }
+		else { panic("Opcode doesn't correspond to any register: cpu_cb error in reg match") }
+	}
+	// The 3 next bits of the opcode represent the bit index concerned by this instruction
+	idx := (opcode >> 3) & 0b111
+	// The 2 highest bits of the opcode help us know the instruction (bit, res or set)
+	op_instr := (opcode >> 6) & 0b11
+
+	mut fetched_value := cpu.get_reg(reg)
+
+	cpu.vboy.timer_cycle(1)
+
+	if reg == .reg_hl {
+		cpu.vboy.timer_cycle(2)
+	}
+
+	match op_instr {
+		0b1 { // BIT
+			cpu.set_flags(int((fetched_value & (1 << idx)) > 0), 0, 1, -1)
+			return
+		}
+		0b10 { // RES
+			fetched_value &= ~(1 << idx)
+			cpu.set_reg(reg, fetched_value)
+			return
+		}
+		0b11 { // SET
+			fetched_value |= 1 << idx
+			cpu.set_reg(reg, fetched_value)
+			return
+		}
+		else { panic("op_instr in cpu_cb have an anormal value ${op_instr}.") }
+	}
+
+	carry_flag := bit(cpu.registers.f, carry_flag_byte_position)
+
+	match idx {
+		1 {
+
+			return
+		}
+		2 {
+
+			return
+		}
+		3 {
+
+			return
+		}
+		else { panic("idx in cpu_cb have an anormal value ${idx}.") }
+	}
+
+}
 
 /* Rotate register A to righ and keep carry */
 fn (mut cpu Cpu) cpu_rrca () {
@@ -224,14 +347,15 @@ fn (mut cpu Cpu) cpu_rla () {
 	cpu.set_flags(0, 0, 0, new_carry)
 }
 
-/* Stop the emulator */
+/* Exit the emulator with panic */
 fn (mut cpu Cpu) cpu_stop () { panic("Stop instruction received!") }
 
+/* Pause the processor */
 fn (mut cpu Cpu) cpu_halt () { cpu.halted = true }
 
 fn (mut cpu Cpu) cpu_daa () {}
 
-/* Invert A bits */
+/* Invert register A bits */
 fn (mut cpu Cpu) cpu_cpl () {
 	cpu.registers.a = ~cpu.registers.a
 	cpu.set_flags(-1, 1, 1, -1)
@@ -246,17 +370,19 @@ fn (mut cpu Cpu) cpu_ccf () { cpu.set_flags(-1, 0, 0, bit(cpu.registers.f, carry
 /* Enable interrupts */
 fn (mut cpu Cpu) cpu_ei () { cpu.int_master_enabled = true }
 
-fn (mut cpu Cpu) cpu_reti () {}
-
+/* Enable interrupts and return */
+fn (mut cpu Cpu) cpu_reti () {
+	cpu.int_master_enabled = true
+	cpu.cpu_ret()
+}
 
 /* Place all the cpu functions in the array for direct access later */
 /* May be nice to find a way to just declare them in it directly as */
 /* it looks really ugly like that 																	*/
 /* Need to add: some fn that are not done yet */
 fn (mut cpu Cpu) init_functions () {
-	for i in 0 .. 255 {
-		cpu.func[i] = cpu.cpu_none
-	}
+	// This is to trigger and error on any other index than thoses set after
+	for i in 0 .. 255 {	cpu.func[i] = cpu.cpu_none }
 
 	cpu.func[int(Instr.instr_none)] = cpu.cpu_none
 	cpu.func[int(Instr.instr_nop)] = cpu.cpu_nop
@@ -295,6 +421,7 @@ fn (mut cpu Cpu) init_functions () {
 	cpu.func[int(Instr.instr_reti)] = cpu.cpu_reti
 }
 
+[direct_array_access]
 fn (mut cpu Cpu) cpu_exec ()  {
 	cpu.func[cpu.fetched_instruction.instr_type]()
 }
