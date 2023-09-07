@@ -9,8 +9,7 @@ pub enum Interruption_types {	  it_vblanks = 0b1
 
 pub fn (mut cpu Cpu) interrupt(address u16, interrupt Interruption_types) bool {
 	return if (cpu.interruption_flags & 0b1) == u8(interrupt) && (cpu.ie_register & 0b1) == u8(interrupt) {
-		// REWORK NEEDED HERE :
-		//cpu.push_u16(cpu.pc)
+		cpu.push_u16(cpu.registers.pc)
 		cpu.registers.pc = address
 		cpu.interruption_flags &= ~u8(interrupt)
 		cpu.halted = false

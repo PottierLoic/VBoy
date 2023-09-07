@@ -300,16 +300,69 @@ fn (mut cpu Cpu) cpu_cb () {
 	carry_flag := bit(cpu.registers.f, carry_flag_byte_position)
 
 	match idx {
+		0 {
+			// RLC Instruction
+			mut carry := false
+			mut value := (fetched_value << 1) & 0xFF
+			if fetched_value & (1 << 7) != 0 {
+				carry = true
+				value |= 1
+			}
+			cpu.set_reg(reg, value)
+			cpu.set_flags(int(value == 0), 0, 0, int(carry))
+			return
+		}
 		1 {
-
+			// RRC Instruction
+			old_value := fetched_value
+			fetched_value = (fetched_value >> 1) | old_value << 7
+			cpu.set_reg(reg, fetched_value)
+			cpu.set_flags(int(fetched_value == 0), 0, 0, int(old_value & 1))
 			return
 		}
 		2 {
-
+			// RL Instruction
+			old_value := fetched_value
+			fetched_value = (fetched_value << 1) | carry_flag
+			cpu.set_reg(reg, fetched_value)
+			cpu.set_flags(int(fetched_value == 0), 0, 0, int(old_value & (1 << 7)))
 			return
 		}
 		3 {
-
+			// RR Instruction
+			old_value := fetched_value
+			fetched_value = (fetched_value >> 1) | carry_flag << 7
+			cpu.set_reg(reg, fetched_value)
+			cpu.set_flags(int(fetched_value == 0), 0, 0, int(old_value & 1))
+			return
+		}
+		4 {
+			// SLA Instruction
+			old_value := fetched_value
+			fetched_value = (fetched_value << 1)
+			cpu.set_reg(reg, fetched_value)
+			cpu.set_flags(int(fetched_value == 0), 0, 0, int(old_value & (1 << 7)))
+			return
+		}
+		5 {
+			// SRA Instruction
+			value := fetched_value >> 1
+			cpu.set_reg(reg, value)
+			cpu.set_flags(int(value == 0), 0, 0, int(fetched_value & 1))
+			return
+		}
+		6 {
+			// SWAP Instruction
+			value := ((fetched_value & 0xF) << 4) | ((fetched_value & 0xF0) >> 4)
+			cpu.set_reg(reg, value)
+			cpu.set_flags(int(value == 0), 0, 0, 0)
+			return
+		}
+		7 {
+			// SRL Instruction
+			value := fetched_value >> 1
+			cpu.set_reg(reg, value)
+			cpu.set_flags(int(value == 0), 0, 0, int(fetched_value & 1))
 			return
 		}
 		else { panic("idx in cpu_cb have an anormal value ${idx}.") }
