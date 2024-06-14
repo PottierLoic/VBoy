@@ -1,9 +1,9 @@
 module vboy
 
-[heap]
+@[heap]
 pub struct Cpu {
 pub mut:
-	vboy               &VBoy = unsafe { nil }
+	vb               &VBoy = unsafe { nil }
 	registers          Registers
 	halted             bool
 	ie_register        u8
@@ -32,7 +32,7 @@ pub fn (mut cpu Cpu) fetch_instruction() {
 pub fn (mut cpu Cpu) step() {
 	if !cpu.halted {
 		cpu.fetch_instruction()
-		cpu.vboy.timer_cycle(1)
+		cpu.vb.timer_cycle(1)
 		cpu.fetch_data()
 
 		// Compile time debugger
@@ -49,7 +49,7 @@ pub fn (mut cpu Cpu) step() {
 
 		cpu.cpu_exec()
 	} else {
-		cpu.vboy.timer_cycle(1)
+		cpu.vb.timer_cycle(1)
 		// if cpu.interruption_flags {
 		// 	cpu.halted = false
 		// }
@@ -77,14 +77,14 @@ pub fn (mut cpu Cpu) fetch_data() {
 		}
 		.am_r_d8 {
 			cpu.fetched_data = cpu.read_byte(cpu.registers.pc)
-			cpu.vboy.timer_cycle(1)
+			cpu.vb.timer_cycle(1)
 			cpu.registers.pc++
 		}
 		.am_r_d16, .am_d16 {
 			lower_byte := cpu.read_byte(cpu.registers.pc)
-			cpu.vboy.timer_cycle(1)
+			cpu.vb.timer_cycle(1)
 			higher_byte := u16(cpu.read_byte(cpu.registers.pc + 1))
-			cpu.vboy.timer_cycle(1)
+			cpu.vb.timer_cycle(1)
 			cpu.fetched_data = lower_byte | (higher_byte << 8)
 			cpu.registers.pc += 2
 		}
@@ -101,17 +101,17 @@ pub fn (mut cpu Cpu) fetch_data() {
 			if cpu.fetched_instruction.reg_2 == .reg_c {
 				destination |= 0xFF00
 			}
-			cpu.vboy.timer_cycle(1)
+			cpu.vb.timer_cycle(1)
 			cpu.fetched_data = cpu.read_byte(destination)
 		}
 		.am_r_hli {
 			cpu.fetched_data = cpu.read_byte(cpu.get_reg(cpu.fetched_instruction.reg_2))
-			cpu.vboy.timer_cycle(1)
+			cpu.vb.timer_cycle(1)
 			cpu.registers.set_hl(cpu.registers.get_hl() + 1)
 		}
 		.am_r_hld {
 			cpu.fetched_data = cpu.read_byte(cpu.get_reg(cpu.fetched_instruction.reg_2))
-			cpu.vboy.timer_cycle(1)
+			cpu.vb.timer_cycle(1)
 			cpu.registers.set_hl(cpu.registers.get_hl() - 1)
 		}
 		.am_hli_r {
@@ -128,30 +128,30 @@ pub fn (mut cpu Cpu) fetch_data() {
 		}
 		.am_r_a8 {
 			cpu.fetched_data = cpu.read_byte(cpu.registers.pc)
-			cpu.vboy.timer_cycle(1)
+			cpu.vb.timer_cycle(1)
 			cpu.registers.pc++
 		}
 		.am_a8_r {
 			cpu.destination = cpu.read_byte(cpu.registers.pc)
 			cpu.memory = true
-			cpu.vboy.timer_cycle(1)
+			cpu.vb.timer_cycle(1)
 			cpu.registers.pc++
 		}
 		.am_hl_spr {
 			cpu.fetched_data = cpu.read_byte(cpu.registers.pc)
-			cpu.vboy.timer_cycle(1)
+			cpu.vb.timer_cycle(1)
 			cpu.registers.pc++
 		}
 		.am_d8 {
 			cpu.fetched_data = cpu.read_byte(cpu.registers.pc)
-			cpu.vboy.timer_cycle(1)
+			cpu.vb.timer_cycle(1)
 			cpu.registers.pc++
 		}
 		.am_a16_r, .am_d16_r {
 			lower_byte := cpu.read_byte(cpu.registers.pc)
-			cpu.vboy.timer_cycle(1)
+			cpu.vb.timer_cycle(1)
 			higher_byte := u16 (cpu.read_byte(cpu.registers.pc + 1))
-			cpu.vboy.timer_cycle(1)
+			cpu.vb.timer_cycle(1)
 			cpu.destination = lower_byte | (higher_byte << 8)
 			cpu.fetched_data = cpu.get_reg(cpu.fetched_instruction.reg_2)
 			cpu.memory = true
@@ -160,7 +160,7 @@ pub fn (mut cpu Cpu) fetch_data() {
 		}
 		.am_mr_d8 {
 			cpu.fetched_data = cpu.read_byte(cpu.get_reg(cpu.fetched_instruction.reg_1))
-			cpu.vboy.timer_cycle(1)
+			cpu.vb.timer_cycle(1)
 			cpu.destination = cpu.get_reg(cpu.fetched_instruction.reg_1)
 			cpu.memory = true
 			cpu.registers.pc++
@@ -169,15 +169,15 @@ pub fn (mut cpu Cpu) fetch_data() {
 			cpu.fetched_data = cpu.read_byte(cpu.get_reg(cpu.fetched_instruction.reg_1))
 			cpu.destination = cpu.get_reg(cpu.fetched_instruction.reg_1)
 			cpu.memory = true
-			cpu.vboy.timer_cycle(1)
+			cpu.vb.timer_cycle(1)
 		}
 		.am_r_a16 {
 			lower_byte := cpu.read_byte(cpu.registers.pc)
-			cpu.vboy.timer_cycle(1)
+			cpu.vb.timer_cycle(1)
 			higher_byte := u16 (cpu.read_byte(cpu.registers.pc + 1))
-			cpu.vboy.timer_cycle(1)
+			cpu.vb.timer_cycle(1)
 			cpu.fetched_data = lower_byte | (higher_byte << 8)
-			cpu.vboy.timer_cycle(1)
+			cpu.vb.timer_cycle(1)
 			cpu.registers.pc++
 		}
 		.am_none {
@@ -203,16 +203,16 @@ pub fn (mut cpu Cpu) init() {
 pub fn (mut cpu Cpu) read_byte(address u16) u8 {
 	if address < 0x8000 {
 		// ROM Data
-		return cpu.vboy.cart.read_byte(address)
+		return cpu.vb.cart.read_byte(address)
 	} else if address < 0xA000 {
 		// Char/map data
 		panic('PPU vram reading not implemented')
 	} else if address < 0xC000 {
 		// Cart RAM
-		return cpu.vboy.cart.read_byte(address)
+		return cpu.vb.cart.read_byte(address)
 	} else if address < 0xE000 {
 		// WRAM
-		return cpu.vboy.ram.read_wram(address)
+		return cpu.vb.ram.read_wram(address)
 	} else if address < 0xFE00 {
 		// Reserved echo ram
 		return 0
@@ -224,13 +224,13 @@ pub fn (mut cpu Cpu) read_byte(address u16) u8 {
 		return 0
 	} else if address < 0xFF80 {
 		// IO Registers
-		return cpu.vboy.io.read_io(address)
+		return cpu.vb.io.read_io(address)
 	} else if address < 0xFFFF {
 		// CPU enable register
 		return cpu.ie_register
 	} else {
 		// HRAM
-		return cpu.vboy.ram.read_hram(address)
+		return cpu.vb.ram.read_hram(address)
 	}
 }
 
@@ -249,16 +249,16 @@ pub fn (mut cpu Cpu) write_u16_byte(address u16, value u16) {
 pub fn (mut cpu Cpu) write_byte(address u16, value u8) {
 	if address < 0x8000 {
 		// ROM Data
-		cpu.vboy.cart.write_byte(address, value)
+		cpu.vb.cart.write_byte(address, value)
 	} else if address < 0xA000 {
 		// Char/map data
 		panic('ppu vram writing not implemented')
 	} else if address < 0xC000 {
 		// Cart RAM
-		cpu.vboy.cart.write_byte(address, value)
+		cpu.vb.cart.write_byte(address, value)
 	} else if address < 0xE000 {
 		// WRAM
-		cpu.vboy.ram.write_wram(address, value)
+		cpu.vb.ram.write_wram(address, value)
 	} else if address < 0xFE00 {
 		// Reserved echo ram
 	} else if address < 0xFEA0 {
@@ -268,12 +268,12 @@ pub fn (mut cpu Cpu) write_byte(address u16, value u8) {
 		// Reserved unusable
 	} else if address < 0xFF80 {
 		// IO Registers
-		cpu.vboy.io.write_io(address, value)
+		cpu.vb.io.write_io(address, value)
 	} else if address < 0xFFFF {
 		// CPU enable register
 		cpu.ie_register = value
 	} else {
 		// HRAM
-		cpu.vboy.ram.write_hram(address, value)
+		cpu.vb.ram.write_hram(address, value)
 	}
 }

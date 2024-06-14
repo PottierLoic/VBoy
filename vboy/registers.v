@@ -62,7 +62,7 @@ pub fn bit_set(nb u8, idx u8, value int) u8 {
 }
 
 pub fn bit(nb u8, idx u8) u8 {
-  return if nb >> idx & 1 == 1 { u8(1) } else { u8(0) }
+  return if (nb >> idx) & 1 == 1 { u8(1) } else { u8(0) }
 }
 
 pub fn is_16_bit(reg Reg) bool {
@@ -98,6 +98,6 @@ pub fn (reg Registers) print () {
 
 pub fn print_full_b2(nb u8) {
   for i in 0 .. 8 {
-    print(nb >> (7 - i) & 1)
+    print((nb >> (7 - i)) & 1)
   }
 }

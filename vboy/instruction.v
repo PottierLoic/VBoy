@@ -114,7 +114,7 @@ pub struct Instruction {
 }
 
 /* return the right instruction */
-[direct_array_access]
+@[direct_array_access]
 pub fn instruction_from_byte(opcode u8) Instruction {
   return instruction[opcode]
 }

@@ -1,7 +1,7 @@
 module vboy
 
 pub struct Ram {
-pub mut:	
+pub mut:
 	wram [0x2000]u8
 	hram [0x80]u8
 }

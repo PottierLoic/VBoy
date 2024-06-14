@@ -298,7 +298,7 @@ pub fn (mut cart Cart) load_rom(rom_path string) bool {
 }
 
 // Return the u8 value stored at provided address
-[direct_array_access]
+@[direct_array_access]
 pub fn (cart Cart) read_byte(address u16) u8 {
   return cart.rom_data[address]
 }

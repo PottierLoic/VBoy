@@ -13,12 +13,12 @@ fn (mut cpu Cpu) cpu_ld () {
 	/* If the instruction need to write values in memory */
 	if cpu.memory {
 		if is_16_bit(cpu.fetched_instruction.reg_2) {
-			cpu.vboy.timer_cycle(1)
+			cpu.vb.timer_cycle(1)
 			cpu.write_u16_byte(cpu.destination, cpu.fetched_data)
 		} else {
 			cpu.write_byte(cpu.destination, u8(cpu.fetched_data))
 		}
-		cpu.vboy.timer_cycle(1)
+		cpu.vb.timer_cycle(1)
 		return
 	}
 
@@ -40,14 +40,14 @@ fn (mut cpu Cpu) cpu_ldh () {
 	} else {
 		cpu.write_byte(cpu.destination, cpu.registers.a)
 	}
-	cpu.vboy.timer_cycle(1)
+	cpu.vb.timer_cycle(1)
 }
 
 /* Jump to address if condition is valid */
 fn (mut cpu Cpu) cpu_jp () {
 	if cpu.cond_is_valid() {
 		cpu.registers.pc = cpu.fetched_data
-		cpu.vboy.timer_cycle(1)
+		cpu.vb.timer_cycle(1)
 	}
 }
 
@@ -57,9 +57,9 @@ fn (mut cpu Cpu) cpu_di () { cpu.int_master_enabled = false }
 /* Retrieve the last value pushed on the stack */
 fn (mut cpu Cpu) cpu_pop () {
 	lower_byte := cpu.pop()
-	cpu.vboy.timer_cycle(1)
+	cpu.vb.timer_cycle(1)
 	higher_byte := u16(cpu.pop())
-	cpu.vboy.timer_cycle(1)
+	cpu.vb.timer_cycle(1)
 
 	value := (higher_byte << 8) | lower_byte
 	cpu.set_reg(cpu.fetched_instruction.reg_1, value)
@@ -71,14 +71,14 @@ fn (mut cpu Cpu) cpu_pop () {
 /* Send values on the stack */
 fn (mut cpu Cpu) cpu_push () {
 	higher_byte := u8(cpu.get_reg(cpu.fetched_instruction.reg_1) >> 8)
-	cpu.vboy.timer_cycle(1)
+	cpu.vb.timer_cycle(1)
 	cpu.push(higher_byte)
 
 	lower_byte := u8(cpu.get_reg(cpu.fetched_instruction.reg_1))
-	cpu.vboy.timer_cycle(1)
+	cpu.vb.timer_cycle(1)
 	cpu.push(lower_byte)
 
-	cpu.vboy.timer_cycle(1)
+	cpu.vb.timer_cycle(1)
 }
 
 /* Jump by a certain number if condition is valid*/
@@ -86,7 +86,7 @@ fn (mut cpu Cpu) cpu_jr () {
 	delta := cpu.fetched_data & 0xFF
 	if cpu.cond_is_valid() {
 		cpu.registers.pc += delta
-		cpu.vboy.timer_cycle(1)
+		cpu.vb.timer_cycle(1)
 	}
 }
 
@@ -94,22 +94,22 @@ fn (mut cpu Cpu) cpu_jr () {
 fn (mut cpu Cpu) cpu_call () {
 	if cpu.cond_is_valid() {
 		cpu.push_u16(cpu.registers.pc)
-		cpu.vboy.timer_cycle(2)
+		cpu.vb.timer_cycle(2)
 		cpu.registers.pc = cpu.fetched_data
-		cpu.vboy.timer_cycle(1)
+		cpu.vb.timer_cycle(1)
 	}
 }
 
 /* Return to the last pc pushed in stack if condition is valid */
 fn (mut cpu Cpu) cpu_ret () {
 	if cpu.fetched_instruction.cond_type != .cond_none {
-		cpu.vboy.timer_cycle(1)
+		cpu.vb.timer_cycle(1)
 	}
 	if cpu.cond_is_valid() {
 		address := cpu.pop_u16()
-		cpu.vboy.timer_cycle(2)
+		cpu.vb.timer_cycle(2)
 		cpu.registers.pc = address
-		cpu.vboy.timer_cycle(1)
+		cpu.vb.timer_cycle(1)
 	}
 }
 
@@ -117,9 +117,9 @@ fn (mut cpu Cpu) cpu_ret () {
 fn (mut cpu Cpu) cpu_rst () {
 	if cpu.cond_is_valid() {
 		cpu.push_u16(cpu.registers.pc)
-		cpu.vboy.timer_cycle(2)
+		cpu.vb.timer_cycle(2)
 		cpu.registers.pc = cpu.fetched_instruction.parameter
-		cpu.vboy.timer_cycle(1)
+		cpu.vb.timer_cycle(1)
 	}
 }
 
@@ -127,7 +127,7 @@ fn (mut cpu Cpu) cpu_rst () {
 fn (mut cpu Cpu) cpu_dec () {
 	mut value := cpu.get_reg(cpu.fetched_instruction.reg_1) - 1
 	is_word := if is_16_bit(cpu.fetched_instruction.reg_1) {
-		cpu.vboy.timer_cycle(1)
+		cpu.vb.timer_cycle(1)
 		true
 	} else { false }
 
@@ -147,7 +147,7 @@ fn (mut cpu Cpu) cpu_dec () {
 fn (mut cpu Cpu) cpu_inc () {
 	mut value := cpu.get_reg(cpu.fetched_instruction.reg_1) + 1
 	is_16bit := if is_16_bit(cpu.fetched_instruction.reg_1) {
-		cpu.vboy.timer_cycle(1)
+		cpu.vb.timer_cycle(1)
 		true
 	} else { false }
 
@@ -167,7 +167,7 @@ fn (mut cpu Cpu) cpu_inc () {
 fn (mut cpu Cpu) cpu_add () {
 	mut value := u32(cpu.get_reg(cpu.fetched_instruction.reg_1) + cpu.fetched_data)
 	is_16bit := if is_16_bit(cpu.fetched_instruction.reg_2) {
-		cpu.vboy.timer_cycle(1)
+		cpu.vb.timer_cycle(1)
 		true
 	} else { false }
 
@@ -273,10 +273,10 @@ fn (mut cpu Cpu) cpu_cb () {
 
 	mut fetched_value := cpu.get_reg(reg)
 
-	cpu.vboy.timer_cycle(1)
+	cpu.vb.timer_cycle(1)
 
 	if reg == .reg_hl {
-		cpu.vboy.timer_cycle(2)
+		cpu.vb.timer_cycle(2)
 	}
 
 	match op_instr {
@@ -434,9 +434,7 @@ fn (mut cpu Cpu) cpu_reti () {
 /* it looks really ugly like that 																	*/
 /* Need to add: some fn that are not done yet */
 fn (mut cpu Cpu) init_functions () {
-	// This is to trigger and error on any other index than thoses set after
 	for i in 0 .. 255 {	cpu.func[i] = cpu.cpu_none }
-
 	cpu.func[int(Instr.instr_none)] = cpu.cpu_none
 	cpu.func[int(Instr.instr_nop)] = cpu.cpu_nop
 	cpu.func[int(Instr.instr_ld)] = cpu.cpu_ld
@@ -474,7 +472,7 @@ fn (mut cpu Cpu) init_functions () {
 	cpu.func[int(Instr.instr_reti)] = cpu.cpu_reti
 }
 
-[direct_array_access]
+@[direct_array_access]
 fn (mut cpu Cpu) cpu_exec ()  {
 	cpu.func[cpu.fetched_instruction.instr_type]()
 }
