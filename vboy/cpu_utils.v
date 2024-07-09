@@ -63,27 +63,27 @@ pub fn (mut cpu Cpu) set_reg(reg Reg, value u16) {
 	}
 }
 
-/* Return the last value pushed to the stack and increment it */
+//  Return the last value pushed to the stack and increment it
 pub fn (mut cpu Cpu) pop() u8 {
 	value := cpu.read_byte(cpu.registers.sp)
 	cpu.registers.sp++
 	return value
 }
 
-/* Return the two last values pushed to the stack and increment it */
+//  Return the two last values pushed to the stack and increment it
 pub fn (mut cpu Cpu) pop_u16() u16 {
 	lower_byte := cpu.pop()
 	higher_byte := u16(cpu.pop())
 	return lower_byte | (higher_byte << 8)
 }
 
-/* Push provided value to the stack and decrement it */
+//  Push provided value to the stack and decrement it
 pub fn (mut cpu Cpu) push(value u8) {
 	cpu.registers.sp--
 	cpu.write_byte(cpu.registers.sp, value)
 }
 
-/* Push provided values to the stack and decrement it */
+//  Push provided values to the stack and decrement it
 pub fn (mut cpu Cpu) push_u16(value u16) {
 	cpu.push(u8((value >> 8)))
 	cpu.push(u8(value >> 8))

@@ -3,7 +3,7 @@ module vboy
 @[heap]
 pub struct Cpu {
 pub mut:
-	vb               &VBoy = unsafe { nil }
+	vb                 &VBoy = unsafe { nil }
 	registers          Registers
 	halted             bool
 	ie_register        u8
@@ -12,8 +12,7 @@ pub mut:
 	ime_enabled        bool
 
 	func [256]fn ()
-
-	/* Step processing */
+	//  Step processing
 	fetched_opcode      u8
 	fetched_instruction Instruction
 	fetched_data        u16
@@ -21,7 +20,7 @@ pub mut:
 	memory              bool
 }
 
-/* Get the opcode at PC and retrieve the corresponding instruction */
+//  Get the opcode at PC and retrieve the corresponding instruction
 pub fn (mut cpu Cpu) fetch_instruction() {
 	cpu.fetched_opcode = cpu.read_byte(cpu.registers.pc)
 	cpu.fetched_instruction = instruction_from_byte(cpu.fetched_opcode)
@@ -38,13 +37,12 @@ pub fn (mut cpu Cpu) step() {
 		// Compile time debugger
 		$if debug_mode {
 			cpu.registers.print()
-			println("Last fetech : (will be applied on next print)")
-			println("fetched opcode: ${cpu.fetched_opcode}")
-			println("fetched instruction: ${cpu.fetched_instruction.instr_type}")
-			println("fetched data: ${cpu.fetched_data}")
-			println("fetched destination: ${cpu.destination}")
-			println("fetched in memory ?: ${cpu.memory}")
-
+			println('Last fetech : (will be applied on next print)')
+			println('fetched opcode: ${cpu.fetched_opcode}')
+			println('fetched instruction: ${cpu.fetched_instruction.instr_type}')
+			println('fetched data: ${cpu.fetched_data}')
+			println('fetched destination: ${cpu.destination}')
+			println('fetched in memory ?: ${cpu.memory}')
 		}
 
 		cpu.cpu_exec()
@@ -65,7 +63,7 @@ pub fn (mut cpu Cpu) step() {
 	}
 }
 
-/* Get data depending on the fetched instruction addressing mode */
+//  Get data depending on the fetched instruction addressing mode
 pub fn (mut cpu Cpu) fetch_data() {
 	match cpu.fetched_instruction.mode {
 		.am_imp {}
@@ -118,7 +116,7 @@ pub fn (mut cpu Cpu) fetch_data() {
 			cpu.fetched_data = cpu.get_reg(cpu.fetched_instruction.reg_2)
 			cpu.destination = cpu.get_reg(cpu.fetched_instruction.reg_1)
 			cpu.memory = true
-			cpu.registers.set_hl(cpu.registers.get_hl() + 1 )
+			cpu.registers.set_hl(cpu.registers.get_hl() + 1)
 		}
 		.am_hld_r {
 			cpu.fetched_data = cpu.get_reg(cpu.fetched_instruction.reg_2)
@@ -150,13 +148,12 @@ pub fn (mut cpu Cpu) fetch_data() {
 		.am_a16_r, .am_d16_r {
 			lower_byte := cpu.read_byte(cpu.registers.pc)
 			cpu.vb.timer_cycle(1)
-			higher_byte := u16 (cpu.read_byte(cpu.registers.pc + 1))
+			higher_byte := u16(cpu.read_byte(cpu.registers.pc + 1))
 			cpu.vb.timer_cycle(1)
 			cpu.destination = lower_byte | (higher_byte << 8)
 			cpu.fetched_data = cpu.get_reg(cpu.fetched_instruction.reg_2)
 			cpu.memory = true
 			cpu.registers.pc += 2
-
 		}
 		.am_mr_d8 {
 			cpu.fetched_data = cpu.read_byte(cpu.get_reg(cpu.fetched_instruction.reg_1))
@@ -174,14 +171,14 @@ pub fn (mut cpu Cpu) fetch_data() {
 		.am_r_a16 {
 			lower_byte := cpu.read_byte(cpu.registers.pc)
 			cpu.vb.timer_cycle(1)
-			higher_byte := u16 (cpu.read_byte(cpu.registers.pc + 1))
+			higher_byte := u16(cpu.read_byte(cpu.registers.pc + 1))
 			cpu.vb.timer_cycle(1)
 			cpu.fetched_data = lower_byte | (higher_byte << 8)
 			cpu.vb.timer_cycle(1)
 			cpu.registers.pc++
 		}
 		.am_none {
-			println("Warning: am_none shold never happend")
+			println('Warning: am_none should never happend')
 			// panic('am_none, this should never happen.')
 		}
 	}
@@ -198,8 +195,8 @@ pub fn (mut cpu Cpu) init() {
 	cpu.init_functions()
 }
 
-/* Select the struct to read in vboy components */
-/* TODO: make it fast (~80% of the execution time is wasted here). */
+//  Select the struct to read in vboy components
+//  TODO: make it fast (~80% of the execution time is wasted here).
 pub fn (mut cpu Cpu) read_byte(address u16) u8 {
 	if address < 0x8000 {
 		// ROM Data
@@ -245,7 +242,7 @@ pub fn (mut cpu Cpu) write_u16_byte(address u16, value u16) {
 	cpu.write_byte(address, u8(value))
 }
 
-/* Select the struct to write in vboy componnents */
+//  Select the struct to write in vboy componnents
 pub fn (mut cpu Cpu) write_byte(address u16, value u8) {
 	if address < 0x8000 {
 		// ROM Data

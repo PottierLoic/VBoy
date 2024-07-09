@@ -3,8 +3,8 @@ module vboy
 // TODO:Maybe remove this quite useless struct
 pub struct Io {
 pub mut:
-	vb &VBoy = unsafe { nil }
-	data [2]u8	// Supposed to be a char, will change later
+	vb   &VBoy = unsafe { nil }
+	data [2]u8 // Supposed to be a char, will change later
 }
 
 pub fn (io Io) read_io(address u16) u8 {
@@ -53,7 +53,6 @@ pub fn (mut io Io) write_io(address u16, value u8) {
 	match address {
 		0xFF00 {
 			// TODO: Gamepad
-
 		}
 		0xFF01 {
 			// Serial transfer data

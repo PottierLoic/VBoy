@@ -2,7 +2,7 @@ module vboy
 
 pub struct Timer {
 pub mut:
-	vb &VBoy = unsafe { nil }
+	vb   &VBoy = unsafe { nil }
 	div  u16
 	tima u8
 	tma  u8
@@ -19,10 +19,18 @@ pub fn (mut timer Timer) timer_tick() {
 	timer.div++
 	mut update := false
 	match timer.tac & 0x03 {
-		0x00 { update = (((last_div & 0b1000000000) >> 9) == 1) && (((timer.div & 0b1000000000) >> 9) == 1) }
-		0x01 { update = (((last_div & 0b1000) >> 3) == 1) && (((timer.div & 0b1000) >> 3) == 1) }
-		0x02 { update = (((last_div & 0b100000) >> 5) == 1) && (((timer.div & 0b100000) >> 5) == 1) }
-		0x03 { update = (((last_div & 0b10000000) >> 7) == 1) && (((timer.div & 0b10000000) >> 7) == 1) }
+		0x00 {
+			update = ((last_div & 0b1000000000) >> 9) == 1 && ((timer.div & 0b1000000000) >> 9) == 1
+		}
+		0x01 {
+			update = ((last_div & 0b1000) >> 3) == 1 && ((timer.div & 0b1000) >> 3) == 1
+		}
+		0x02 {
+			update = ((last_div & 0b100000) >> 5) == 1 && ((timer.div & 0b100000) >> 5) == 1
+		}
+		0x03 {
+			update = ((last_div & 0b10000000) >> 7) == 1 && ((timer.div & 0b10000000) >> 7) == 1
+		}
 		else {}
 	}
 

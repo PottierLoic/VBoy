@@ -1,5 +1,5 @@
 import vboy
 
-fn main () {
+fn main() {
 	vboy.run()
 }

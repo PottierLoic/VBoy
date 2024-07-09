@@ -3,21 +3,18 @@ module vboy
 import os
 import time
 
-const (
-	debug_mode = true
-)
+const debug_mode = true
 
 pub struct VBoy {
 pub mut:
 	// Emulator components
-	cpu  Cpu
-	ppu  Ppu
-	cart Cart
-	ram  Ram
-  io   Io
-  timer Timer
-	lcd Lcd
-
+	cpu   Cpu
+	ppu   Ppu
+	cart  Cart
+	ram   Ram
+	io    Io
+	timer Timer
+	lcd   Lcd
 	// Emulator states
 	paused  bool
 	running bool
@@ -62,7 +59,7 @@ pub fn run() {
 	// Starting emulation
 	println('Starting emulation')
 	vb.running = true
-	vb.paused = debug_mode
+	vb.paused = vboy.debug_mode
 
 	mut instruction_count := 0
 
@@ -84,4 +81,3 @@ pub fn (mut vb VBoy) timer_cycle(amount int) {
 		// DMA tick when it is done
 	}
 }
-
