@@ -1,179 +1,6 @@
-module vboy
+module cartridge
 
 import os
-
-const rom_types = [
-	'ROM ONLY',
-	'MBC1',
-	'MBC1+RAM',
-	'MBC1+RAM+BATTERY',
-	'0x04 ???',
-	'MBC2',
-	'MBC2+BATTERY',
-	'0x07 ???',
-	'ROM+RAM 1',
-	'ROM+RAM+BATTERY 1',
-	'0x0A ???',
-	'MMM01',
-	'MMM01+RAM',
-	'MMM01+RAM+BATTERY',
-	'0x0E ???',
-	'MBC3+TIMER+BATTERY',
-	'MBC3+TIMER+RAM+BATTERY 2',
-	'MBC3',
-	'MBC3+RAM 2',
-	'MBC3+RAM+BATTERY 2',
-	'0x14 ???',
-	'0x15 ???',
-	'0x16 ???',
-	'0x17 ???',
-	'0x18 ???',
-	'MBC5',
-	'MBC5+RAM',
-	'MBC5+RAM+BATTERY',
-	'MBC5+RUMBLE',
-	'MBC5+RUMBLE+RAM',
-	'MBC5+RUMBLE+RAM+BATTERY',
-	'0x1F ???',
-	'MBC6',
-	'0x21 ???',
-	'MBC7+SENSOR+RUMBLE+RAM+BATTERY',
-]
-
-const lic_codes = [
-	'None',
-	'Nintendo R&D1',
-	'Unknown',
-	'Unknown',
-	'Unknown',
-	'Unknown',
-	'Unknown',
-	'Unknown',
-	'Capcom',
-	'Unknown',
-	'Unknown',
-	'Unknown',
-	'Unknown',
-	'Electronic Arts',
-	'Unknown',
-	'Unknown',
-	'Unknown',
-	'Unknown',
-	'Hudson Soft',
-	'b-ai',
-	'kss',
-	'Unknown',
-	'pow',
-	'Unknown',
-	'PCM Complete',
-	'san-x',
-	'Unknown',
-	'Unknown',
-	'Kemco Japan',
-	'seta',
-	'Viacom',
-	'Nintendo',
-	'Bandai',
-	'Ocean/Acclaim',
-	'Konami',
-	'Hector',
-	'Unknown',
-	'Taito',
-	'Hudson',
-	'Banpresto',
-	'Unknown',
-	'Ubi Soft',
-	'Atlus',
-	'Unknown',
-	'Malibu',
-	'Unknown',
-	'angel',
-	'Bullet-Proof',
-	'Unknown',
-	'irem',
-	'Absolute',
-	'Acclaim',
-	'Activision',
-	'American sammy',
-	'Konami',
-	'Hi tech entertainment',
-	'LJN',
-	'Matchbox',
-	'Mattel',
-	'Milton Bradley',
-	'Titus',
-	'Virgin',
-	'Unknown',
-	'Unknown',
-	'LucasArts',
-	'Unknown',
-	'Unknown',
-	'Ocean',
-	'Unknown',
-	'Electronic Arts',
-	'Infogrames',
-	'Interplay',
-	'Broderbund',
-	'sculptured',
-	'Unknown',
-	'sci',
-	'Unknown',
-	'Unknown',
-	'THQ',
-	'Accolade',
-	'misawa',
-	'Unknown',
-	'Unknown',
-	'lozc',
-	'Unknown',
-	'Unknown',
-	'Tokuma Shoten Intermedia',
-	'Tsukuda Original',
-	'Unknown',
-	'Unknown',
-	'Unknown',
-	'Chunsoft',
-	'Video system',
-	'Ocean/Acclaim',
-	'Unknown',
-	'Varie',
-	"Yonezawa/s'pal",
-	'Kaneko',
-	'Unknown',
-	'Pack in soft',
-	'Unknown',
-	'Unknown',
-	'Unknown',
-	'Unknown',
-	'Unknown',
-	'Unknown',
-	'Unknown',
-	'Unknown',
-	'Unknown',
-	'Unknown',
-	'Konami (Yu-Gi-Oh!)',
-]
-
-const rom_sizes = [
-	'32 KiB',
-	'64 KiB',
-	'128 KiB',
-	'256 KiB',
-	'512 KiB',
-	'1 MiB',
-	'2 MiB',
-	'4 MiB',
-	'8 MiB',
-]
-
-const ram_sizes = [
-	'0',
-	'-',
-	'8 KiB',
-	'32 KiB',
-	'128 KiB',
-	'64 KiB',
-]
 
 pub struct RomHeader {
 pub mut:
@@ -203,7 +30,7 @@ pub mut:
 // Return the licence code corresponding to the cart informations.
 pub fn (cart Cart) cart_lic() string {
 	if cart.header.new_lic_code <= 0xa4 {
-		return vboy.lic_codes[cart.header.lic_code]
+		return lic_codes[cart.header.lic_code]
 	} else {
 		return 'UNKNOWN LICENCE: ${cart.header.lic_code}'
 	}
@@ -212,7 +39,7 @@ pub fn (cart Cart) cart_lic() string {
 // Return the Rom type corresponding to the cart informations.
 pub fn (cart Cart) cart_type() string {
 	if cart.header.rom_type <= 0x22 {
-		return vboy.rom_types[cart.header.rom_type]
+		return rom_types[cart.header.rom_type]
 	} else {
 		return 'UNKNOWN ROM TYPE: ${cart.header.rom_type}'
 	}
@@ -220,7 +47,7 @@ pub fn (cart Cart) cart_type() string {
 
 pub fn (cart Cart) cart_rom_size() string {
 	if cart.header.rom_size <= 0x8 {
-		return vboy.rom_sizes[cart.header.rom_size]
+		return rom_sizes[cart.header.rom_size]
 	} else {
 		return 'UNKNOWN ROM SIZE: ${cart.header.rom_size}'
 	}
@@ -228,7 +55,7 @@ pub fn (cart Cart) cart_rom_size() string {
 
 pub fn (cart Cart) cart_ram_size() string {
 	if cart.header.ram_size <= 0x5 {
-		return vboy.ram_sizes[cart.header.ram_size]
+		return ram_sizes[cart.header.ram_size]
 	} else {
 		return 'UNKNOWN RAM SIZE: ${cart.header.ram_size}'
 	}
@@ -305,8 +132,7 @@ pub fn (cart Cart) read_byte(address u16) u8 {
 	return cart.rom_data[address]
 }
 
-/* Write u8 value on the provided address in rom.
-This does not save a new file but just modify the values in the cart struct. */
+// Write u8 value on the provided address in rom.
 pub fn (mut cart Cart) write_byte(address u16, value u8) {
 	cart.rom_data[address] = value
 }

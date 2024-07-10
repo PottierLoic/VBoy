@@ -1,4 +1,6 @@
-module vboy
+module main
+
+import instructions
 
 //  Should never happend
 fn (mut cpu Cpu) cpu_none() {
@@ -12,15 +14,15 @@ fn (mut cpu Cpu) cpu_nop() {}
 fn (mut cpu Cpu) cpu_ld() {
 	//  If the instruction need to write values in memory
 	if cpu.memory {
-		if is_16_bit(cpu.fetched_instruction.reg_2) {
-			cpu.vb.timer_cycle(1)
+		if instructions.is_16_bit(cpu.fetched_instruction.reg_2) {
+			// cpu.emu.timer_cycle(1)
 			cpu.write_u16_byte(cpu.destination, cpu.fetched_data)
 		} else {
 			cpu.write_byte(cpu.destination, u8(cpu.fetched_data))
 		}
-		cpu.vb.timer_cycle(1)
+		// cpu.emu.timer_cycle(1)
 		return
-	}
+}
 
 	if cpu.fetched_instruction.mode == .am_hl_spr {
 		h := (cpu.get_reg(cpu.fetched_instruction.reg_2) & 0xF) + (cpu.fetched_data & 0xF) >= 0x10
@@ -41,14 +43,14 @@ fn (mut cpu Cpu) cpu_ldh() {
 	} else {
 		cpu.write_byte(cpu.destination, cpu.registers.a)
 	}
-	cpu.vb.timer_cycle(1)
+	// cpu.emu.timer_cycle(1)
 }
 
 //  Jump to address if condition is valid
 fn (mut cpu Cpu) cpu_jp() {
 	if cpu.cond_is_valid() {
 		cpu.registers.pc = cpu.fetched_data
-		cpu.vb.timer_cycle(1)
+		// cpu.emu.timer_cycle(1)
 	}
 }
 
@@ -60,9 +62,9 @@ fn (mut cpu Cpu) cpu_di() {
 //  Retrieve the last value pushed on the stack
 fn (mut cpu Cpu) cpu_pop() {
 	lower_byte := cpu.pop()
-	cpu.vb.timer_cycle(1)
+	// cpu.emu.timer_cycle(1)
 	higher_byte := u16(cpu.pop())
-	cpu.vb.timer_cycle(1)
+	// cpu.emu.timer_cycle(1)
 
 	value := (higher_byte << 8) | lower_byte
 	cpu.set_reg(cpu.fetched_instruction.reg_1, value)
@@ -74,14 +76,14 @@ fn (mut cpu Cpu) cpu_pop() {
 //  Send values on the stack
 fn (mut cpu Cpu) cpu_push() {
 	higher_byte := u8(cpu.get_reg(cpu.fetched_instruction.reg_1) >> 8)
-	cpu.vb.timer_cycle(1)
+	// cpu.emu.timer_cycle(1)
 	cpu.push(higher_byte)
 
 	lower_byte := u8(cpu.get_reg(cpu.fetched_instruction.reg_1))
-	cpu.vb.timer_cycle(1)
+	// cpu.emu.timer_cycle(1)
 	cpu.push(lower_byte)
 
-	cpu.vb.timer_cycle(1)
+	// cpu.emu.timer_cycle(1)
 }
 
 //  Jump by a certain number if condition is valid
@@ -89,7 +91,7 @@ fn (mut cpu Cpu) cpu_jr() {
 	delta := cpu.fetched_data & 0xFF
 	if cpu.cond_is_valid() {
 		cpu.registers.pc += delta
-		cpu.vb.timer_cycle(1)
+		// cpu.emu.timer_cycle(1)
 	}
 }
 
@@ -97,22 +99,22 @@ fn (mut cpu Cpu) cpu_jr() {
 fn (mut cpu Cpu) cpu_call() {
 	if cpu.cond_is_valid() {
 		cpu.push_u16(cpu.registers.pc)
-		cpu.vb.timer_cycle(2)
+		// cpu.emu.timer_cycle(2)
 		cpu.registers.pc = cpu.fetched_data
-		cpu.vb.timer_cycle(1)
+		// cpu.emu.timer_cycle(1)
 	}
 }
 
 //  Return to the last pc pushed in stack if condition is valid
 fn (mut cpu Cpu) cpu_ret() {
 	if cpu.fetched_instruction.cond_type != .cond_none {
-		cpu.vb.timer_cycle(1)
+		// cpu.emu.timer_cycle(1)
 	}
 	if cpu.cond_is_valid() {
 		address := cpu.pop_u16()
-		cpu.vb.timer_cycle(2)
+		// cpu.emu.timer_cycle(2)
 		cpu.registers.pc = address
-		cpu.vb.timer_cycle(1)
+		// cpu.emu.timer_cycle(1)
 	}
 }
 
@@ -120,17 +122,17 @@ fn (mut cpu Cpu) cpu_ret() {
 fn (mut cpu Cpu) cpu_rst() {
 	if cpu.cond_is_valid() {
 		cpu.push_u16(cpu.registers.pc)
-		cpu.vb.timer_cycle(2)
+		// cpu.emu.timer_cycle(2)
 		cpu.registers.pc = cpu.fetched_instruction.parameter
-		cpu.vb.timer_cycle(1)
+		// cpu.emu.timer_cycle(1)
 	}
 }
 
 //  Decrement a register
 fn (mut cpu Cpu) cpu_dec() {
 	mut value := cpu.get_reg(cpu.fetched_instruction.reg_1) - 1
-	is_word := if is_16_bit(cpu.fetched_instruction.reg_1) {
-		cpu.vb.timer_cycle(1)
+	is_word := if instructions.is_16_bit(cpu.fetched_instruction.reg_1) {
+		// cpu.emu.timer_cycle(1)
 		true
 	} else {
 		false
@@ -151,8 +153,8 @@ fn (mut cpu Cpu) cpu_dec() {
 //  Increment a register
 fn (mut cpu Cpu) cpu_inc() {
 	mut value := cpu.get_reg(cpu.fetched_instruction.reg_1) + 1
-	is_16bit := if is_16_bit(cpu.fetched_instruction.reg_1) {
-		cpu.vb.timer_cycle(1)
+	is_16bit := if instructions.is_16_bit(cpu.fetched_instruction.reg_1) {
+		// cpu.emu.timer_cycle(1)
 		true
 	} else {
 		false
@@ -173,8 +175,8 @@ fn (mut cpu Cpu) cpu_inc() {
 //  Add fetched_data to target register
 fn (mut cpu Cpu) cpu_add() {
 	mut value := u32(cpu.get_reg(cpu.fetched_instruction.reg_1) + cpu.fetched_data)
-	is_16bit := if is_16_bit(cpu.fetched_instruction.reg_2) {
-		cpu.vb.timer_cycle(1)
+	is_16bit := if instructions.is_16_bit(cpu.fetched_instruction.reg_2) {
+		// cpu.emu.timer_cycle(1)
 		true
 	} else {
 		false
@@ -271,14 +273,14 @@ fn (mut cpu Cpu) cpu_cb() {
 	opcode := cpu.fetched_data
 	// The lowest 3 bits of the opcode represent the target register
 	reg := match opcode & 0b111 {
-		0b0 { Reg.reg_b }
-		0b1 { Reg.reg_c }
-		0b10 { Reg.reg_d }
-		0b11 { Reg.reg_e }
-		0b100 { Reg.reg_h }
-		0b101 { Reg.reg_l }
-		0b110 { Reg.reg_hl }
-		0b111 { Reg.reg_a }
+		0b0 { instructions.Instr_reg.reg_b }
+		0b1 { instructions.Instr_reg.reg_c }
+		0b10 { instructions.Instr_reg.reg_d }
+		0b11 { instructions.Instr_reg.reg_e }
+		0b100 { instructions.Instr_reg.reg_h }
+		0b101 { instructions.Instr_reg.reg_l }
+		0b110 { instructions.Instr_reg.reg_hl }
+		0b111 { instructions.Instr_reg.reg_a }
 		else { panic("Opcode doesn't correspond to any register: cpu_cb error in reg match") }
 	}
 	// The 3 next bits of the opcode represent the bit index concerned by this instruction
@@ -288,10 +290,10 @@ fn (mut cpu Cpu) cpu_cb() {
 
 	mut fetched_value := cpu.get_reg(reg)
 
-	cpu.vb.timer_cycle(1)
+	// cpu.emu.timer_cycle(1)
 
 	if reg == .reg_hl {
-		cpu.vb.timer_cycle(2)
+		// cpu.emu.timer_cycle(2)
 	}
 
 	match op_instr {
@@ -459,47 +461,47 @@ fn (mut cpu Cpu) cpu_reti() {
 
 //  Place all the cpu functions in the array for direct access later
 //  May be nice to find a way to just declare them in it directly as
-//  it looks really ugly like that 																	
+//  it looks really ugly like that
 //  Need to add: some fn that are not done yet
 fn (mut cpu Cpu) init_functions() {
 	for i in 0 .. 255 {
 		cpu.func[i] = cpu.cpu_none
 	}
-	cpu.func[int(Instr.instr_none)] = cpu.cpu_none
-	cpu.func[int(Instr.instr_nop)] = cpu.cpu_nop
-	cpu.func[int(Instr.instr_ld)] = cpu.cpu_ld
-	cpu.func[int(Instr.instr_ldh)] = cpu.cpu_ldh
-	cpu.func[int(Instr.instr_jp)] = cpu.cpu_jp
-	cpu.func[int(Instr.instr_di)] = cpu.cpu_di
-	cpu.func[int(Instr.instr_pop)] = cpu.cpu_pop
-	cpu.func[int(Instr.instr_push)] = cpu.cpu_push
-	cpu.func[int(Instr.instr_jr)] = cpu.cpu_jr
-	cpu.func[int(Instr.instr_call)] = cpu.cpu_call
-	cpu.func[int(Instr.instr_ret)] = cpu.cpu_ret
-	cpu.func[int(Instr.instr_rst)] = cpu.cpu_rst
-	cpu.func[int(Instr.instr_dec)] = cpu.cpu_dec
-	cpu.func[int(Instr.instr_inc)] = cpu.cpu_inc
-	cpu.func[int(Instr.instr_add)] = cpu.cpu_add
-	cpu.func[int(Instr.instr_adc)] = cpu.cpu_adc
-	cpu.func[int(Instr.instr_sub)] = cpu.cpu_sub
-	cpu.func[int(Instr.instr_sbc)] = cpu.cpu_sbc
-	cpu.func[int(Instr.instr_and)] = cpu.cpu_and
-	cpu.func[int(Instr.instr_xor)] = cpu.cpu_xor
-	cpu.func[int(Instr.instr_or)] = cpu.cpu_or
-	cpu.func[int(Instr.instr_cp)] = cpu.cpu_cp
-	cpu.func[int(Instr.instr_cb)] = cpu.cpu_cb
-	cpu.func[int(Instr.instr_rrca)] = cpu.cpu_rrca
-	cpu.func[int(Instr.instr_rlca)] = cpu.cpu_rlca
-	cpu.func[int(Instr.instr_rra)] = cpu.cpu_rra
-	cpu.func[int(Instr.instr_rla)] = cpu.cpu_rla
-	cpu.func[int(Instr.instr_stop)] = cpu.cpu_stop
-	cpu.func[int(Instr.instr_halt)] = cpu.cpu_halt
-	cpu.func[int(Instr.instr_daa)] = cpu.cpu_daa
-	cpu.func[int(Instr.instr_cpl)] = cpu.cpu_cpl
-	cpu.func[int(Instr.instr_scf)] = cpu.cpu_scf
-	cpu.func[int(Instr.instr_ccf)] = cpu.cpu_ccf
-	cpu.func[int(Instr.instr_ei)] = cpu.cpu_ei
-	cpu.func[int(Instr.instr_reti)] = cpu.cpu_reti
+	cpu.func[int(instructions.Instr.instr_none)] = cpu.cpu_none
+	cpu.func[int(instructions.Instr.instr_nop)] = cpu.cpu_nop
+	cpu.func[int(instructions.Instr.instr_ld)] = cpu.cpu_ld
+	cpu.func[int(instructions.Instr.instr_ldh)] = cpu.cpu_ldh
+	cpu.func[int(instructions.Instr.instr_jp)] = cpu.cpu_jp
+	cpu.func[int(instructions.Instr.instr_di)] = cpu.cpu_di
+	cpu.func[int(instructions.Instr.instr_pop)] = cpu.cpu_pop
+	cpu.func[int(instructions.Instr.instr_push)] = cpu.cpu_push
+	cpu.func[int(instructions.Instr.instr_jr)] = cpu.cpu_jr
+	cpu.func[int(instructions.Instr.instr_call)] = cpu.cpu_call
+	cpu.func[int(instructions.Instr.instr_ret)] = cpu.cpu_ret
+	cpu.func[int(instructions.Instr.instr_rst)] = cpu.cpu_rst
+	cpu.func[int(instructions.Instr.instr_dec)] = cpu.cpu_dec
+	cpu.func[int(instructions.Instr.instr_inc)] = cpu.cpu_inc
+	cpu.func[int(instructions.Instr.instr_add)] = cpu.cpu_add
+	cpu.func[int(instructions.Instr.instr_adc)] = cpu.cpu_adc
+	cpu.func[int(instructions.Instr.instr_sub)] = cpu.cpu_sub
+	cpu.func[int(instructions.Instr.instr_sbc)] = cpu.cpu_sbc
+	cpu.func[int(instructions.Instr.instr_and)] = cpu.cpu_and
+	cpu.func[int(instructions.Instr.instr_xor)] = cpu.cpu_xor
+	cpu.func[int(instructions.Instr.instr_or)] = cpu.cpu_or
+	cpu.func[int(instructions.Instr.instr_cp)] = cpu.cpu_cp
+	cpu.func[int(instructions.Instr.instr_cb)] = cpu.cpu_cb
+	cpu.func[int(instructions.Instr.instr_rrca)] = cpu.cpu_rrca
+	cpu.func[int(instructions.Instr.instr_rlca)] = cpu.cpu_rlca
+	cpu.func[int(instructions.Instr.instr_rra)] = cpu.cpu_rra
+	cpu.func[int(instructions.Instr.instr_rla)] = cpu.cpu_rla
+	cpu.func[int(instructions.Instr.instr_stop)] = cpu.cpu_stop
+	cpu.func[int(instructions.Instr.instr_halt)] = cpu.cpu_halt
+	cpu.func[int(instructions.Instr.instr_daa)] = cpu.cpu_daa
+	cpu.func[int(instructions.Instr.instr_cpl)] = cpu.cpu_cpl
+	cpu.func[int(instructions.Instr.instr_scf)] = cpu.cpu_scf
+	cpu.func[int(instructions.Instr.instr_ccf)] = cpu.cpu_ccf
+	cpu.func[int(instructions.Instr.instr_ei)] = cpu.cpu_ei
+	cpu.func[int(instructions.Instr.instr_reti)] = cpu.cpu_reti
 }
 
 @[direct_array_access]

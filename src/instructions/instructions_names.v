@@ -1,6 +1,5 @@
-module vboy
+module instructions
 
-//  Choose the correct method to get instruction name
 pub fn instruction_name_from_byte(value u8, prefixed bool) string {
 	if prefixed {
 		return prefixed_instruction_name(value)

@@ -1,6 +1,6 @@
-module vboy
+module main
 
-pub enum Interruption_types {
+enum Interruption_types {
 	it_vblanks  = 0b1
 	it_lcd_stat = 0b10
 	it_timer    = 0b100
@@ -8,7 +8,7 @@ pub enum Interruption_types {
 	it_joypad   = 0b10000
 }
 
-pub fn (mut cpu Cpu) interrupt(address u16, interrupt Interruption_types) bool {
+fn (mut cpu Cpu) interrupt(address u16, interrupt Interruption_types) bool {
 	return if (cpu.interruption_flags & 0b1) == u8(interrupt)
 		&& (cpu.ie_register & 0b1) == u8(interrupt) {
 		cpu.push_u16(cpu.registers.pc)
@@ -22,7 +22,7 @@ pub fn (mut cpu Cpu) interrupt(address u16, interrupt Interruption_types) bool {
 	}
 }
 
-pub fn (mut cpu Cpu) handle_interrupts() {
+fn (mut cpu Cpu) handle_interrupts() {
 	// Finding a way to loop on enum remove necessity for this function
 	if cpu.interrupt(0x40, .it_vblanks) {
 	} else if cpu.interrupt(0x48, .it_lcd_stat) {
@@ -32,6 +32,6 @@ pub fn (mut cpu Cpu) handle_interrupts() {
 	}
 }
 
-pub fn (mut cpu Cpu) request_interrupt(interrupt Interruption_types) {
+fn (mut cpu Cpu) request_interrupt(interrupt Interruption_types) {
 	cpu.interruption_flags |= u8(interrupt)
 }
