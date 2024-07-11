@@ -22,7 +22,7 @@ fn (mut cpu Cpu) cpu_ld() {
 		}
 		// cpu.emu.timer_cycle(1)
 		return
-}
+	}
 
 	if cpu.fetched_instruction.mode == .am_hl_spr {
 		h := (cpu.get_reg(cpu.fetched_instruction.reg_2) & 0xF) + (cpu.fetched_data & 0xF) >= 0x10

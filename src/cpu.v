@@ -211,7 +211,7 @@ fn (mut cpu Cpu) read_byte(address u16) u8 {
 		return 0
 	} else if address < 0xFF80 {
 		// IO Registers
-		panic("IO reading not implemented")
+		panic('IO reading not implemented')
 	} else if address < 0xFFFF {
 		// CPU enable register
 		return cpu.ie_register

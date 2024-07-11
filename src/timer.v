@@ -1,8 +1,8 @@
-module vboy
+module main
 
 pub struct Timer {
 pub mut:
-	vb   &VBoy = unsafe { nil }
+	emu  &Emulator = unsafe { nil }
 	div  u16
 	tima u8
 	tma  u8
@@ -39,7 +39,7 @@ pub fn (mut timer Timer) timer_tick() {
 
 		if timer.tima == 0xFF {
 			timer.tima = timer.tma
-			timer.vb.cpu.request_interrupt(.it_timer)
+			timer.emu.cpu.request_interrupt(.it_timer)
 		}
 	}
 }
