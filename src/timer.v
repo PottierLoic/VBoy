@@ -9,11 +9,11 @@ pub mut:
 	tac  u8
 }
 
-pub fn (mut timer Timer) timer_init() {
+pub fn (mut timer Timer) init() {
 	timer.div = 0xAC00
 }
 
-pub fn (mut timer Timer) timer_tick() {
+pub fn (mut timer Timer) tick() {
 	// TODO: implement timer
 	last_div := timer.div
 	timer.div++
@@ -44,7 +44,7 @@ pub fn (mut timer Timer) timer_tick() {
 	}
 }
 
-pub fn (mut timer Timer) timer_read(address u16) u8 {
+pub fn (mut timer Timer) read(address u16) u8 {
 	return match address {
 		0xFF04 { u8(timer.div >> 8) }
 		0xFF05 { timer.tima }
@@ -54,7 +54,7 @@ pub fn (mut timer Timer) timer_read(address u16) u8 {
 	}
 }
 
-pub fn (mut timer Timer) timer_write(address u16, value u8) {
+pub fn (mut timer Timer) write(address u16, value u8) {
 	match address {
 		0xFF04 { timer.div = 0 }
 		0xFF05 { timer.tima = value }
