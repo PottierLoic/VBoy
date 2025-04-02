@@ -57,8 +57,8 @@ So there are 512 opcodes in total. (somes are unused)
 
 Interrupts are enabled by setting the corresponding bit in the Interrupt Enable Register (0xFFFF).
 
-- Bit 0: V-Blank  Interrupt Enable  (INT 40h)  (1=Enable)  
-- Bit 1: LCD STAT Interrupt Enable  (INT 48h)  (1=Enable)  
-- Bit 2: Timer    Interrupt Enable  (INT 50h)  (1=Enable)  
-- Bit 3: Serial   Interrupt Enable  (INT 58h)  (1=Enable)  
-- Bit 4: Joypad   Interrupt Enable  (INT 60h)  (1=Enable)  
+- Bit 0: V-Blank  Interrupt Enable  (INT 40h)  
+- Bit 1: LCD STAT Interrupt Enable  (INT 48h)  
+- Bit 2: Timer    Interrupt Enable  (INT 50h)  
+- Bit 3: Serial   Interrupt Enable  (INT 58h)  
+- Bit 4: Joypad   Interrupt Enable  (INT 60h)  

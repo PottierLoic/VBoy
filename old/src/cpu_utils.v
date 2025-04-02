@@ -1,5 +1,7 @@
 module main
 
+import instructions
+
 fn (mut cpu Cpu) set_flags(z int, n int, h int, c int) {
 	if z != -1 {
 		bit_set(cpu.registers.f, zero_flag_byte_position, z)
@@ -15,7 +17,7 @@ fn (mut cpu Cpu) set_flags(z int, n int, h int, c int) {
 	}
 }
 
-fn (cpu Cpu) get_reg(reg Instr_reg) u16 {
+fn (cpu Cpu) get_reg(reg instructions.Instr_reg) u16 {
 	return match reg {
 		.reg_af { cpu.registers.get_af() }
 		.reg_bc { cpu.registers.get_bc() }
@@ -35,7 +37,7 @@ fn (cpu Cpu) get_reg(reg Instr_reg) u16 {
 	}
 }
 
-fn (mut cpu Cpu) set_reg(reg Instr_reg, value u16) {
+fn (mut cpu Cpu) set_reg(reg instructions.Instr_reg, value u16) {
 	match reg {
 		.reg_a { cpu.registers.a = u8(value) }
 		.reg_f { cpu.registers.f = u8(value) }

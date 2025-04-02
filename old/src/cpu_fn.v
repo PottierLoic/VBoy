@@ -1,5 +1,7 @@
 module main
 
+import instructions
+
 //  Should never happend
 fn (mut cpu Cpu) cpu_none() {
 	panic('Invalid instruction: ${cpu.fetched_instruction}')
@@ -12,7 +14,7 @@ fn (mut cpu Cpu) cpu_nop() {}
 fn (mut cpu Cpu) cpu_ld() {
 	//  If the instruction need to write values in memory
 	if cpu.memory {
-		if is_16_bit(cpu.fetched_instruction.reg_2) {
+		if instructions.is_16_bit(cpu.fetched_instruction.reg_2) {
 			// cpu.emu.timer_cycle(1)
 			cpu.write_u16_byte(cpu.destination, cpu.fetched_data)
 		} else {
@@ -129,7 +131,7 @@ fn (mut cpu Cpu) cpu_rst() {
 //  Decrement a register
 fn (mut cpu Cpu) cpu_dec() {
 	mut value := cpu.get_reg(cpu.fetched_instruction.reg_1) - 1
-	is_word := if is_16_bit(cpu.fetched_instruction.reg_1) {
+	is_word := if instructions.is_16_bit(cpu.fetched_instruction.reg_1) {
 		// cpu.emu.timer_cycle(1)
 		true
 	} else {
@@ -151,7 +153,7 @@ fn (mut cpu Cpu) cpu_dec() {
 //  Increment a register
 fn (mut cpu Cpu) cpu_inc() {
 	mut value := cpu.get_reg(cpu.fetched_instruction.reg_1) + 1
-	is_16bit := if is_16_bit(cpu.fetched_instruction.reg_1) {
+	is_16bit := if instructions.is_16_bit(cpu.fetched_instruction.reg_1) {
 		// cpu.emu.timer_cycle(1)
 		true
 	} else {
@@ -173,7 +175,7 @@ fn (mut cpu Cpu) cpu_inc() {
 //  Add fetched_data to target register
 fn (mut cpu Cpu) cpu_add() {
 	mut value := u32(cpu.get_reg(cpu.fetched_instruction.reg_1) + cpu.fetched_data)
-	is_16bit := if is_16_bit(cpu.fetched_instruction.reg_2) {
+	is_16bit := if instructions.is_16_bit(cpu.fetched_instruction.reg_2) {
 		// cpu.emu.timer_cycle(1)
 		true
 	} else {
@@ -271,14 +273,14 @@ fn (mut cpu Cpu) cpu_cb() {
 	opcode := cpu.fetched_data
 	// The lowest 3 bits of the opcode represent the target register
 	reg := match opcode & 0b111 {
-		0b0 { Instr_reg.reg_b }
-		0b1 { Instr_reg.reg_c }
-		0b10 { Instr_reg.reg_d }
-		0b11 { Instr_reg.reg_e }
-		0b100 { Instr_reg.reg_h }
-		0b101 { Instr_reg.reg_l }
-		0b110 { Instr_reg.reg_hl }
-		0b111 { Instr_reg.reg_a }
+		0b0 { instructions.Instr_reg.reg_b }
+		0b1 { instructions.Instr_reg.reg_c }
+		0b10 { instructions.Instr_reg.reg_d }
+		0b11 { instructions.Instr_reg.reg_e }
+		0b100 { instructions.Instr_reg.reg_h }
+		0b101 { instructions.Instr_reg.reg_l }
+		0b110 { instructions.Instr_reg.reg_hl }
+		0b111 { instructions.Instr_reg.reg_a }
 		else { panic("Opcode doesn't correspond to any register: cpu_cb error in reg match") }
 	}
 	// The 3 next bits of the opcode represent the bit index concerned by this instruction
@@ -465,41 +467,41 @@ fn (mut cpu Cpu) init_functions() {
 	for i in 0 .. 255 {
 		cpu.func[i] = cpu.cpu_none
 	}
-	cpu.func[int(Instr.instr_none)] = cpu.cpu_none
-	cpu.func[int(Instr.instr_nop)] = cpu.cpu_nop
-	cpu.func[int(Instr.instr_ld)] = cpu.cpu_ld
-	cpu.func[int(Instr.instr_ldh)] = cpu.cpu_ldh
-	cpu.func[int(Instr.instr_jp)] = cpu.cpu_jp
-	cpu.func[int(Instr.instr_di)] = cpu.cpu_di
-	cpu.func[int(Instr.instr_pop)] = cpu.cpu_pop
-	cpu.func[int(Instr.instr_push)] = cpu.cpu_push
-	cpu.func[int(Instr.instr_jr)] = cpu.cpu_jr
-	cpu.func[int(Instr.instr_call)] = cpu.cpu_call
-	cpu.func[int(Instr.instr_ret)] = cpu.cpu_ret
-	cpu.func[int(Instr.instr_rst)] = cpu.cpu_rst
-	cpu.func[int(Instr.instr_dec)] = cpu.cpu_dec
-	cpu.func[int(Instr.instr_inc)] = cpu.cpu_inc
-	cpu.func[int(Instr.instr_add)] = cpu.cpu_add
-	cpu.func[int(Instr.instr_adc)] = cpu.cpu_adc
-	cpu.func[int(Instr.instr_sub)] = cpu.cpu_sub
-	cpu.func[int(Instr.instr_sbc)] = cpu.cpu_sbc
-	cpu.func[int(Instr.instr_and)] = cpu.cpu_and
-	cpu.func[int(Instr.instr_xor)] = cpu.cpu_xor
-	cpu.func[int(Instr.instr_or)] = cpu.cpu_or
-	cpu.func[int(Instr.instr_cp)] = cpu.cpu_cp
-	cpu.func[int(Instr.instr_cb)] = cpu.cpu_cb
-	cpu.func[int(Instr.instr_rrca)] = cpu.cpu_rrca
-	cpu.func[int(Instr.instr_rlca)] = cpu.cpu_rlca
-	cpu.func[int(Instr.instr_rra)] = cpu.cpu_rra
-	cpu.func[int(Instr.instr_rla)] = cpu.cpu_rla
-	cpu.func[int(Instr.instr_stop)] = cpu.cpu_stop
-	cpu.func[int(Instr.instr_halt)] = cpu.cpu_halt
-	cpu.func[int(Instr.instr_daa)] = cpu.cpu_daa
-	cpu.func[int(Instr.instr_cpl)] = cpu.cpu_cpl
-	cpu.func[int(Instr.instr_scf)] = cpu.cpu_scf
-	cpu.func[int(Instr.instr_ccf)] = cpu.cpu_ccf
-	cpu.func[int(Instr.instr_ei)] = cpu.cpu_ei
-	cpu.func[int(Instr.instr_reti)] = cpu.cpu_reti
+	cpu.func[int(instructions.Instr.instr_none)] = cpu.cpu_none
+	cpu.func[int(instructions.Instr.instr_nop)] = cpu.cpu_nop
+	cpu.func[int(instructions.Instr.instr_ld)] = cpu.cpu_ld
+	cpu.func[int(instructions.Instr.instr_ldh)] = cpu.cpu_ldh
+	cpu.func[int(instructions.Instr.instr_jp)] = cpu.cpu_jp
+	cpu.func[int(instructions.Instr.instr_di)] = cpu.cpu_di
+	cpu.func[int(instructions.Instr.instr_pop)] = cpu.cpu_pop
+	cpu.func[int(instructions.Instr.instr_push)] = cpu.cpu_push
+	cpu.func[int(instructions.Instr.instr_jr)] = cpu.cpu_jr
+	cpu.func[int(instructions.Instr.instr_call)] = cpu.cpu_call
+	cpu.func[int(instructions.Instr.instr_ret)] = cpu.cpu_ret
+	cpu.func[int(instructions.Instr.instr_rst)] = cpu.cpu_rst
+	cpu.func[int(instructions.Instr.instr_dec)] = cpu.cpu_dec
+	cpu.func[int(instructions.Instr.instr_inc)] = cpu.cpu_inc
+	cpu.func[int(instructions.Instr.instr_add)] = cpu.cpu_add
+	cpu.func[int(instructions.Instr.instr_adc)] = cpu.cpu_adc
+	cpu.func[int(instructions.Instr.instr_sub)] = cpu.cpu_sub
+	cpu.func[int(instructions.Instr.instr_sbc)] = cpu.cpu_sbc
+	cpu.func[int(instructions.Instr.instr_and)] = cpu.cpu_and
+	cpu.func[int(instructions.Instr.instr_xor)] = cpu.cpu_xor
+	cpu.func[int(instructions.Instr.instr_or)] = cpu.cpu_or
+	cpu.func[int(instructions.Instr.instr_cp)] = cpu.cpu_cp
+	cpu.func[int(instructions.Instr.instr_cb)] = cpu.cpu_cb
+	cpu.func[int(instructions.Instr.instr_rrca)] = cpu.cpu_rrca
+	cpu.func[int(instructions.Instr.instr_rlca)] = cpu.cpu_rlca
+	cpu.func[int(instructions.Instr.instr_rra)] = cpu.cpu_rra
+	cpu.func[int(instructions.Instr.instr_rla)] = cpu.cpu_rla
+	cpu.func[int(instructions.Instr.instr_stop)] = cpu.cpu_stop
+	cpu.func[int(instructions.Instr.instr_halt)] = cpu.cpu_halt
+	cpu.func[int(instructions.Instr.instr_daa)] = cpu.cpu_daa
+	cpu.func[int(instructions.Instr.instr_cpl)] = cpu.cpu_cpl
+	cpu.func[int(instructions.Instr.instr_scf)] = cpu.cpu_scf
+	cpu.func[int(instructions.Instr.instr_ccf)] = cpu.cpu_ccf
+	cpu.func[int(instructions.Instr.instr_ei)] = cpu.cpu_ei
+	cpu.func[int(instructions.Instr.instr_reti)] = cpu.cpu_reti
 }
 
 @[direct_array_access]

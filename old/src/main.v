@@ -13,5 +13,8 @@ fn main() {
 		println('Too many parameters, only specify rom_path')
 		return
 	}
-	println("Starting VBoy!")
+
+	// Emulator initialization
+	mut emulator := Emulator{}
+	emulator.init(args[1])
 }

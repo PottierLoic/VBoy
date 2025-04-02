@@ -103,3 +103,4 @@ fn (reg Registers) print() {
   println('| SP | 0x${reg.sp.hex()} |')
   println('----------------------')
 }
+

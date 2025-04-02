@@ -1,4 +1,4 @@
-module cartridge
+module main
 
 import os
 
@@ -23,7 +23,7 @@ pub struct Cart {
 pub mut:
 	filename string
 	rom_size u32
-	rom_data [65536]u8 // Not sure if this is the maximum size a cart can be
+	rom_data [65536]u8 // TODO: Not sure if this is the maximum size a cart can be
 	header   RomHeader
 }
 
@@ -128,12 +128,12 @@ pub fn (mut cart Cart) load_rom(rom_path string) bool {
 
 // Return the u8 value stored at provided address
 @[direct_array_access]
-pub fn (cart Cart) read_byte(address u16) u8 {
+pub fn (cart Cart) read(address u16) u8 {
 	return cart.rom_data[address]
 }
 
 // Write u8 value on the provided address in rom.
-pub fn (mut cart Cart) write_byte(address u16, value u8) {
+pub fn (mut cart Cart) write(address u16, value u8) {
 	cart.rom_data[address] = value
 }
 
